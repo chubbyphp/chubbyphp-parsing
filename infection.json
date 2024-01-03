@@ -1,0 +1,20 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "timeout": 10,
+    "logs": {
+        "text": "build/phpinfection/infection.log",
+        "html": "build/phpinfection/infection.html",
+        "json": "build/phpinfection/infection.json",
+        "summary": "build/phpinfection/summary.log",
+        "stryker": {
+            "report": "master"
+        }
+    },
+    "mutators": {
+        "@default": true
+    }
+}
