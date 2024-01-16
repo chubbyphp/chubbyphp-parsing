@@ -18,18 +18,27 @@ final class ParserTest extends TestCase
     public function testParse(): void
     {
         $person = new class() {
-            public null|string $firstname;
+            public string $firstname;
             public string $lastname;
             public null|int $age;
+            public array $contactDetails;
+        };
+
+        $email = new class() {
+            public string $_type;
+            public string $value;
+        };
+
+        $phone = new class() {
+            public string $_type;
+            public string $value;
         };
 
         $p = new Parser();
 
         $schema = $p->array(
-            $p->object([
-                '_type' => $p->literal('person'),
-                'firstname' => $p->string()->default('John'),
-                'lastname' => $p->string()->default('Doe'),
+            $p->object(['firstname' => $p->string(),
+                'lastname' => $p->string(),
                 'age' => $p->union([
                     $p->integer(),
                     $p->string()->transform(static function (string $age, array &$parseErrors) {
@@ -44,13 +53,37 @@ final class ParserTest extends TestCase
                         return $ageAsInteger;
                     })->nullable(),
                 ]),
+                'contactDetails' => $p->array($p->discriminatedUnion(
+                    [
+                        $p->object([
+                            '_type' => $p->literal('email'),
+                            'value' => $p->string(),
+                        ], $email::class),
+                        $p->object([
+                            '_type' => $p->literal('phone'),
+                            'value' => $p->string(),
+                        ], $phone::class),
+                    ],
+                    '_type',
+                ))->default([]),
             ], $person::class)
         );
 
         $result = $schema->safeParse([
-            ['_type' => 'person', 'firstname' => 'James', 'lastname' => 'Smith', 'age' => 32],
-            ['_type' => 'person', 'firstname' => 'Jane', 'lastname' => 'Smith', 'age' => '28'],
-            ['_type' => 'person'],
+            [
+                'firstname' => 'James',
+                'lastname' => 'Smith',
+                'age' => 32,
+                'contactDetails' => [
+                    ['_type' => 'email', 'value' => 'james.smith@example.com'],
+                    ['_type' => 'phone', 'value' => '+41790000000'],
+                ],
+            ],
+            [
+                'firstname' => 'Jane',
+                'lastname' => 'Smith',
+                'age' => '28',
+            ],
         ]);
 
         var_dump($result->data);

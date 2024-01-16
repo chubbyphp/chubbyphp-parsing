@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing;
 
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\IntegerSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
@@ -19,6 +20,14 @@ final class Parser
         return new ArraySchema($itemSchema);
     }
 
+    /**
+     * @param array<SchemaInterface> $objectSchemas
+     */
+    public function discriminatedUnion(array $objectSchemas, string $discriminatorFieldName): DiscriminatedUnionSchema
+    {
+        return new DiscriminatedUnionSchema($objectSchemas, $discriminatorFieldName);
+    }
+
     public function integer(): IntegerSchema
     {
         return new IntegerSchema();
@@ -30,12 +39,12 @@ final class Parser
     }
 
     /**
-     * @param array<string, SchemaInterface> $objectSchema
+     * @param array<string, SchemaInterface> $fieldSchemas
      * @param class-string                   $classname
      */
-    public function object(array $objectSchema, string $classname = \stdClass::class): ObjectSchema
+    public function object(array $fieldSchemas, string $classname = \stdClass::class): ObjectSchema
     {
-        return new ObjectSchema($objectSchema, $classname);
+        return new ObjectSchema($fieldSchemas, $classname);
     }
 
     public function string(): StringSchema

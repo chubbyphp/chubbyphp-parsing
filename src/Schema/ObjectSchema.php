@@ -8,12 +8,12 @@ use Chubbyphp\Parsing\ParseError;
 use Chubbyphp\Parsing\ParseErrorInterface;
 use Chubbyphp\Parsing\ParseErrors;
 
-final class ObjectSchema extends AbstractSchema
+final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 {
     /**
      * @var array<string, SchemaInterface>
      */
-    public readonly array $fieldSchemas;
+    private array $fieldSchemas;
 
     /**
      * @param array<string, SchemaInterface> $fieldSchemas
@@ -25,13 +25,13 @@ final class ObjectSchema extends AbstractSchema
             if (!\is_string($name)) {
                 $type = \is_object($name) ? $name::class : \gettype($name);
 
-                throw new \InvalidArgumentException(sprintf('Argument #1 name #%s ($objectSchema) must be of type string, %s given', (string) $name, $type));
+                throw new \InvalidArgumentException(sprintf('Argument #1 name #%s ($fieldSchemas) must be of type string, %s given', (string) $name, $type));
             }
 
             if (!$fieldSchema instanceof SchemaInterface) {
                 $type = \is_object($fieldSchema) ? $fieldSchema::class : \gettype($fieldSchema);
 
-                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($objectSchema) must be of type SchemaInterface, %s given', (string) $name, $type));
+                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($fieldSchemas) must be of type SchemaInterface, %s given', (string) $name, $type));
             }
         }
 
@@ -56,17 +56,17 @@ final class ObjectSchema extends AbstractSchema
             /** @var array<string,ParseErrorInterface> $parseErrors */
             $parseErrors = [];
 
-            foreach (array_keys($input) as $property) {
-                if (!isset($this->fieldSchemas[$property])) {
-                    $parseErrors[$property] = new ParseErrors([new ParseError(sprintf("Additional property '%s'", $property))]);
+            foreach (array_keys($input) as $fieldName) {
+                if (!isset($this->fieldSchemas[$fieldName])) {
+                    $parseErrors[$fieldName] = new ParseErrors([new ParseError(sprintf("Additional property '%s'", $fieldName))]);
                 }
             }
 
-            foreach ($this->fieldSchemas as $property => $fieldSchema) {
+            foreach ($this->fieldSchemas as $fieldName => $fieldSchema) {
                 try {
-                    $output->{$property} = $fieldSchema->parse($input[$property] ?? null);
+                    $output->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
                 } catch (ParseErrorInterface $parseError) {
-                    $parseErrors[$property] = $parseError;
+                    $parseErrors[$fieldName] = $parseError;
                 }
             }
 
@@ -86,5 +86,10 @@ final class ObjectSchema extends AbstractSchema
 
             throw $parseError;
         }
+    }
+
+    public function getFieldSchema(string $fieldName): null|SchemaInterface
+    {
+        return $this->fieldSchemas[$fieldName] ?? null;
     }
 }

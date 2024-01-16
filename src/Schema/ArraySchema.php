@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\ParseError;
 use Chubbyphp\Parsing\ParseErrorInterface;
 use Chubbyphp\Parsing\ParseErrors;
 
-final class ArraySchema extends AbstractSchema
+final class ArraySchema extends AbstractSchema implements SchemaInterface
 {
     public function __construct(private SchemaInterface $itemSchema) {}
 
@@ -26,6 +26,8 @@ final class ArraySchema extends AbstractSchema
             }
 
             $output = [];
+
+            /** @var array<ParseErrorInterface> $parseErrors */
             $parseErrors = [];
 
             foreach ($input as $i => $item) {

@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\ParseError;
 use Chubbyphp\Parsing\ParseErrorInterface;
 use Chubbyphp\Parsing\ParseErrors;
 
-final class LiteralSchema extends AbstractSchema
+final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterface
 {
     public function __construct(private string $literal) {}
 

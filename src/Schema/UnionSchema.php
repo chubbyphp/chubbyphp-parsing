@@ -7,7 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\ParseErrorInterface;
 use Chubbyphp\Parsing\ParseErrors;
 
-final class UnionSchema extends AbstractSchema
+final class UnionSchema extends AbstractSchema implements SchemaInterface
 {
     /**
      * @var array<SchemaInterface>

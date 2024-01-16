@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\ParseError;
 use Chubbyphp\Parsing\ParseErrorInterface;
 use Chubbyphp\Parsing\ParseErrors;
 
-final class StringSchema extends AbstractSchema
+final class StringSchema extends AbstractSchema implements SchemaInterface
 {
     public function parse(mixed $input): mixed
     {
