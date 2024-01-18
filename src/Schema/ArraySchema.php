@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParseError;
-use Chubbyphp\Parsing\ParseErrorInterface;
-use Chubbyphp\Parsing\ParseErrors;
+use Chubbyphp\Parsing\ParserErrorException;
 
 final class ArraySchema extends AbstractSchema implements SchemaInterface
 {
@@ -22,37 +20,32 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
 
         try {
             if (!\is_array($input)) {
-                throw new ParseError(sprintf("Input needs to be array, '%s'", \gettype($input)));
+                throw new ParserErrorException(sprintf("Input needs to be array, '%s'", \gettype($input)));
             }
 
             $output = [];
 
-            /** @var array<ParseErrorInterface> $parseErrors */
-            $parseErrors = [];
+            $childrenParserErrorException = new ParserErrorException();
 
             foreach ($input as $i => $item) {
                 try {
                     $output[$i] = $this->itemSchema->parse($item);
-                } catch (ParseErrorInterface $parseError) {
-                    $parseErrors[$i] = $parseError;
+                } catch (ParserErrorException $childParserErrorException) {
+                    $childrenParserErrorException->addParserErrorException($childParserErrorException, $i);
                 }
             }
 
-            foreach ($this->transform as $transform) {
-                $output = $transform($output, $parseErrors);
+            if ($childrenParserErrorException->hasError()) {
+                throw $childrenParserErrorException;
             }
 
-            if (\count($parseErrors)) {
-                throw new ParseErrors($parseErrors);
-            }
-
-            return $output;
-        } catch (ParseErrorInterface $parseError) {
+            return $this->transformOutput($output);
+        } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
-                return ($this->catch)($input, $parseError);
+                return ($this->catch)($input, $parserErrorException);
             }
 
-            throw $parseError;
+            throw $parserErrorException;
         }
     }
 }

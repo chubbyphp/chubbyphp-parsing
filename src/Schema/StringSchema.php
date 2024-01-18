@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParseError;
-use Chubbyphp\Parsing\ParseErrorInterface;
-use Chubbyphp\Parsing\ParseErrors;
+use Chubbyphp\Parsing\ParserErrorException;
 
 final class StringSchema extends AbstractSchema implements SchemaInterface
 {
@@ -20,29 +18,16 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
         try {
             if (!\is_string($input)) {
-                throw new ParseError(sprintf("Type should be 'string' '%s' given", \gettype($input)));
+                throw new ParserErrorException(sprintf("Type should be 'string' '%s' given", \gettype($input)));
             }
 
-            $output = $input;
-
-            /** @var array<ParseErrorInterface> $parseErrors */
-            $parseErrors = [];
-
-            foreach ($this->transform as $transform) {
-                $output = $transform($output, $parseErrors);
-            }
-
-            if (\count($parseErrors)) {
-                throw new ParseErrors($parseErrors);
-            }
-
-            return $output;
-        } catch (ParseErrorInterface $parseError) {
+            return $this->transformOutput($input);
+        } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
-                return ($this->catch)($input, $parseError);
+                return ($this->catch)($input, $parserErrorException);
             }
 
-            throw $parseError;
+            throw $parserErrorException;
         }
     }
 }

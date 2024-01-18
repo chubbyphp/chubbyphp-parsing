@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParseErrorInterface;
+use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Result;
 
 abstract class AbstractSchema implements SchemaInterface
 {
     /**
-     * @var array<\Closure(mixed, array<ParseErrorInterface> &$parseError): mixed>
+     * @var array<\Closure(mixed): mixed>
      */
     protected array $transform = [];
 
     protected mixed $default = null;
 
     /**
-     * @var \Closure(mixed, ParseErrorInterface): mixed
+     * @var \Closure(mixed, ParserErrorException): mixed
      */
     protected mixed $catch = null;
 
@@ -27,13 +27,13 @@ abstract class AbstractSchema implements SchemaInterface
     {
         try {
             return new Result($this->parse($input), null);
-        } catch (ParseErrorInterface $parseError) {
-            return new Result(null, $parseError);
+        } catch (ParserErrorException $parserErrorException) {
+            return new Result(null, $parserErrorException);
         }
     }
 
     /**
-     * @param \Closure(mixed $input, array<ParseErrorInterface> &$parseError): mixed $transform
+     * @param \Closure(mixed $input): mixed $transform
      */
     final public function transform(\Closure $transform): static
     {
@@ -50,7 +50,7 @@ abstract class AbstractSchema implements SchemaInterface
     }
 
     /**
-     * @param \Closure(mixed $input, ParseErrorInterface $parseError): mixed $catch
+     * @param \Closure(mixed $input, ParserErrorException $\parserErrorException): mixed $catch
      */
     final public function catch(\Closure $catch): static
     {
@@ -64,5 +64,14 @@ abstract class AbstractSchema implements SchemaInterface
         $this->nullable = true;
 
         return $this;
+    }
+
+    protected function transformOutput(mixed $output): mixed
+    {
+        foreach ($this->transform as $transform) {
+            $output = $transform($output);
+        }
+
+        return $output;
     }
 }

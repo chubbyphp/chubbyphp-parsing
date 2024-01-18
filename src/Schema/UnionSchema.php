@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParseErrorInterface;
-use Chubbyphp\Parsing\ParseErrors;
+use Chubbyphp\Parsing\ParserErrorException;
 
 final class UnionSchema extends AbstractSchema implements SchemaInterface
 {
@@ -41,40 +40,28 @@ final class UnionSchema extends AbstractSchema implements SchemaInterface
         try {
             $output = $this->parseSchemas($input);
 
-            /** @var array<ParseErrorInterface> $parseErrors */
-            $parseErrors = [];
-
-            foreach ($this->transform as $transform) {
-                $output = $transform($output, $parseErrors);
-            }
-
-            if (\count($parseErrors)) {
-                throw new ParseErrors($parseErrors);
-            }
-
-            return $output;
-        } catch (ParseErrorInterface $parseError) {
+            return $this->transformOutput($output);
+        } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
-                return ($this->catch)($input, $parseError);
+                return ($this->catch)($input, $parserErrorException);
             }
 
-            throw $parseError;
+            throw $parserErrorException;
         }
     }
 
     private function parseSchemas(mixed $input)
     {
-        /** @var array<ParseErrorInterface> $parseErrors */
-        $parseErrors = [];
+        $parserErrorException = new ParserErrorException();
 
         foreach ($this->schemas as $schema) {
             try {
                 return $schema->parse($input);
-            } catch (ParseErrorInterface $parseError) {
-                $parseErrors = array_merge($parseErrors, $parseError->getParseErrors());
+            } catch (ParserErrorException $childParserErrorException) {
+                $parserErrorException->addParserErrorException($childParserErrorException);
             }
         }
 
-        throw new ParseErrors($parseErrors);
+        throw $parserErrorException;
     }
 }

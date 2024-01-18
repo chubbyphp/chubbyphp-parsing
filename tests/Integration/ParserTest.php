@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Integration;
 
-use Chubbyphp\Parsing\ParseError;
 use Chubbyphp\Parsing\Parser;
+use Chubbyphp\Parsing\ParserErrorException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -41,13 +41,11 @@ final class ParserTest extends TestCase
                 'lastname' => $p->string(),
                 'age' => $p->union([
                     $p->integer(),
-                    $p->string()->transform(static function (string $age, array &$parseErrors) {
+                    $p->string()->transform(static function (string $age) {
                         $ageAsInteger = (int) $age;
 
                         if ((string) $ageAsInteger !== $age) {
-                            $parseErrors[] = new ParseError(sprintf("Age '%s' is not parseable to inteter", $age));
-
-                            return $age;
+                            throw new ParserErrorException(sprintf("Age '%s' is not parseable to integer", $age));
                         }
 
                         return $ageAsInteger;
@@ -69,25 +67,26 @@ final class ParserTest extends TestCase
             ], $person::class)
         );
 
-        $result = $schema->safeParse([
-            [
-                'firstname' => 'James',
-                'lastname' => 'Smith',
-                'age' => 32,
-                'contactDetails' => [
-                    ['_type' => 'email', 'value' => 'james.smith@example.com'],
-                    ['_type' => 'phone', 'value' => '+41790000000'],
+        try {
+            var_dump($schema->parse([
+                [
+                    'firstname' => 'James',
+                    'lastname' => 'Smith',
+                    'age' => 32,
+                    'contactDetails' => [
+                        ['_type' => 'email', 'value' => 'james.smith@example.com'],
+                        ['_type' => 'phone', 'value' => '+41790000000'],
+                    ],
                 ],
-            ],
-            [
-                'firstname' => 'Jane',
-                'lastname' => 'Smith',
-                'age' => '28',
-            ],
-        ]);
-
-        var_dump($result->data);
-        var_dump($result->error?->getData());
+                [
+                    'firstname' => 'Jane',
+                    'lastname' => 'Smith',
+                    'age' => '28',
+                ],
+            ]));
+        } catch (ParserErrorException $e) {
+            var_dump($e->getErrors());
+        }
 
         self::assertTrue(true);
     }

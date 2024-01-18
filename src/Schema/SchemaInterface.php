@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParseErrorInterface;
+use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Result;
 
 interface SchemaInterface
@@ -14,14 +14,14 @@ interface SchemaInterface
     public function safeParse(mixed $input): Result;
 
     /**
-     * @param \Closure(mixed $input, array<ParseErrorInterface> &$parseError): mixed $transform
+     * @param \Closure(mixed $input): mixed $transform
      */
     public function transform(\Closure $transform): static;
 
     public function default(mixed $default): static;
 
     /**
-     * @param \Closure(mixed $input, ParseErrorInterface $parseError): mixed $catch
+     * @param \Closure(mixed $input, ParserErrorException $\parserErrorException): mixed $catch
      */
     public function catch(\Closure $catch): static;
 

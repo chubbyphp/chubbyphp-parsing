@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParseError;
-use Chubbyphp\Parsing\ParseErrorInterface;
-use Chubbyphp\Parsing\ParseErrors;
+use Chubbyphp\Parsing\ParserErrorException;
 
 final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 {
@@ -48,43 +46,38 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
         try {
             if (!\is_array($input)) {
-                throw new ParseError(sprintf("Input needs to be array, '%s'", \gettype($input)));
+                throw new ParserErrorException(sprintf("Input needs to be array, '%s'", \gettype($input)));
             }
 
             $output = new $this->classname();
 
-            /** @var array<string,ParseErrorInterface> $parseErrors */
-            $parseErrors = [];
+            $childrenParserErrorException = new ParserErrorException();
 
             foreach (array_keys($input) as $fieldName) {
                 if (!isset($this->fieldSchemas[$fieldName])) {
-                    $parseErrors[$fieldName] = new ParseErrors([new ParseError(sprintf("Additional property '%s'", $fieldName))]);
+                    $childrenParserErrorException->addError(sprintf("Additional property '%s'", $fieldName), $fieldName);
                 }
             }
 
             foreach ($this->fieldSchemas as $fieldName => $fieldSchema) {
                 try {
                     $output->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
-                } catch (ParseErrorInterface $parseError) {
-                    $parseErrors[$fieldName] = $parseError;
+                } catch (ParserErrorException $childParserErrorException) {
+                    $childrenParserErrorException->addParserErrorException($childParserErrorException, $fieldName);
                 }
             }
 
-            foreach ($this->transform as $transform) {
-                $output = $transform($output, $parseErrors);
+            if ($childrenParserErrorException->hasError()) {
+                throw $childrenParserErrorException;
             }
 
-            if (\count($parseErrors)) {
-                throw new ParseErrors($parseErrors);
-            }
-
-            return $output;
-        } catch (ParseErrorInterface $parseError) {
+            return $this->transformOutput($output);
+        } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
-                return ($this->catch)($input, $parseError);
+                return ($this->catch)($input, $parserErrorException);
             }
 
-            throw $parseError;
+            throw $parserErrorException;
         }
     }
 

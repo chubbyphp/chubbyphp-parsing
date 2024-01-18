@@ -8,8 +8,8 @@ final class Result
 {
     public bool $success;
 
-    public function __construct(public mixed $data, public null|ParseErrorInterface $error)
+    public function __construct(public mixed $data, public null|ParserErrorException $exception)
     {
-        $this->success = null === $error;
+        $this->success = null === $exception;
     }
 }
