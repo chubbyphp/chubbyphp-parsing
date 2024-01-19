@@ -6,7 +6,7 @@ namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\ParserErrorException;
 
-final class StringSchema extends AbstractSchema implements SchemaInterface
+final class FloatSchema extends AbstractSchema implements SchemaInterface
 {
     public function parse(mixed $input): mixed
     {
@@ -17,8 +17,8 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         }
 
         try {
-            if (!\is_string($input)) {
-                throw new ParserErrorException(sprintf('Type should be "string" "%s" given', \gettype($input)));
+            if (!\is_float($input)) {
+                throw new ParserErrorException(sprintf('Type should be "float" "%s" given', \gettype($input)));
             }
 
             return $this->transformOutput($input);

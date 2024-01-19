@@ -39,13 +39,12 @@ final class ParserTest extends TestCase
         $schema = $p->array(
             $p->object(['firstname' => $p->string(),
                 'lastname' => $p->string(),
-                'age' => $p->union([
-                    $p->integer(),
+                'age' => $p->union([$p->int(),
                     $p->string()->transform(static function (string $age) {
                         $ageAsInteger = (int) $age;
 
                         if ((string) $ageAsInteger !== $age) {
-                            throw new ParserErrorException(sprintf("Age '%s' is not parseable to integer", $age));
+                            throw new ParserErrorException(sprintf("Age '%s' is not parseable to int", $age));
                         }
 
                         return $ageAsInteger;

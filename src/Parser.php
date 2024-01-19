@@ -6,7 +6,7 @@ namespace Chubbyphp\Parsing;
 
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
-use Chubbyphp\Parsing\Schema\IntegerSchema;
+use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
@@ -28,9 +28,9 @@ final class Parser
         return new DiscriminatedUnionSchema($objectSchemas, $discriminatorFieldName);
     }
 
-    public function integer(): IntegerSchema
+    public function int(): IntSchema
     {
-        return new IntegerSchema();
+        return new IntSchema();
     }
 
     public function literal(string $literal): LiteralSchema

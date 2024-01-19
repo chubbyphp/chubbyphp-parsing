@@ -6,7 +6,7 @@ namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\ParserErrorException;
 
-final class IntegerSchema extends AbstractSchema implements SchemaInterface
+final class IntSchema extends AbstractSchema implements SchemaInterface
 {
     public function parse(mixed $input): mixed
     {
@@ -18,7 +18,7 @@ final class IntegerSchema extends AbstractSchema implements SchemaInterface
 
         try {
             if (!\is_int($input)) {
-                throw new ParserErrorException(sprintf("Type should be 'integer' '%s' given", \gettype($input)));
+                throw new ParserErrorException(sprintf('Type should be "int" "%s" given', \gettype($input)));
             }
 
             return $this->transformOutput($input);
