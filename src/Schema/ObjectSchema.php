@@ -21,11 +21,23 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     {
         foreach ($fieldSchemas as $name => $fieldSchema) {
             if (!\is_string($name)) {
-                throw new \InvalidArgumentException(sprintf('Argument #1 name #%s ($fieldSchemas) must be of type string, %s given', (string) $name, $this->getDataType($name)));
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Argument #1 name #%s ($fieldSchemas) must be of type string, %s given',
+                        (string) $name,
+                        $this->getDataType($name)
+                    )
+                );
             }
 
             if (!$fieldSchema instanceof SchemaInterface) {
-                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($fieldSchemas) must be of type SchemaInterface, %s given', (string) $name, $this->getDataType($fieldSchema)));
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Argument #1 value of #%s ($fieldSchemas) must be of type SchemaInterface, %s given',
+                        (string) $name,
+                        $this->getDataType($fieldSchema)
+                    )
+                );
             }
         }
 
