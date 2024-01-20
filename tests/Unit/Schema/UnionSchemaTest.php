@@ -21,7 +21,7 @@ final class UnionSchemaTest extends TestCase
     public function testConstructWithWrongArgument(): void
     {
         try {
-            new UnionSchema([new StringSchema(), 'string']);
+            new UnionSchema([new StringSchema(), 'string', new IntSchema()]);
 
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
