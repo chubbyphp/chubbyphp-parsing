@@ -105,14 +105,14 @@ final class LiteralSchemaTest extends TestCase
 
     public function testParseFailedWithCatch(): void
     {
-        $schema = new LiteralSchema('test');
+        $schema = (new LiteralSchema('test'))
+            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+                self::assertNull($input);
+                self::assertSame(['Type should be "bool|float|int|string" "NULL" given'], $parserErrorException->getErrors());
 
-        $schema->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
-            self::assertNull($input);
-            self::assertSame(['Type should be "bool|float|int|string" "NULL" given'], $parserErrorException->getErrors());
-
-            return 'catched';
-        })->parse(null);
+                return 'catched';
+            })
+        ;
 
         self::assertSame('catched', $schema->parse(null));
     }

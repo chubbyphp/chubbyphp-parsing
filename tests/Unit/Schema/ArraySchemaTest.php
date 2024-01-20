@@ -84,14 +84,14 @@ final class ArraySchemaTest extends TestCase
 
     public function testParseFailedWithCatch(): void
     {
-        $schema = new ArraySchema(new StringSchema());
+        $schema = (new ArraySchema(new StringSchema()))
+            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+                self::assertNull($input);
+                self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
 
-        $schema->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
-            self::assertNull($input);
-            self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
-
-            return 'catched';
-        })->parse(null);
+                return 'catched';
+            })
+        ;
 
         self::assertSame('catched', $schema->parse(null));
     }

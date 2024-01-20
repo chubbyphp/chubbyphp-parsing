@@ -65,14 +65,14 @@ final class StringSchemaTest extends TestCase
 
     public function testParseFailedWithCatch(): void
     {
-        $schema = new StringSchema();
+        $schema = (new StringSchema())
+            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+                self::assertNull($input);
+                self::assertSame(['Type should be "string" "NULL" given'], $parserErrorException->getErrors());
 
-        $schema->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
-            self::assertNull($input);
-            self::assertSame(['Type should be "string" "NULL" given'], $parserErrorException->getErrors());
-
-            return 'catched';
-        })->parse(null);
+                return 'catched';
+            })
+        ;
 
         self::assertSame('catched', $schema->parse(null));
     }

@@ -65,14 +65,15 @@ final class BoolSchemaTest extends TestCase
 
     public function testParseFailedWithCatch(): void
     {
-        $schema = new BoolSchema();
+        $schema = (new BoolSchema())
 
-        $schema->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
-            self::assertNull($input);
-            self::assertSame(['Type should be "bool" "NULL" given'], $parserErrorException->getErrors());
+            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+                self::assertNull($input);
+                self::assertSame(['Type should be "bool" "NULL" given'], $parserErrorException->getErrors());
 
-            return 'catched';
-        })->parse(null);
+                return 'catched';
+            })
+        ;
 
         self::assertSame('catched', $schema->parse(null));
     }

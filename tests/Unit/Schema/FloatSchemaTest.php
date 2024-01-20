@@ -65,14 +65,15 @@ final class FloatSchemaTest extends TestCase
 
     public function testParseFailedWithCatch(): void
     {
-        $schema = new FloatSchema();
+        $schema = (new FloatSchema())
 
-        $schema->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
-            self::assertNull($input);
-            self::assertSame(['Type should be "float" "NULL" given'], $parserErrorException->getErrors());
+            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+                self::assertNull($input);
+                self::assertSame(['Type should be "float" "NULL" given'], $parserErrorException->getErrors());
 
-            return 'catched';
-        })->parse(null);
+                return 'catched';
+            })
+        ;
 
         self::assertSame('catched', $schema->parse(null));
     }

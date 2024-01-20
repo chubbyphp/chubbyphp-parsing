@@ -65,14 +65,14 @@ final class DateTimeSchemaTest extends TestCase
 
     public function testParseFailedWithCatch(): void
     {
-        $schema = new DateTimeSchema();
+        $schema = (new DateTimeSchema())
+            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+                self::assertNull($input);
+                self::assertSame(['Type should be "DateTimeInterface" "NULL" given'], $parserErrorException->getErrors());
 
-        $schema->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
-            self::assertNull($input);
-            self::assertSame(['Type should be "DateTimeInterface" "NULL" given'], $parserErrorException->getErrors());
-
-            return 'catched';
-        })->parse(null);
+                return 'catched';
+            })
+        ;
 
         self::assertSame('catched', $schema->parse(null));
     }

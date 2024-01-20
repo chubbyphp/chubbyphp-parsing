@@ -65,14 +65,14 @@ final class IntSchemaTest extends TestCase
 
     public function testParseFailedWithCatch(): void
     {
-        $schema = new IntSchema();
+        $schema = (new IntSchema())
+            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+                self::assertNull($input);
+                self::assertSame(['Type should be "int" "NULL" given'], $parserErrorException->getErrors());
 
-        $schema->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
-            self::assertNull($input);
-            self::assertSame(['Type should be "int" "NULL" given'], $parserErrorException->getErrors());
-
-            return 'catched';
-        })->parse(null);
+                return 'catched';
+            })
+        ;
 
         self::assertSame('catched', $schema->parse(null));
     }
