@@ -99,7 +99,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
             try {
                 $discriminatorFieldSchema->parse($discriminator);
             } catch (ParserErrorException $childParserErrorException) {
-                $parserErrorException->addParserErrorException($childParserErrorException, $i);
+                $parserErrorException->addParserErrorException($childParserErrorException);
 
                 continue;
             }
