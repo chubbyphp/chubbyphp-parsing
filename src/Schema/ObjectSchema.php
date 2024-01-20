@@ -21,15 +21,11 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     {
         foreach ($fieldSchemas as $name => $fieldSchema) {
             if (!\is_string($name)) {
-                $type = \is_object($name) ? $name::class : \gettype($name);
-
-                throw new \InvalidArgumentException(sprintf('Argument #1 name #%s ($fieldSchemas) must be of type string, %s given', (string) $name, $type));
+                throw new \InvalidArgumentException(sprintf('Argument #1 name #%s ($fieldSchemas) must be of type string, %s given', (string) $name, $this->getDataType($name)));
             }
 
             if (!$fieldSchema instanceof SchemaInterface) {
-                $type = \is_object($fieldSchema) ? $fieldSchema::class : \gettype($fieldSchema);
-
-                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($fieldSchemas) must be of type SchemaInterface, %s given', (string) $name, $type));
+                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($fieldSchemas) must be of type SchemaInterface, %s given', (string) $name, $this->getDataType($fieldSchema)));
             }
         }
 
@@ -46,7 +42,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
         try {
             if (!\is_array($input)) {
-                throw new ParserErrorException(sprintf("Input needs to be array, '%s'", \gettype($input)));
+                throw new ParserErrorException(sprintf("Input needs to be array, '%s'", $this->getDataType($input)));
             }
 
             $output = new $this->classname();

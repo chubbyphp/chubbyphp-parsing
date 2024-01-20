@@ -20,9 +20,7 @@ final class UnionSchema extends AbstractSchema implements SchemaInterface
     {
         foreach ($schemas as $i => $schema) {
             if (!$schema instanceof SchemaInterface) {
-                $type = \is_object($schema) ? $schema::class : \gettype($schema);
-
-                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($schemas) must be of type SchemaInterface, %s given', (string) $i, $type));
+                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($schemas) must be of type SchemaInterface, %s given', (string) $i, $this->getDataType($schema)));
             }
         }
 

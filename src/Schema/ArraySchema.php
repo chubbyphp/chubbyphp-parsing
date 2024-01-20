@@ -20,7 +20,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
 
         try {
             if (!\is_array($input)) {
-                throw new ParserErrorException(sprintf("Input needs to be array, '%s'", \gettype($input)));
+                throw new ParserErrorException(sprintf("Input needs to be array, '%s'", $this->getDataType($input)));
             }
 
             $output = [];

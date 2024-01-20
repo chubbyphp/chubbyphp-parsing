@@ -20,9 +20,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
     {
         foreach ($objectSchemas as $i => $objectSchema) {
             if (!$objectSchema instanceof ObjectSchemaInterface) {
-                $objectSchemaType = \is_object($objectSchema) ? $objectSchema::class : \gettype($objectSchema);
-
-                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($objectSchemas) must be of type ObjectSchemaInterface, %s given', (string) $i, $objectSchemaType));
+                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s ($objectSchemas) must be of type ObjectSchemaInterface, %s given', (string) $i, $this->getDataType($objectSchema)));
             }
 
             $discriminatorFieldSchema = $objectSchema->getFieldSchema($discriminatorFieldName);
@@ -32,9 +30,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
             }
 
             if (!$discriminatorFieldSchema instanceof LiteralSchemaInterface) {
-                $discriminatorFieldSchemaType = \is_object($discriminatorFieldSchema) ? $discriminatorFieldSchema::class : \gettype($discriminatorFieldSchema);
-
-                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s #%s ($objectSchemas) must be of type LiteralSchemaInterface, %s given', (string) $i, $discriminatorFieldName, $discriminatorFieldSchemaType));
+                throw new \InvalidArgumentException(sprintf('Argument #1 value of #%s #%s ($objectSchemas) must be of type LiteralSchemaInterface, %s given', (string) $i, $discriminatorFieldName, $this->getDataType($discriminatorFieldSchema)));
             }
         }
 
@@ -51,7 +47,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
 
         try {
             if (!\is_array($input)) {
-                throw new ParserErrorException(sprintf("Input needs to be array, '%s'", \gettype($input)));
+                throw new ParserErrorException(sprintf("Input needs to be array, '%s'", $this->getDataType($input)));
             }
 
             $discriminator = $input[$this->discriminatorFieldName] ?? null;

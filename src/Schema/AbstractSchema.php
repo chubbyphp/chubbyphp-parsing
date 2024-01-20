@@ -74,4 +74,9 @@ abstract class AbstractSchema implements SchemaInterface
 
         return $output;
     }
+
+    protected function getDataType(mixed $input): string
+    {
+        return \is_object($input) ? $input::class : \gettype($input);
+    }
 }

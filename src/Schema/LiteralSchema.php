@@ -20,7 +20,7 @@ final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterfa
 
         try {
             if (!\is_string($input)) {
-                throw new ParserErrorException(sprintf("Type should be 'string' '%s' given", \gettype($input)));
+                throw new ParserErrorException(sprintf("Type should be 'string' '%s' given", $this->getDataType($input)));
             }
 
             if ($input !== $this->literal) {

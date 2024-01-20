@@ -18,7 +18,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
         try {
             if (!\is_int($input)) {
-                throw new ParserErrorException(sprintf('Type should be "int" "%s" given', \gettype($input)));
+                throw new ParserErrorException(sprintf('Type should be "int" "%s" given', $this->getDataType($input)));
             }
 
             return $this->transformOutput($input);

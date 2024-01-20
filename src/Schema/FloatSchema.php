@@ -18,7 +18,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
 
         try {
             if (!\is_float($input)) {
-                throw new ParserErrorException(sprintf('Type should be "float" "%s" given', \gettype($input)));
+                throw new ParserErrorException(sprintf('Type should be "float" "%s" given', $this->getDataType($input)));
             }
 
             return $this->transformOutput($input);
