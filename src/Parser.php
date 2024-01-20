@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing;
 
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
@@ -19,6 +20,11 @@ final class Parser
     public function array(SchemaInterface $itemSchema): ArraySchema
     {
         return new ArraySchema($itemSchema);
+    }
+
+    public function bool(): BoolSchema
+    {
+        return new BoolSchema();
     }
 
     public function dateTime(): DateTimeSchema
