@@ -20,24 +20,12 @@ final class ParserErrorException extends \RuntimeException
     public function addParserErrorException(self $parserErrorException, null|int|string $key = null): self
     {
         if (null !== $key) {
-            if (!isset($this->errors[$key])) {
-                $this->errors[$key] = [];
-            }
-
-            foreach ($parserErrorException->getErrors() as $subPath => $error) {
-                if (!isset($this->errors[$key][$subPath])) {
-                    $this->errors[$key][$subPath] = [];
-                }
-
-                $this->errors[$key][$subPath] = $error;
-            }
+            $this->errors[$key] = array_merge_recursive($this->errors[$key] ?? [], $parserErrorException->getErrors());
 
             return $this;
         }
 
-        foreach ($parserErrorException->getErrors() as $subPath => $error) {
-            $this->errors[$subPath] = $error;
-        }
+        $this->errors = array_merge_recursive($this->errors, $parserErrorException->getErrors());
 
         return $this;
     }
@@ -45,16 +33,12 @@ final class ParserErrorException extends \RuntimeException
     public function addError(string $error, null|int|string $key = null): self
     {
         if (null !== $key) {
-            if (!isset($this->errors[$key])) {
-                $this->errors[$key] = [];
-            }
-
-            $this->errors[$key][] = $error;
+            $this->errors[$key] = array_merge($this->errors[$key] ?? [], [$error]);
 
             return $this;
         }
 
-        $this->errors[] = $error;
+        $this->errors = array_merge($this->errors, [$error]);
 
         return $this;
     }
