@@ -84,7 +84,7 @@ final class ParserErrorExceptionTest extends TestCase
                 (new ParserErrorException())
                     ->addError('This is a error message', 'field1')
                     ->addError('This is a error message', 'field2')
-            ->addParserErrorException(
+                    ->addParserErrorException(
                         (new ParserErrorException())
                             ->addError('This is a error message', 'field1')
                             ->addError('This is a error message', 'field2'),
@@ -96,7 +96,7 @@ final class ParserErrorExceptionTest extends TestCase
                 (new ParserErrorException())
                     ->addError('This is a error message', 'field1')
                     ->addError('This is a error message', 'field2')
-            ->addParserErrorException(
+                    ->addParserErrorException(
                         (new ParserErrorException())
                             ->addError('This is a error message', 'field1')
                             ->addError('This is a error message', 'field2'),
