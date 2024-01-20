@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 
 final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterface
 {
-    public function __construct(private string $literal) {}
+    public function __construct(private bool|float|int|string $literal) {}
 
     public function parse(mixed $input): mixed
     {
@@ -19,12 +19,20 @@ final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterfa
         }
 
         try {
-            if (!\is_string($input)) {
-                throw new ParserErrorException(sprintf("Type should be 'string' '%s' given", $this->getDataType($input)));
+            if (!\is_bool($input) && !\is_float($input) && !\is_int($input) && !\is_string($input)) {
+                throw new ParserErrorException(
+                    sprintf('Type should be "bool|float|int|string" "%s" given', $this->getDataType($input))
+                );
             }
 
             if ($input !== $this->literal) {
-                throw new ParserErrorException(sprintf("Input should be '%s' '%s' given", $this->literal, $input));
+                throw new ParserErrorException(
+                    sprintf(
+                        'Input should be %s %s given',
+                        \is_string($this->literal) ? '"'.$this->literal.'"' : (string) $this->literal,
+                        \is_string($input) ? '"'.$input.'"' : (string) $input
+                    )
+                );
             }
 
             return $this->transformOutput($input);
