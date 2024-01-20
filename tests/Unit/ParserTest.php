@@ -6,6 +6,7 @@ namespace Chubbyphp\Tests\Parsing\Unit;
 
 use Chubbyphp\Parsing\Parser;
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
@@ -28,6 +29,15 @@ final class ParserTest extends TestCase
         $arraySchema = $p->array($p->string());
 
         self::assertInstanceOf(ArraySchema::class, $arraySchema);
+    }
+
+    public function testDateTime(): void
+    {
+        $p = new Parser();
+
+        $dateTimeSchema = $p->dateTime();
+
+        self::assertInstanceOf(DateTimeSchema::class, $dateTimeSchema);
     }
 
     public function testDiscriminatedUnion(): void
