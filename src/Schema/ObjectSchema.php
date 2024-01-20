@@ -59,11 +59,11 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
             $output = new $this->classname();
 
-            $childrenParserErrorException = new ParserErrorException();
+            $parserErrorException = new ParserErrorException();
 
             foreach (array_keys($input) as $fieldName) {
                 if (!isset($this->fieldSchemas[$fieldName])) {
-                    $childrenParserErrorException->addError(sprintf("Additional property '%s'", $fieldName), $fieldName);
+                    $parserErrorException->addError(sprintf("Additional property '%s'", $fieldName), $fieldName);
                 }
             }
 
@@ -71,12 +71,12 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 try {
                     $output->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
                 } catch (ParserErrorException $childParserErrorException) {
-                    $childrenParserErrorException->addParserErrorException($childParserErrorException, $fieldName);
+                    $parserErrorException->addParserErrorException($childParserErrorException, $fieldName);
                 }
             }
 
-            if ($childrenParserErrorException->hasError()) {
-                throw $childrenParserErrorException;
+            if ($parserErrorException->hasError()) {
+                throw $parserErrorException;
             }
 
             return $this->transformOutput($output);
