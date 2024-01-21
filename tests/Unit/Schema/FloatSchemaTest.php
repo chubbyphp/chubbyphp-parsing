@@ -50,7 +50,7 @@ final class FloatSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals(['Type should be "float" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame(['Type should be "float" "NULL" given'], $parserErrorException->getErrors());
         }
     }
 
@@ -58,7 +58,7 @@ final class FloatSchemaTest extends TestCase
     {
         $input = 1.5;
 
-        $schema = (new FloatSchema())->transform(static fn (float $input) => (string) $input);
+        $schema = (new FloatSchema())->transform(static fn (float $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

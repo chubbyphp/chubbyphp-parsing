@@ -50,7 +50,7 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals(['Type should be "string" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame(['Type should be "string" "NULL" given'], $parserErrorException->getErrors());
         }
     }
 
@@ -58,7 +58,7 @@ final class StringSchemaTest extends TestCase
     {
         $input = '1';
 
-        $schema = (new StringSchema())->transform(static fn (string $input) => (int) $input);
+        $schema = (new StringSchema())->transform(static fn (string $output) => (int) $output);
 
         self::assertSame((int) $input, $schema->parse($input));
     }

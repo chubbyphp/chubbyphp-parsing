@@ -77,7 +77,7 @@ final class LiteralSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals(['Type should be "bool|float|int|string" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame(['Type should be "bool|float|int|string" "NULL" given'], $parserErrorException->getErrors());
         }
     }
 
@@ -90,7 +90,7 @@ final class LiteralSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals(['Input should be "tes1" "test2" given'], $parserErrorException->getErrors());
+            self::assertSame(['Input should be "tes1" "test2" given'], $parserErrorException->getErrors());
         }
     }
 
@@ -98,7 +98,7 @@ final class LiteralSchemaTest extends TestCase
     {
         $input = 'test1';
 
-        $schema = (new LiteralSchema($input))->transform(static fn (string $input) => $input.'1');
+        $schema = (new LiteralSchema($input))->transform(static fn (string $output) => $output.'1');
 
         self::assertSame('test11', $schema->parse($input));
     }

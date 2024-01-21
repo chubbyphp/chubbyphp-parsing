@@ -50,7 +50,7 @@ final class BoolSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals(['Type should be "bool" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame(['Type should be "bool" "NULL" given'], $parserErrorException->getErrors());
         }
     }
 
@@ -58,7 +58,7 @@ final class BoolSchemaTest extends TestCase
     {
         $input = true;
 
-        $schema = (new BoolSchema())->transform(static fn (bool $input) => (bool) $input);
+        $schema = (new BoolSchema())->transform(static fn (bool $output) => (bool) $output);
 
         self::assertSame((bool) $input, $schema->parse($input));
     }

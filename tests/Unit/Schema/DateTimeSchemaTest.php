@@ -50,7 +50,7 @@ final class DateTimeSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals(['Type should be "DateTimeInterface" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame(['Type should be "DateTimeInterface" "NULL" given'], $parserErrorException->getErrors());
         }
     }
 
@@ -58,7 +58,7 @@ final class DateTimeSchemaTest extends TestCase
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00Z');
 
-        $schema = (new DateTimeSchema())->transform(static fn (\DateTimeInterface $input) => $input->format('c'));
+        $schema = (new DateTimeSchema())->transform(static fn (\DateTimeInterface $output) => $output->format('c'));
 
         self::assertSame($input->format('c'), $schema->parse($input));
     }

@@ -25,7 +25,7 @@ final class UnionSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
-            self::assertEquals(
+            self::assertSame(
                 'Argument #1 value of #1 ($schemas) must be of type SchemaInterface, string given',
                 $invalidArgumentException->getMessage()
             );
@@ -84,7 +84,7 @@ final class UnionSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals([
+            self::assertSame([
                 'Type should be "string" "NULL" given',
                 'Type should be "int" "NULL" given',
             ], $parserErrorException->getErrors());
@@ -95,7 +95,7 @@ final class UnionSchemaTest extends TestCase
     {
         $input = '1';
 
-        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->transform(static fn (string $input) => (int) $input);
+        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->transform(static fn (string $output) => (int) $output);
 
         self::assertSame((int) $input, $schema->parse($input));
     }
@@ -104,7 +104,7 @@ final class UnionSchemaTest extends TestCase
     {
         $input = 1;
 
-        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->transform(static fn (int $input) => (string) $input);
+        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->transform(static fn (int $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

@@ -50,7 +50,7 @@ final class IntSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals(['Type should be "int" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame(['Type should be "int" "NULL" given'], $parserErrorException->getErrors());
         }
     }
 
@@ -58,7 +58,7 @@ final class IntSchemaTest extends TestCase
     {
         $input = 1;
 
-        $schema = (new IntSchema())->transform(static fn (int $input) => (string) $input);
+        $schema = (new IntSchema())->transform(static fn (int $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

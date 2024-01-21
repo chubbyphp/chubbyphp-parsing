@@ -51,7 +51,7 @@ final class ArraySchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
         }
     }
 
@@ -66,7 +66,7 @@ final class ArraySchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertEquals([
+            self::assertSame([
                 1 => ['Type should be "string" "integer" given'],
                 2 => ['Type should be "string" "boolean" given'],
             ], $parserErrorException->getErrors());
@@ -77,9 +77,9 @@ final class ArraySchemaTest extends TestCase
     {
         $input = ['test1'];
 
-        $schema = (new ArraySchema(new StringSchema()))->transform(static fn (array $input) => array_merge($input, ['test2']));
+        $schema = (new ArraySchema(new StringSchema()))->transform(static fn (array $output) => array_merge($output, ['test2']));
 
-        self::assertEquals(array_merge($input, ['test2']), $schema->parse($input));
+        self::assertSame(array_merge($input, ['test2']), $schema->parse($input));
     }
 
     public function testParseFailedWithCatch(): void
