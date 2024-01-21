@@ -69,7 +69,9 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
 
         try {
             if (!\is_array($input)) {
-                throw new ParserErrorException(sprintf('Type should be "array" "%s" given', $this->getDataType($input)));
+                throw new ParserErrorException(
+                    sprintf('Type should be "array" "%s" given', $this->getDataType($input))
+                );
             }
 
             if (!isset($input[$this->discriminatorFieldName])) {
@@ -97,7 +99,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
     {
         $parserErrorException = new ParserErrorException();
 
-        foreach ($this->objectSchemas as $i => $objectSchema) {
+        foreach ($this->objectSchemas as $objectSchema) {
             /** @var LiteralSchemaInterface $discriminatorFieldSchema */
             $discriminatorFieldSchema = $objectSchema->getFieldSchema($this->discriminatorFieldName);
 

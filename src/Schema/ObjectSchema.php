@@ -55,7 +55,9 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
         try {
             if (!\is_array($input)) {
-                throw new ParserErrorException(sprintf('Type should be "array" "%s" given', $this->getDataType($input)));
+                throw new ParserErrorException(
+                    sprintf('Type should be "array" "%s" given', $this->getDataType($input))
+                );
             }
 
             $output = new $this->classname();
