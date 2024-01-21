@@ -33,8 +33,9 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             if (!$fieldSchema instanceof SchemaInterface) {
                 throw new \InvalidArgumentException(
                     sprintf(
-                        'Argument #1 value of #%s ($fieldSchemas) must be of type SchemaInterface, %s given',
+                        'Argument #1 value of #%s ($fieldSchemas) must be of type %s, %s given',
                         (string) $name,
+                        SchemaInterface::class,
                         $this->getDataType($fieldSchema)
                     )
                 );

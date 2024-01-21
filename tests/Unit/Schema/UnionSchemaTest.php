@@ -26,7 +26,7 @@ final class UnionSchemaTest extends TestCase
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
             self::assertSame(
-                'Argument #1 value of #1 ($schemas) must be of type SchemaInterface, string given',
+                'Argument #1 value of #1 ($schemas) must be of type Chubbyphp\Parsing\Schema\SchemaInterface, string given',
                 $invalidArgumentException->getMessage()
             );
         }

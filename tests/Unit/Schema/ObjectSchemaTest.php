@@ -41,7 +41,7 @@ final class ObjectSchemaTest extends TestCase
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
             self::assertSame(
-                'Argument #1 value of #field2 ($fieldSchemas) must be of type SchemaInterface, string given',
+                'Argument #1 value of #field2 ($fieldSchemas) must be of type Chubbyphp\Parsing\Schema\SchemaInterface, string given',
                 $invalidArgumentException->getMessage()
             );
         }
