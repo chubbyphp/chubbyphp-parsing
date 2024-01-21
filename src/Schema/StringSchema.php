@@ -10,13 +10,25 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 {
     public const UUID_V4 = 4;
     public const UUID_V5 = 5;
-    private const VALID_URL_OPTIONS = [0, FILTER_FLAG_PATH_REQUIRED, FILTER_FLAG_QUERY_REQUIRED, FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED];
-    private const VALID_IP_OPTIONS = [0, FILTER_FLAG_IPV4, FILTER_FLAG_IPV6, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6];
+    private const VALID_URL_OPTIONS = [
+        0,
+        FILTER_FLAG_PATH_REQUIRED,
+        FILTER_FLAG_QUERY_REQUIRED,
+        FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED,
+    ];
+    private const VALID_IP_OPTIONS = [
+        0,
+        FILTER_FLAG_IPV4,
+        FILTER_FLAG_IPV6,
+        FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6,
+    ];
 
     private const VALID_UUID_OPTIONS = [0, self::UUID_V4, self::UUID_V5];
 
     private const UUID_V4_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
     private const UUID_V5_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
+
+    private const INVALID_OPTION_TEMPLATE = 'Invalid option "%s" given';
 
     public function parse(mixed $input): mixed
     {
@@ -99,7 +111,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public function url(int $options = 0): static
     {
         if (!\in_array($options, self::VALID_URL_OPTIONS, true)) {
-            throw new \InvalidArgumentException(sprintf('Invalid option "%s" given', $options));
+            throw new \InvalidArgumentException(sprintf(self::INVALID_OPTION_TEMPLATE, $options));
         }
 
         return $this->transform(static function (string $output) use ($options) {
@@ -117,7 +129,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public function uuid(int $options = 0): static
     {
         if (!\in_array($options, self::VALID_UUID_OPTIONS, true)) {
-            throw new \InvalidArgumentException(sprintf('Invalid option "%s" given', $options));
+            throw new \InvalidArgumentException(sprintf(self::INVALID_OPTION_TEMPLATE, $options));
         }
 
         return $this->transform(static function (string $output) use ($options) {
@@ -212,7 +224,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public function ip(int $options = 0): static
     {
         if (!\in_array($options, self::VALID_IP_OPTIONS, true)) {
-            throw new \InvalidArgumentException(sprintf('Invalid option "%s" given', $options));
+            throw new \InvalidArgumentException(sprintf(self::INVALID_OPTION_TEMPLATE, $options));
         }
 
         return $this->transform(static function (string $output) use ($options) {
