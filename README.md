@@ -24,6 +24,8 @@
 
 Allows parsing data of various structures, meaning the population and validation of data into a defined structure. For example, converting an API request into a Data Transfer Object (DTO).
 
+Heavily inspired by the well-known TypeScript library [zod](https://github.com/colinhacks/zod).
+
 ## Requirements
 
  * php: ^8.1
