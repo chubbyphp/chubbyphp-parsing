@@ -1,6 +1,6 @@
 {
     "name": "chubbyphp/chubbyphp-parsing",
-    "description": "Chubbyphp Parse",
+    "description": "Allows parsing data of various structures, meaning the population and validation of data into a defined structure. For example, converting an API request into a Data Transfer Object (DTO).",
     "keywords": [
         "chubbyphp"
     ],

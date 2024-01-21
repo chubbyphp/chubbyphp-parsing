@@ -22,7 +22,7 @@
 
 ## Description
 
-
+Allows parsing data of various structures, meaning the population and validation of data into a defined structure. For example, converting an API request into a Data Transfer Object (DTO).
 
 ## Requirements
 
@@ -37,6 +37,136 @@ composer require chubbyphp/chubbyphp-parsing "^1.0"
 ```
 
 ## Usage
+
+### array
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->array($p->string());
+
+$data = $schema->parse(['John Doe']);
+```
+
+### bool
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->bool();
+
+$data = $schema->parse(true);
+```
+
+### dateTime
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->dateTime();
+
+$data = $schema->parse(new \DateTimeImmutable('2024-01-20T09:15:00Z'));
+```
+
+### discriminatedUnion
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->discriminatedUnion([
+    $p->object(['_type' => $p->literal('email'), 'address' => $p->string()]),
+    $p->object(['_type' => $p->literal('phone'), 'number' => $p->string()]),
+]);
+
+$data = $schema->parse(['_type' => 'phone', 'number' => '+41790000000']);
+```
+
+### float
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->float();
+
+$data = $schema->parse(4.2);
+```
+
+### int
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->int();
+
+$data = $schema->parse(1337);
+```
+
+### literal
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->literal('email'); // supports string|float|int|bool
+
+$data = $schema->parse('email');
+```
+
+### object
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->object(['name' => $p->string()]);
+
+// stdClass object
+$data = $schema->parse(['name' => 'John Doe']);
+
+// SampleClass object
+$data = $schema->parse(['name' => 'John Doe'], SampleNamespace\SampleClass::class);
+```
+
+### string
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->string();
+
+$data = $schema->parse('John Doe');
+```
+
+### union
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->union([
+    $p->string()->transform(static fn (string $output) => (int) $output),
+    $p->int(),
+]);
+
+$data = $schema->parse('42');
+```
 
 ## Copyright
 
