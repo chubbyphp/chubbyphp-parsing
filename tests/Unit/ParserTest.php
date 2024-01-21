@@ -9,6 +9,7 @@ use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
+use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
@@ -61,6 +62,15 @@ final class ParserTest extends TestCase
         ], '_type');
 
         self::assertInstanceOf(DiscriminatedUnionSchema::class, $discriminatedUnionSchema);
+    }
+
+    public function testFloat(): void
+    {
+        $p = new Parser();
+
+        $floatSchema = $p->float();
+
+        self::assertInstanceOf(FloatSchema::class, $floatSchema);
     }
 
     public function testInt(): void
