@@ -51,7 +51,7 @@ final class Parser
         return new IntSchema();
     }
 
-    public function literal(string $literal): LiteralSchema
+    public function literal(bool|float|int|string $literal): LiteralSchema
     {
         return new LiteralSchema($literal);
     }
