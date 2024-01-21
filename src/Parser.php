@@ -12,6 +12,7 @@ use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
+use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
@@ -34,7 +35,7 @@ final class Parser
     }
 
     /**
-     * @param array<SchemaInterface> $objectSchemas
+     * @param array<ObjectSchemaInterface> $objectSchemas
      */
     public function discriminatedUnion(array $objectSchemas, string $discriminatorFieldName): DiscriminatedUnionSchema
     {

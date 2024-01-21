@@ -98,6 +98,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
         $parserErrorException = new ParserErrorException();
 
         foreach ($this->objectSchemas as $i => $objectSchema) {
+            /** @var LiteralSchemaInterface $discriminatorFieldSchema */
             $discriminatorFieldSchema = $objectSchema->getFieldSchema($this->discriminatorFieldName);
 
             try {

@@ -55,7 +55,7 @@ final class UnionSchema extends AbstractSchema implements SchemaInterface
         }
     }
 
-    private function parseSchemas(mixed $input)
+    private function parseSchemas(mixed $input): mixed
     {
         $parserErrorException = new ParserErrorException();
 

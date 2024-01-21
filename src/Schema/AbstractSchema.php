@@ -19,7 +19,7 @@ abstract class AbstractSchema implements SchemaInterface
     /**
      * @var \Closure(mixed, ParserErrorException): mixed
      */
-    protected mixed $catch = null;
+    protected null|\Closure $catch = null;
 
     protected bool $nullable = false;
 
@@ -50,7 +50,7 @@ abstract class AbstractSchema implements SchemaInterface
     }
 
     /**
-     * @param \Closure(mixed $input, ParserErrorException $\parserErrorException): mixed $catch
+     * @param \Closure(mixed $input, ParserErrorException $parserErrorException): mixed $catch
      */
     final public function catch(\Closure $catch): static
     {

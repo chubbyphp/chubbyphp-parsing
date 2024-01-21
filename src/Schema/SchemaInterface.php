@@ -21,7 +21,7 @@ interface SchemaInterface
     public function default(mixed $default): static;
 
     /**
-     * @param \Closure(mixed $input, ParserErrorException $\parserErrorException): mixed $catch
+     * @param \Closure(mixed $input, ParserErrorException $parserErrorException): mixed $catch
      */
     public function catch(\Closure $catch): static;
 
