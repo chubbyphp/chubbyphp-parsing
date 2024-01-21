@@ -23,7 +23,7 @@ final class UnionSchema extends AbstractSchema implements SchemaInterface
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Argument #1 value of #%s ($schemas) must be of type %s, %s given',
-                        (string) $i,
+                        $i,
                         SchemaInterface::class,
                         $this->getDataType($schema)
                     )

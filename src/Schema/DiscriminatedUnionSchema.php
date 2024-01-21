@@ -23,7 +23,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Argument #1 value of #%s ($objectSchemas) must be of type %s, %s given',
-                        (string) $i,
+                        $i,
                         ObjectSchemaInterface::class,
                         $this->getDataType($objectSchema)
                     )
@@ -36,7 +36,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Argument #1 value of #%s #%s ($objectSchemas) must contain %s',
-                        (string) $i,
+                        $i,
                         $discriminatorFieldName,
                         LiteralSchemaInterface::class,
                     )
@@ -47,7 +47,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Argument #1 value of #%s #%s ($objectSchemas) must be of type %s, %s given',
-                        (string) $i,
+                        $i,
                         $discriminatorFieldName,
                         LiteralSchemaInterface::class,
                         $this->getDataType($discriminatorFieldSchema)

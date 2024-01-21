@@ -19,13 +19,13 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
      */
     public function __construct(array $fieldSchemas, private string $classname = \stdClass::class)
     {
-        foreach ($fieldSchemas as $name => $fieldSchema) {
-            if (!\is_string($name)) {
+        foreach ($fieldSchemas as $fieldName => $fieldSchema) {
+            if (!\is_string($fieldName)) {
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Argument #1 name #%s ($fieldSchemas) must be of type string, %s given',
-                        (string) $name,
-                        $this->getDataType($name)
+                        $fieldName,
+                        $this->getDataType($fieldName)
                     )
                 );
             }
@@ -34,7 +34,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Argument #1 value of #%s ($fieldSchemas) must be of type %s, %s given',
-                        (string) $name,
+                        $fieldName,
                         SchemaInterface::class,
                         $this->getDataType($fieldSchema)
                     )
