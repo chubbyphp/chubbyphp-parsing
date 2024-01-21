@@ -189,10 +189,7 @@ use Chubbyphp\Parsing\Parser;
 
 $p = new Parser();
 
-$schema = $p->union([
-    $p->string()->transform(static fn (string $output) => (int) $output),
-    $p->int(),
-]);
+$schema = $p->union([$p->string(), $p->int()]);
 
 $data = $schema->parse('42');
 ```
