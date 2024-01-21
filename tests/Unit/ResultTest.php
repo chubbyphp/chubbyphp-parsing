@@ -23,6 +23,7 @@ final class ResultTest extends TestCase
 
         self::assertSame($data, $result->data);
         self::assertNull($result->exception);
+        self::assertTrue($result->success);
     }
 
     public function testException(): void
@@ -33,5 +34,6 @@ final class ResultTest extends TestCase
 
         self::assertNull($result->data);
         self::assertSame($exception, $result->exception);
+        self::assertFalse($result->success);
     }
 }
