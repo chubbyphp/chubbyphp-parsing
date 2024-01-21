@@ -17,7 +17,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
      * @param array<string, SchemaInterface> $fieldSchemas
      * @param class-string                   $classname
      */
-    public function __construct(array $fieldSchemas, private string $classname)
+    public function __construct(array $fieldSchemas, private string $classname = \stdClass::class)
     {
         foreach ($fieldSchemas as $name => $fieldSchema) {
             if (!\is_string($name)) {
@@ -63,7 +63,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
             foreach (array_keys($input) as $fieldName) {
                 if (!isset($this->fieldSchemas[$fieldName])) {
-                    $parserErrorException->addError(sprintf("Additional property '%s'", $fieldName), $fieldName);
+                    $parserErrorException->addError('Unknown field', $fieldName);
                 }
             }
 
