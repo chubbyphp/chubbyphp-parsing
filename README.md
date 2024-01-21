@@ -155,6 +155,33 @@ $schema = $p->string();
 $data = $schema->parse('John Doe');
 ```
 
+#### Predefined transformers
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+// validations
+$p->string()->min(5);
+$p->string()->max(5);
+$p->string()->length(5);
+$p->string()->email();
+$p->string()->url();
+$p->string()->uuid();
+$p->string()->regex('/^[a-z]+$/i');
+$p->string()->contains();
+$p->string()->startsWith('exa');
+$p->string()->endsWith('mpl');
+$p->string()->dateTime();
+$p->string()->ip();
+
+// transformations
+$p->string()->trim();
+$p->string()->toLower();
+$p->string()->toUpper();
+```
+
 ### union
 
 ```php
