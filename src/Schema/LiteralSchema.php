@@ -28,9 +28,9 @@ final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterfa
             if ($input !== $this->literal) {
                 throw new ParserErrorException(
                     sprintf(
-                        'Input should be %s %s given',
-                        \is_string($this->literal) ? '"'.$this->literal.'"' : (string) $this->literal,
-                        \is_string($input) ? '"'.$input.'"' : (string) $input
+                        'Input should be %s, %s given',
+                        $this->formatValue($this->literal),
+                        $this->formatValue($input),
                     )
                 );
             }
@@ -43,5 +43,18 @@ final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterfa
 
             throw $parserErrorException;
         }
+    }
+
+    private function formatValue(bool|float|int|string $literal): string
+    {
+        if (\is_string($literal)) {
+            return '"'.$literal.'"';
+        }
+
+        if (\is_float($literal) || \is_int($literal)) {
+            return (string) $literal;
+        }
+
+        return true === $literal ? 'true' : 'false';
     }
 }

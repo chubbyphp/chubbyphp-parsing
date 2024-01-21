@@ -81,16 +81,55 @@ final class LiteralSchemaTest extends TestCase
         }
     }
 
-    public function testParseFailedWithDifferentLiteralValue(): void
+    public function testParseFailedWithDifferentStringLiteralValue(): void
     {
-        $schema = new LiteralSchema('tes1');
+        $schema = new LiteralSchema('test1');
 
         try {
             $schema->parse('test2');
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Input should be "tes1" "test2" given'], $parserErrorException->getErrors());
+            self::assertSame(['Input should be "test1", "test2" given'], $parserErrorException->getErrors());
+        }
+    }
+
+    public function testParseFailedWithDifferentFloatLiteralValue(): void
+    {
+        $schema = new LiteralSchema(4.2);
+
+        try {
+            $schema->parse(4.1);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame(['Input should be 4.2, 4.1 given'], $parserErrorException->getErrors());
+        }
+    }
+
+    public function testParseFailedWithDifferentIntLiteralValue(): void
+    {
+        $schema = new LiteralSchema(1337);
+
+        try {
+            $schema->parse(1336);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame(['Input should be 1337, 1336 given'], $parserErrorException->getErrors());
+        }
+    }
+
+    public function testParseFailedWithDifferentBoolLiteralValue(): void
+    {
+        $schema = new LiteralSchema(true);
+
+        try {
+            $schema->parse(false);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame(['Input should be true, false given'], $parserErrorException->getErrors());
         }
     }
 

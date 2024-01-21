@@ -151,9 +151,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                'Input should be "type1" "type3" given',
-                'Input should be "type2" "type3" given',
+            self::assertSame(['Input should be "type1", "type3" given',
+                'Input should be "type2", "type3" given',
             ], $parserErrorException->getErrors());
         }
     }
