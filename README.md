@@ -1,6 +1,6 @@
 # chubbyphp-parsing
 
-[![CI](https://github.com/chubbyphp/chubbyphp-parsing/workflows/CI/badge.svg?branch=master)](https://github.com/chubbyphp/chubbyphp-parsing/actions?query=workflow%3ACI)
+[![CI](https://github.com/chubbyphp/chubbyphp-parsing/actions/workflows/ci.yml/badge.svg)](https://github.com/chubbyphp/chubbyphp-parsing/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/chubbyphp/chubbyphp-parsing/badge.svg?branch=master)](https://coveralls.io/github/chubbyphp/chubbyphp-parsing?branch=master)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fchubbyphp%2Fchubbyphp-parsing%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/chubbyphp/chubbyphp-parsing/master)
 [![Latest Stable Version](https://poser.pugx.org/chubbyphp/chubbyphp-parsing/v/stable.png)](https://packagist.org/packages/chubbyphp/chubbyphp-parsing)
