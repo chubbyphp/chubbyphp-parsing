@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ParserErrorException;
 
 final class FloatSchema extends AbstractSchema implements SchemaInterface
 {
+    public const ERROR_TYPE_CODE = 'float.type';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "float", "{{given}}" given';
+
     public function parse(mixed $input): mixed
     {
         $input ??= $this->default;
@@ -19,7 +23,11 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
         try {
             if (!\is_float($input)) {
                 throw new ParserErrorException(
-                    sprintf('Type should be "float" "%s" given', $this->getDataType($input))
+                    new Error(
+                        self::ERROR_TYPE_CODE,
+                        self::ERROR_TYPE_TEMPLATE,
+                        ['given' => $this->getDataType($input)]
+                    )
                 );
             }
 

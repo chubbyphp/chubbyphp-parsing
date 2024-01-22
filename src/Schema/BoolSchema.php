@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ParserErrorException;
 
 final class BoolSchema extends AbstractSchema implements SchemaInterface
 {
+    public const ERROR_TYPE_CODE = 'bool.type';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "bool", "{{given}}" given';
+
     public function parse(mixed $input): mixed
     {
         $input ??= $this->default;
@@ -18,7 +22,13 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
         try {
             if (!\is_bool($input)) {
-                throw new ParserErrorException(sprintf('Type should be "bool" "%s" given', $this->getDataType($input)));
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_TYPE_CODE,
+                        self::ERROR_TYPE_TEMPLATE,
+                        ['given' => $this->getDataType($input)]
+                    )
+                );
             }
 
             return $this->transformOutput($input);

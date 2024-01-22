@@ -6,7 +6,7 @@ namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
-use PHPUnit\Framework\TestCase;
+use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @internal
  */
-final class DateTimeSchemaTest extends TestCase
+final class DateTimeSchemaTest extends AbstractTestCase
 {
     public function testParseSuccess(): void
     {
@@ -50,7 +50,15 @@ final class DateTimeSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Type should be "DateTimeInterface" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'datetime.type',
+                    'template' => 'Type should be "\DateTimeInterface", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -66,9 +74,17 @@ final class DateTimeSchemaTest extends TestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new DateTimeSchema())
-            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
                 self::assertNull($input);
-                self::assertSame(['Type should be "DateTimeInterface" "NULL" given'], $parserErrorException->getErrors());
+                self::assertSame([
+                    [
+                        'code' => 'datetime.type',
+                        'template' => 'Type should be "\DateTimeInterface", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
 
                 return 'catched';
             })
@@ -90,6 +106,14 @@ final class DateTimeSchemaTest extends TestCase
     {
         $schema = new DateTimeSchema();
 
-        self::assertSame(['Type should be "DateTimeInterface" "NULL" given'], $schema->safeParse(null)->exception->getErrors());
+        self::assertSame([
+            [
+                'code' => 'datetime.type',
+                'template' => 'Type should be "\DateTimeInterface", "{{given}}" given',
+                'variables' => [
+                    'given' => 'NULL',
+                ],
+            ],
+        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 }

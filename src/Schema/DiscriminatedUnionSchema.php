@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ParserErrorException;
 
 final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInterface
 {
+    public const ERROR_TYPE_CODE = 'discriminatedUnion.type';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", "{{given}}" given';
+
+    public const ERROR_DISCRIMINATOR_FIELD_CODE = 'discriminatedUnion.discriminatorField';
+    public const ERROR_DISCRIMINATOR_FIELD_TEMPLATE = 'Input does not contain the discriminator field "{{discriminatorFieldName}}"';
+
     /**
      * @var array<ObjectSchemaInterface>
      */
@@ -70,15 +77,20 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
         try {
             if (!\is_array($input)) {
                 throw new ParserErrorException(
-                    sprintf('Type should be "array" "%s" given', $this->getDataType($input))
+                    new Error(
+                        self::ERROR_TYPE_CODE,
+                        self::ERROR_TYPE_TEMPLATE,
+                        ['given' => $this->getDataType($input)]
+                    )
                 );
             }
 
             if (!isset($input[$this->discriminatorFieldName])) {
                 throw new ParserErrorException(
-                    sprintf(
-                        'Missing discriminator value on field "%s"',
-                        $this->discriminatorFieldName,
+                    new Error(
+                        self::ERROR_DISCRIMINATOR_FIELD_CODE,
+                        self::ERROR_DISCRIMINATOR_FIELD_TEMPLATE,
+                        ['discriminatorFieldName' => $this->discriminatorFieldName]
                     )
                 );
             }

@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ParserErrorException;
 
 final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterface
 {
+    public const ERROR_TYPE_CODE = 'literal.type';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "bool|float|int|string", "{{given}}" given';
+
+    public const ERROR_EQUALS_CODE = 'literal.equals';
+    public const ERROR_EQUALS_TEMPLATE = 'Input should be {{expected}}, {{given}} given';
+
     public function __construct(private bool|float|int|string $literal) {}
 
     public function parse(mixed $input): mixed
@@ -21,16 +28,20 @@ final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterfa
         try {
             if (!\is_bool($input) && !\is_float($input) && !\is_int($input) && !\is_string($input)) {
                 throw new ParserErrorException(
-                    sprintf('Type should be "bool|float|int|string" "%s" given', $this->getDataType($input))
+                    new Error(
+                        self::ERROR_TYPE_CODE,
+                        self::ERROR_TYPE_TEMPLATE,
+                        ['given' => $this->getDataType($input)]
+                    )
                 );
             }
 
             if ($input !== $this->literal) {
                 throw new ParserErrorException(
-                    sprintf(
-                        'Input should be %s, %s given',
-                        $this->formatValue($this->literal),
-                        $this->formatValue($input),
+                    new Error(
+                        self::ERROR_EQUALS_CODE,
+                        self::ERROR_EQUALS_TEMPLATE,
+                        ['expected' => $this->literal, 'given' => $input]
                     )
                 );
             }
@@ -43,18 +54,5 @@ final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterfa
 
             throw $parserErrorException;
         }
-    }
-
-    private function formatValue(bool|float|int|string $literal): string
-    {
-        if (\is_string($literal)) {
-            return '"'.$literal.'"';
-        }
-
-        if (\is_float($literal) || \is_int($literal)) {
-            return (string) $literal;
-        }
-
-        return true === $literal ? 'true' : 'false';
     }
 }

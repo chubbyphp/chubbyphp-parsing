@@ -28,7 +28,7 @@ final class ResultTest extends TestCase
 
     public function testException(): void
     {
-        $exception = new ParserErrorException('test');
+        $exception = new ParserErrorException();
 
         $result = new Result(null, $exception);
 

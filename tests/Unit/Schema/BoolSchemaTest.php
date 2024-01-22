@@ -6,7 +6,7 @@ namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\BoolSchema;
-use PHPUnit\Framework\TestCase;
+use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @internal
  */
-final class BoolSchemaTest extends TestCase
+final class BoolSchemaTest extends AbstractTestCase
 {
     public function testParseSuccess(): void
     {
@@ -50,7 +50,15 @@ final class BoolSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Type should be "bool" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'bool.type',
+                    'template' => 'Type should be "bool", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -67,9 +75,17 @@ final class BoolSchemaTest extends TestCase
     {
         $schema = (new BoolSchema())
 
-            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
                 self::assertNull($input);
-                self::assertSame(['Type should be "bool" "NULL" given'], $parserErrorException->getErrors());
+                self::assertSame([
+                    [
+                        'code' => 'bool.type',
+                        'template' => 'Type should be "bool", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
 
                 return 'catched';
             })
@@ -91,6 +107,14 @@ final class BoolSchemaTest extends TestCase
     {
         $schema = new BoolSchema();
 
-        self::assertSame(['Type should be "bool" "NULL" given'], $schema->safeParse(null)->exception->getErrors());
+        self::assertSame([
+            [
+                'code' => 'bool.type',
+                'template' => 'Type should be "bool", "{{given}}" given',
+                'variables' => [
+                    'given' => 'NULL',
+                ],
+            ],
+        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 }

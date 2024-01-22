@@ -73,37 +73,103 @@ final class ParserTest extends TestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 'array' => [
-                    0 => 'Type should be "array" "NULL" given',
+                    [
+                        'code' => 'array.type',
+                        'template' => 'Type should be "array", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'bool' => [
-                    0 => 'Type should be "bool" "NULL" given',
+                    [
+                        'code' => 'bool.type',
+                        'template' => 'Type should be "bool", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'dateTime' => [
-                    0 => 'Type should be "DateTimeInterface" "NULL" given',
+                    [
+                        'code' => 'datetime.type',
+                        'template' => 'Type should be "\\DateTimeInterface", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'discriminatedUnion' => [
-                    0 => 'Type should be "array" "NULL" given',
+                    [
+                        'code' => 'discriminatedUnion.type',
+                        'template' => 'Type should be "array", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'float' => [
-                    0 => 'Type should be "float" "NULL" given',
+                    [
+                        'code' => 'float.type',
+                        'template' => 'Type should be "float", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'int' => [
-                    0 => 'Type should be "int" "NULL" given',
+                    [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'literal' => [
-                    0 => 'Type should be "bool|float|int|string" "NULL" given',
+                    [
+                        'code' => 'literal.type',
+                        'template' => 'Type should be "bool|float|int|string", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'object' => [
-                    0 => 'Type should be "array" "NULL" given',
+                    [
+                        'code' => 'object.type',
+                        'template' => 'Type should be "array", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'string' => [
-                    0 => 'Type should be "string" "NULL" given',
+                    [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
                 'union' => [
-                    0 => 'Type should be "string" "NULL" given',
-                    1 => 'Type should be "int" "NULL" given',
+                    [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                    [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
                 ],
-            ], $parserErrorException->getErrors());
+            ], json_decode(json_encode($parserErrorException->getErrors()), true));
         }
     }
 

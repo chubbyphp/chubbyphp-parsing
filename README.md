@@ -52,14 +52,14 @@ $schema = $p->array($p->string());
 $data = $schema->parse(['John Doe']);
 ```
 
-### bool
+### boolean
 
 ```php
 use Chubbyphp\Parsing\Parser;
 
 $p = new Parser();
 
-$schema = $p->bool();
+$schema = $p->boolean();
 
 $data = $schema->parse(true);
 ```
@@ -166,20 +166,23 @@ $p = new Parser();
 $p->string()->min(5);
 $p->string()->max(5);
 $p->string()->length(5);
-$p->string()->email();
-$p->string()->url();
-$p->string()->uuid();
-$p->string()->regex('/^[a-z]+$/i');
 $p->string()->contains();
 $p->string()->startsWith('exa');
 $p->string()->endsWith('mpl');
-$p->string()->dateTime();
+$p->string()->regex('/^[a-z]+$/i');
+$p->string()->email();
 $p->string()->ip();
+$p->string()->url();
+$p->string()->uuid();
 
 // transformations
 $p->string()->trim();
-$p->string()->toLower();
-$p->string()->toUpper();
+$p->string()->lower();
+$p->string()->upper();
+
+// conversions
+$p->string()->toInt();
+$p->string()->toDateTime();
 ```
 
 ### union

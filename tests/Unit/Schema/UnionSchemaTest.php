@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
-use PHPUnit\Framework\TestCase;
+use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @internal
  */
-final class UnionSchemaTest extends TestCase
+final class UnionSchemaTest extends AbstractTestCase
 {
     public function testConstructWithWrongArgument(): void
     {
@@ -85,9 +85,21 @@ final class UnionSchemaTest extends TestCase
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
-                'Type should be "string" "NULL" given',
-                'Type should be "int" "NULL" given',
-            ], $parserErrorException->getErrors());
+                [
+                    'code' => 'string.type',
+                    'template' => 'Type should be "string", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
+                ],
+                [
+                    'code' => 'int.type',
+                    'template' => 'Type should be "int", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -112,12 +124,24 @@ final class UnionSchemaTest extends TestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))
-            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
                 self::assertNull($input);
                 self::assertSame([
-                    'Type should be "string" "NULL" given',
-                    'Type should be "int" "NULL" given',
-                ], $parserErrorException->getErrors());
+                    [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                    [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
 
                 return 'catched';
             })
@@ -149,8 +173,20 @@ final class UnionSchemaTest extends TestCase
         $schema = new UnionSchema([new StringSchema(), new IntSchema()]);
 
         self::assertSame([
-            'Type should be "string" "NULL" given',
-            'Type should be "int" "NULL" given',
-        ], $schema->safeParse(null)->exception->getErrors());
+            [
+                'code' => 'string.type',
+                'template' => 'Type should be "string", "{{given}}" given',
+                'variables' => [
+                    'given' => 'NULL',
+                ],
+            ],
+            [
+                'code' => 'int.type',
+                'template' => 'Type should be "int", "{{given}}" given',
+                'variables' => [
+                    'given' => 'NULL',
+                ],
+            ],
+        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 }

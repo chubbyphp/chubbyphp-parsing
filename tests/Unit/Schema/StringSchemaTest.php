@@ -6,7 +6,7 @@ namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use PHPUnit\Framework\TestCase;
+use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @internal
  */
-final class StringSchemaTest extends TestCase
+final class StringSchemaTest extends AbstractTestCase
 {
     public function testParseSuccess(): void
     {
@@ -50,7 +50,15 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Type should be "string" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'string.type',
+                    'template' => 'Type should be "string", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -66,9 +74,17 @@ final class StringSchemaTest extends TestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new StringSchema())
-            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
                 self::assertNull($input);
-                self::assertSame(['Type should be "string" "NULL" given'], $parserErrorException->getErrors());
+                self::assertSame([
+                    [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
 
                 return 'catched';
             })
@@ -90,7 +106,15 @@ final class StringSchemaTest extends TestCase
     {
         $schema = new StringSchema();
 
-        self::assertSame(['Type should be "string" "NULL" given'], $schema->safeParse(null)->exception->getErrors());
+        self::assertSame([
+            [
+                'code' => 'string.type',
+                'template' => 'Type should be "string", "{{given}}" given',
+                'variables' => [
+                    'given' => 'NULL',
+                ],
+            ],
+        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 
     public function testParseWithValidMin(): void
@@ -113,7 +137,16 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Length should at min 5, 4 given'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'string.min',
+                    'template' => 'Min length {{min}}, {{given}} given',
+                    'variables' => [
+                        'min' => 5,
+                        'given' => 4,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -137,7 +170,16 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Length should at max 3, 4 given'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'string.max',
+                    'template' => 'Max length {{max}}, {{given}} given',
+                    'variables' => [
+                        'max' => 3,
+                        'given' => 4,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -161,262 +203,16 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Length should be 5, 4 given'], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithValidEmail(): void
-    {
-        $input = 'john.doe@example.com';
-
-        $schema = (new StringSchema())->email();
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidMail(): void
-    {
-        $input = 'test';
-
-        $schema = (new StringSchema())->email();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"test" is not a valid email'], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithUrlWithInvalidOption(): void
-    {
-        try {
-            (new StringSchema())->url(99);
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid option "99" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidUrl(): void
-    {
-        $input = 'https://localhost';
-
-        $schema = (new StringSchema())->url();
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUrl(): void
-    {
-        $input = 'test';
-
-        $schema = (new StringSchema())->url();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"test" is not a valid url'], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithValidUrlPathReqired(): void
-    {
-        $input = 'https://localhost/';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUrlPathReqired(): void
-    {
-        $input = 'https://localhost';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"https://localhost" is not a valid url'], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithValidUrlQueryReqired(): void
-    {
-        $input = 'https://localhost?key=value';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_QUERY_REQUIRED);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUrlQueryReqired(): void
-    {
-        $input = 'https://localhost';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_QUERY_REQUIRED);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"https://localhost" is not a valid url'], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithValidUrlPathAndQueryReqired(): void
-    {
-        $input = 'https://localhost/?key=value';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUrlPathAndQueryReqired(): void
-    {
-        $input = 'https://localhost';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"https://localhost" is not a valid url'], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithUuidWithInvalidOption(): void
-    {
-        try {
-            (new StringSchema())->uuid(99);
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid option "99" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidUuid(): void
-    {
-        $input1 = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
-        $input2 = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuid();
-
-        self::assertSame($input1, $schema->parse($input1));
-        self::assertSame($input2, $schema->parse($input2));
-    }
-
-    public function testParseWithInvalidUuid(): void
-    {
-        $input = '960b0533-da17-72d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuid();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"960b0533-da17-72d8-a0a4-dd2ab7213caf" is not a valid uuid',
-            ], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithValidUuidV4(): void
-    {
-        $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuid(StringSchema::UUID_V4);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUuidV4(): void
-    {
-        $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuid(StringSchema::UUID_V4);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"960b0533-da17-52d8-a0a4-dd2ab7213caf" is not a valid uuid v4',
-            ], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithValidUuidV5(): void
-    {
-        $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuid(StringSchema::UUID_V5);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUuidV5(): void
-    {
-        $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuid(StringSchema::UUID_V5);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
-                '"960b0533-da17-42d8-a0a4-dd2ab7213caf" is not a valid uuid v5',
-            ], $parserErrorException->getErrors());
-        }
-    }
-
-    public function testParseWithRegexWithInvalidPattern(): void
-    {
-        try {
-            (new StringSchema())->regex('test');
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid pattern "test" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidRegex(): void
-    {
-        $input = 'aBcDeFg';
-
-        $schema = (new StringSchema())->regex('/^[a-z]+$/i');
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidRegex(): void
-    {
-        $input = 'a1B2C3d4';
-
-        $schema = (new StringSchema())->regex('/^[a-z]+$/i');
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"a1B2C3d4" does not match pattern "/^[a-z]+$/i"'], $parserErrorException->getErrors());
+                [
+                    'code' => 'string.length',
+                    'template' => 'Length {{length}}, {{given}} given',
+                    'variables' => [
+                        'length' => 5,
+                        'given' => 4,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -440,7 +236,16 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"example" does not contains with "lee"'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'string.contains',
+                    'template' => '"{{given}}" does not contain "{{contain}}"',
+                    'variables' => [
+                        'given' => 'example',
+                        'contain' => 'lee',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -464,7 +269,16 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"example" does not starts with "xam"'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'string.startsWith',
+                    'template' => '"{{given}}" does not starts with "{{startsWith}}"',
+                    'variables' => [
+                        'given' => 'example',
+                        'startsWith' => 'xam',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -488,31 +302,92 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"example" does not ends with "mpl"'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'string.endsWith',
+                    'template' => '"{{given}}" does not ends with "{{endsWith}}"',
+                    'variables' => [
+                        'given' => 'example',
+                        'endsWith' => 'mpl',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
-    public function testParseWithValidDateTime(): void
+    public function testParseWithRegexWithInvalidPattern(): void
     {
-        $input = '2024-01-20T09:15:00Z';
+        try {
+            (new StringSchema())->regex('test');
 
-        $schema = (new StringSchema())->dateTime();
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid regex "test" given', $e->getMessage());
+        }
+    }
+
+    public function testParseWithValidRegex(): void
+    {
+        $input = 'aBcDeFg';
+
+        $schema = (new StringSchema())->regex('/^[a-z]+$/i');
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidDateTime(): void
+    public function testParseWithInvalidRegex(): void
     {
-        $input = 'test';
+        $input = 'a1B2C3d4';
 
-        $schema = (new StringSchema())->dateTime();
+        $schema = (new StringSchema())->regex('/^[a-z]+$/i');
 
         try {
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"test" is not a valid datetime'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'string.regex',
+                    'template' => '"{{given}}" does not regex "{{regex}}"',
+                    'variables' => [
+                        'given' => 'a1B2C3d4',
+                        'regex' => '/^[a-z]+$/i',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidEmail(): void
+    {
+        $input = 'john.doe@example.com';
+
+        $schema = (new StringSchema())->email();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidEmail(): void
+    {
+        $input = 'test';
+
+        $schema = (new StringSchema())->email();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.email',
+                    'template' => 'Invalid email "{{given}}"',
+                    'variables' => [
+                        'given' => 'test',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -551,8 +426,14 @@ final class StringSchemaTest extends TestCase
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
-                '"256.202.56.89" is not a valid ip',
-            ], $parserErrorException->getErrors());
+                [
+                    'code' => 'string.ip',
+                    'template' => 'Invalid ip "{{given}}"',
+                    'variables' => [
+                        'given' => '256.202.56.89',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
 
         try {
@@ -561,8 +442,14 @@ final class StringSchemaTest extends TestCase
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
-                '"2001:0db8:85a3:0000:0000:8a2e:0370:733g" is not a valid ip',
-            ], $parserErrorException->getErrors());
+                [
+                    'code' => 'string.ip',
+                    'template' => 'Invalid ip "{{given}}"',
+                    'variables' => [
+                        'given' => '2001:0db8:85a3:0000:0000:8a2e:0370:733g',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -587,8 +474,14 @@ final class StringSchemaTest extends TestCase
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
-                '"256.202.56.89" is not a valid ip',
-            ], $parserErrorException->getErrors());
+                [
+                    'code' => 'string.ip',
+                    'template' => 'Invalid ip "{{given}}"',
+                    'variables' => [
+                        'given' => '256.202.56.89',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -612,8 +505,330 @@ final class StringSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['"2001:0db8:85a3:0000:0000:8a2e:0370:733g" is not a valid ip',
-            ], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'string.ip',
+                    'template' => 'Invalid ip "{{given}}"',
+                    'variables' => [
+                        'given' => '2001:0db8:85a3:0000:0000:8a2e:0370:733g',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithUrlWithInvalidOption(): void
+    {
+        try {
+            (new StringSchema())->url(99);
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid option "99" given', $e->getMessage());
+        }
+    }
+
+    public function testParseWithValidUrl(): void
+    {
+        $input = 'https://localhost';
+
+        $schema = (new StringSchema())->url();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUrl(): void
+    {
+        $input = 'test';
+
+        $schema = (new StringSchema())->url();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.url',
+                    'template' => 'Invalid url "{{given}}"',
+                    'variables' => [
+                        'given' => 'test',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidUrlPathReqired(): void
+    {
+        $input = 'https://localhost/';
+
+        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUrlPathReqired(): void
+    {
+        $input = 'https://localhost';
+
+        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.url',
+                    'template' => 'Invalid url "{{given}}"',
+                    'variables' => [
+                        'given' => 'https://localhost',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidUrlQueryReqired(): void
+    {
+        $input = 'https://localhost?key=value';
+
+        $schema = (new StringSchema())->url(FILTER_FLAG_QUERY_REQUIRED);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUrlQueryReqired(): void
+    {
+        $input = 'https://localhost';
+
+        $schema = (new StringSchema())->url(FILTER_FLAG_QUERY_REQUIRED);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.url',
+                    'template' => 'Invalid url "{{given}}"',
+                    'variables' => [
+                        'given' => 'https://localhost',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidUrlPathAndQueryReqired(): void
+    {
+        $input = 'https://localhost/?key=value';
+
+        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUrlPathAndQueryReqired(): void
+    {
+        $input = 'https://localhost';
+
+        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.url',
+                    'template' => 'Invalid url "{{given}}"',
+                    'variables' => [
+                        'given' => 'https://localhost',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithUuidWithInvalidOption(): void
+    {
+        try {
+            (new StringSchema())->uuid(99);
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid option "99" given', $e->getMessage());
+        }
+    }
+
+    public function testParseWithValidUuid(): void
+    {
+        $input1 = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
+        $input2 = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
+
+        $schema = (new StringSchema())->uuid();
+
+        self::assertSame($input1, $schema->parse($input1));
+        self::assertSame($input2, $schema->parse($input2));
+    }
+
+    public function testParseWithInvalidUuid(): void
+    {
+        $input = '960b0533-da17-72d8-a0a4-dd2ab7213caf';
+
+        $schema = (new StringSchema())->uuid();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.uuid',
+                    'template' => 'Invalid uuid {{version}} "{{given}}"',
+                    'variables' => [
+                        'version' => '4|5',
+                        'given' => '960b0533-da17-72d8-a0a4-dd2ab7213caf',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidUuidV4(): void
+    {
+        $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
+
+        $schema = (new StringSchema())->uuid(StringSchema::UUID_V4);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUuidV4(): void
+    {
+        $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
+
+        $schema = (new StringSchema())->uuid(StringSchema::UUID_V4);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.uuid',
+                    'template' => 'Invalid uuid {{version}} "{{given}}"',
+                    'variables' => [
+                        'version' => '4',
+                        'given' => '960b0533-da17-52d8-a0a4-dd2ab7213caf',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidUuidV5(): void
+    {
+        $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
+
+        $schema = (new StringSchema())->uuid(StringSchema::UUID_V5);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUuidV5(): void
+    {
+        $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
+
+        $schema = (new StringSchema())->uuid(StringSchema::UUID_V5);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.uuid',
+                    'template' => 'Invalid uuid {{version}} "{{given}}"',
+                    'variables' => [
+                        'version' => '5',
+                        'given' => '960b0533-da17-42d8-a0a4-dd2ab7213caf',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidtoInt(): void
+    {
+        $input = '42';
+
+        $schema = (new StringSchema())->toInt();
+
+        self::assertEquals((int) $input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidtoInt(): void
+    {
+        $input = '42cars';
+
+        $schema = (new StringSchema())->toInt();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.int',
+                    'template' => 'Invalid int "{{given}}"',
+                    'variables' => [
+                        'given' => '42cars',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidToDateTime(): void
+    {
+        $input = '2024-01-20T09:15:00Z';
+
+        $schema = (new StringSchema())->toDateTime();
+
+        self::assertEquals(new \DateTimeImmutable($input), $schema->parse($input));
+    }
+
+    public function testParseWithInvalidToDateTime(): void
+    {
+        $input = 'test';
+
+        $schema = (new StringSchema())->toDateTime();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.datetime',
+                    'template' => 'Invalid datetime "{{given}}"',
+                    'variables' => [
+                        'given' => 'test',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -626,20 +841,20 @@ final class StringSchemaTest extends TestCase
         self::assertSame(trim($input), $schema->parse($input));
     }
 
-    public function testParseWithtoLower(): void
+    public function testParseWithLower(): void
     {
         $input = 'TEST';
 
-        $schema = (new StringSchema())->toLower();
+        $schema = (new StringSchema())->lower();
 
         self::assertSame(strtolower($input), $schema->parse($input));
     }
 
-    public function testParseWithtoUpper(): void
+    public function testParseWithUpper(): void
     {
         $input = 'test';
 
-        $schema = (new StringSchema())->toUpper();
+        $schema = (new StringSchema())->upper();
 
         self::assertSame(strtoupper($input), $schema->parse($input));
     }

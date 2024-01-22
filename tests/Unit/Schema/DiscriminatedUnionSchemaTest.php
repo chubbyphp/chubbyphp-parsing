@@ -9,7 +9,7 @@ use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use PHPUnit\Framework\TestCase;
+use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @internal
  */
-final class DiscriminatedUnionSchemaTest extends TestCase
+final class DiscriminatedUnionSchemaTest extends AbstractTestCase
 {
     public function testConstructWithoutObjectSchema(): void
     {
@@ -115,7 +115,15 @@ final class DiscriminatedUnionSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'discriminatedUnion.type',
+                    'template' => 'Type should be "array", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -133,7 +141,15 @@ final class DiscriminatedUnionSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Missing discriminator value on field "field1"'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'discriminatedUnion.discriminatorField',
+                    'template' => 'Input does not contain the discriminator field "{{discriminatorFieldName}}"',
+                    'variables' => [
+                        'discriminatorFieldName' => 'field1',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -151,9 +167,24 @@ final class DiscriminatedUnionSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Input should be "type1", "type3" given',
-                'Input should be "type2", "type3" given',
-            ], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'literal.equals',
+                    'template' => 'Input should be {{expected}}, {{given}} given',
+                    'variables' => [
+                        'expected' => 'type1',
+                        'given' => 'type3',
+                    ],
+                ],
+                1 => [
+                    'code' => 'literal.equals',
+                    'template' => 'Input should be {{expected}}, {{given}} given',
+                    'variables' => [
+                        'expected' => 'type2',
+                        'given' => 'type3',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -179,9 +210,17 @@ final class DiscriminatedUnionSchemaTest extends TestCase
             new ObjectSchema(['field1' => new LiteralSchema('type1')]),
             new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1'))
-            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
                 self::assertNull($input);
-                self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
+                self::assertSame([
+                    [
+                        'code' => 'discriminatedUnion.type',
+                        'template' => 'Type should be "array", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
 
                 return 'catched';
             })
@@ -209,6 +248,14 @@ final class DiscriminatedUnionSchemaTest extends TestCase
             new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
-        self::assertSame(['Type should be "array" "NULL" given'], $schema->safeParse(null)->exception->getErrors());
+        self::assertSame([
+            [
+                'code' => 'discriminatedUnion.type',
+                'template' => 'Type should be "array", "{{given}}" given',
+                'variables' => [
+                    'given' => 'NULL',
+                ],
+            ],
+        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 }

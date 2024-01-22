@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ParserErrorException;
 
 final class ArraySchema extends AbstractSchema implements SchemaInterface
 {
+    public const ERROR_TYPE_CODE = 'array.type';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", "{{given}}" given';
+
     public function __construct(private SchemaInterface $itemSchema) {}
 
     public function parse(mixed $input): mixed
@@ -21,7 +25,11 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
         try {
             if (!\is_array($input)) {
                 throw new ParserErrorException(
-                    sprintf('Type should be "array" "%s" given', $this->getDataType($input))
+                    new Error(
+                        self::ERROR_TYPE_CODE,
+                        self::ERROR_TYPE_TEMPLATE,
+                        ['given' => $this->getDataType($input)]
+                    )
                 );
             }
 

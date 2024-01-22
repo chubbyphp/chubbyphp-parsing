@@ -8,13 +8,18 @@ final class ParserErrorException extends \RuntimeException
 {
     private array $errors = [];
 
-    public function __construct(null|string $error = null, null|int|string $key = null)
+    public function __construct(null|Error $error = null, null|int|string $key = null)
     {
         if (null === $error) {
             return;
         }
 
         $this->addError($error, $key);
+    }
+
+    public function __toString(): string
+    {
+        return self::class;
     }
 
     public function addParserErrorException(self $parserErrorException, null|int|string $key = null): self
@@ -30,7 +35,7 @@ final class ParserErrorException extends \RuntimeException
         return $this;
     }
 
-    public function addError(string $error, null|int|string $key = null): self
+    public function addError(Error $error, null|int|string $key = null): self
     {
         if (null !== $key) {
             $this->errors[$key] = array_merge($this->errors[$key] ?? [], [$error]);

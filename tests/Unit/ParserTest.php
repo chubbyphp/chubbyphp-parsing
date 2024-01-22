@@ -37,9 +37,9 @@ final class ParserTest extends TestCase
     {
         $p = new Parser();
 
-        $boolSchema = $p->bool();
+        $BoolSchema = $p->bool();
 
-        self::assertInstanceOf(BoolSchema::class, $boolSchema);
+        self::assertInstanceOf(BoolSchema::class, $BoolSchema);
     }
 
     public function testDateTime(): void

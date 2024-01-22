@@ -7,7 +7,7 @@ namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use PHPUnit\Framework\TestCase;
+use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @internal
  */
-final class ArraySchemaTest extends TestCase
+final class ArraySchemaTest extends AbstractTestCase
 {
     public function testParseSuccess(): void
     {
@@ -51,7 +51,18 @@ final class ArraySchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame(
+                [
+                    [
+                        'code' => 'array.type',
+                        'template' => 'Type should be "array", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                ],
+                $this->errorsToSimpleArray($parserErrorException->getErrors())
+            );
         }
     }
 
@@ -67,9 +78,25 @@ final class ArraySchemaTest extends TestCase
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
-                1 => ['Type should be "string" "integer" given'],
-                2 => ['Type should be "string" "boolean" given'],
-            ], $parserErrorException->getErrors());
+                1 => [
+                    [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'integer',
+                        ],
+                    ],
+                ],
+                2 => [
+                    [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'boolean',
+                        ],
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -77,7 +104,9 @@ final class ArraySchemaTest extends TestCase
     {
         $input = ['test1'];
 
-        $schema = (new ArraySchema(new StringSchema()))->transform(static fn (array $output) => array_merge($output, ['test2']));
+        $schema = (new ArraySchema(new StringSchema()))
+            ->transform(static fn (array $output) => array_merge($output, ['test2']))
+        ;
 
         self::assertSame(array_merge($input, ['test2']), $schema->parse($input));
     }
@@ -85,9 +114,21 @@ final class ArraySchemaTest extends TestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new ArraySchema(new StringSchema()))
-            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
                 self::assertNull($input);
-                self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
+
+                self::assertSame(
+                    [
+                        [
+                            'code' => 'array.type',
+                            'template' => 'Type should be "array", "{{given}}" given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
+                        ],
+                    ],
+                    $this->errorsToSimpleArray($parserErrorException->getErrors())
+                );
 
                 return 'catched';
             })
@@ -109,6 +150,17 @@ final class ArraySchemaTest extends TestCase
     {
         $schema = new ArraySchema(new StringSchema());
 
-        self::assertSame(['Type should be "array" "NULL" given'], $schema->safeParse(null)->exception->getErrors());
+        self::assertSame(
+            [
+                [
+                    'code' => 'array.type',
+                    'template' => 'Type should be "array", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
+                ],
+            ],
+            $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors())
+        );
     }
 }

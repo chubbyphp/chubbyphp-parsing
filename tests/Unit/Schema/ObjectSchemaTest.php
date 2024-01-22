@@ -9,7 +9,7 @@ use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use PHPUnit\Framework\TestCase;
+use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @internal
  */
-final class ObjectSchemaTest extends TestCase
+final class ObjectSchemaTest extends AbstractTestCase
 {
     public function testConstructWithoutFieldName(): void
     {
@@ -89,7 +89,15 @@ final class ObjectSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
+            self::assertSame([
+                [
+                    'code' => 'object.type',
+                    'template' => 'Type should be "array", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -104,7 +112,26 @@ final class ObjectSchemaTest extends TestCase
 
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
-            self::assertSame(['field2' => ['Unknown field'], 'field3' => ['Unknown field']], $parserErrorException->getErrors());
+            self::assertSame([
+                'field2' => [
+                    [
+                        'code' => 'object.unknownField',
+                        'template' => 'Unknown field "{{fieldName}}"',
+                        'variables' => [
+                            'fieldName' => 'field2',
+                        ],
+                    ],
+                ],
+                'field3' => [
+                    [
+                        'code' => 'object.unknownField',
+                        'template' => 'Unknown field "{{fieldName}}"',
+                        'variables' => [
+                            'fieldName' => 'field3',
+                        ],
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -120,9 +147,25 @@ final class ObjectSchemaTest extends TestCase
             throw new \Exception('code should not be reached');
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
-                'field2' => ['Type should be "float" "string" given'],
-                'field3' => ['Type should be "int" "string" given'],
-            ], $parserErrorException->getErrors());
+                'field2' => [
+                    [
+                        'code' => 'float.type',
+                        'template' => 'Type should be "float", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'string',
+                        ],
+                    ],
+                ],
+                'field3' => [
+                    [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'string',
+                        ],
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
@@ -142,9 +185,17 @@ final class ObjectSchemaTest extends TestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new ObjectSchema(['field1' => new StringSchema()]))
-            ->catch(static function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
                 self::assertNull($input);
-                self::assertSame(['Type should be "array" "NULL" given'], $parserErrorException->getErrors());
+                self::assertSame([
+                    [
+                        'code' => 'object.type',
+                        'template' => 'Type should be "array", "{{given}}" given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
 
                 return 'catched';
             })
@@ -166,7 +217,15 @@ final class ObjectSchemaTest extends TestCase
     {
         $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
 
-        self::assertSame(['Type should be "array" "NULL" given'], $schema->safeParse(null)->exception->getErrors());
+        self::assertSame([
+            [
+                'code' => 'object.type',
+                'template' => 'Type should be "array", "{{given}}" given',
+                'variables' => [
+                    'given' => 'NULL',
+                ],
+            ],
+        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 
     public function testGetFieldSchemaSuccess(): void

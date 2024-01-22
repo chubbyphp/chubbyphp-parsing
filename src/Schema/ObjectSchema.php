@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ParserErrorException;
 
 final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 {
+    public const ERROR_TYPE_CODE = 'object.type';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", "{{given}}" given';
+
+    public const ERROR_UNKNOWN_FIELD_CODE = 'object.unknownField';
+    public const ERROR_UNKNOWN_FIELD_TEMPLATE = 'Unknown field "{{fieldName}}"';
+
     /**
      * @var array<string, SchemaInterface>
      */
@@ -56,7 +63,11 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
         try {
             if (!\is_array($input)) {
                 throw new ParserErrorException(
-                    sprintf('Type should be "array" "%s" given', $this->getDataType($input))
+                    new Error(
+                        self::ERROR_TYPE_CODE,
+                        self::ERROR_TYPE_TEMPLATE,
+                        ['given' => $this->getDataType($input)]
+                    )
                 );
             }
 
@@ -66,7 +77,11 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
             foreach (array_keys($input) as $fieldName) {
                 if (!isset($this->fieldSchemas[$fieldName])) {
-                    $parserErrorException->addError('Unknown field', $fieldName);
+                    $parserErrorException->addError(new Error(
+                        self::ERROR_UNKNOWN_FIELD_CODE,
+                        self::ERROR_UNKNOWN_FIELD_TEMPLATE,
+                        ['fieldName' => $fieldName]
+                    ), $fieldName);
                 }
             }
 
