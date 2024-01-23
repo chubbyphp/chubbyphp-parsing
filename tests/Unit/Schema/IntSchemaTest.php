@@ -474,6 +474,41 @@ final class IntSchemaTest extends AbstractTestCase
         }
     }
 
+    public function testParseWithValidDivisorOf(): void
+    {
+        $input = 5;
+        $divisorOf = 25;
+
+        $schema = (new IntSchema())->divisorOf($divisorOf);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidDivisorOf(): void
+    {
+        $input = 5;
+        $divisorOf = 23;
+
+        $schema = (new IntSchema())->divisorOf($divisorOf);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.divisorOf',
+                    'template' => 'Value should be divisor of {{divisorOf}}, {{given}} given',
+                    'variables' => [
+                        'divisorOf' => $divisorOf,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
     public function testParseWithToString(): void
     {
         $input = 42;

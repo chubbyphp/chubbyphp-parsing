@@ -27,6 +27,9 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_MULTIPLEOF_CODE = 'int.multipleOf';
     public const ERROR_MULTIPLEOF_TEMPLATE = 'Value should be multiple of {{multipleOf}}, {{given}} given';
 
+    public const ERROR_DIVISOROF_CODE = 'int.divisorOf';
+    public const ERROR_DIVISOROF_TEMPLATE = 'Value should be divisor of {{divisorOf}}, {{given}} given';
+
     public function parse(mixed $input): mixed
     {
         $input ??= $this->default;
@@ -153,6 +156,23 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
                         self::ERROR_MULTIPLEOF_CODE,
                         self::ERROR_MULTIPLEOF_TEMPLATE,
                         ['multipleOf' => $multipleOf, 'given' => $output]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function divisorOf(int $divisorOf): static
+    {
+        return $this->transform(static function (int $output) use ($divisorOf) {
+            if (0 !== $divisorOf % $output) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_DIVISOROF_CODE,
+                        self::ERROR_DIVISOROF_TEMPLATE,
+                        ['divisorOf' => $divisorOf, 'given' => $output]
                     )
                 );
             }

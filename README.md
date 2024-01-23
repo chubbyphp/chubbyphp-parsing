@@ -132,6 +132,7 @@ $p->int()->nonNegative();
 $p->int()->negative();
 $p->int()->nonPositive();
 $p->int()->multipleOf(5);
+$p->int()->divisorOf(25);
 
 // transformations
 
