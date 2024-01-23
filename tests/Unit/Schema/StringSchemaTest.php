@@ -588,7 +588,7 @@ final class StringSchemaTest extends AbstractTestCase
 
         $schema = (new StringSchema())->toInt();
 
-        self::assertEquals((int) $input, $schema->parse($input));
+        self::assertSame((int) $input, $schema->parse($input));
     }
 
     public function testParseWithInvalidtoInt(): void

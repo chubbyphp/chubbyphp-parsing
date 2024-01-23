@@ -44,7 +44,7 @@ final class ParserErrorExceptionTest extends AbstractTestCase
 
     public function testToString(): void
     {
-        self::assertEquals(ParserErrorException::class, (string) new ParserErrorException());
+        self::assertSame(ParserErrorException::class, (string) new ParserErrorException());
     }
 
     public function testAddParserErrorException(): void
@@ -136,22 +136,23 @@ final class ParserErrorExceptionTest extends AbstractTestCase
             )
         ;
 
-        self::assertEquals(['field1' => [
-            [
-                'code' => 'error: 1',
-                'template' => 'template',
-                'variables' => [
-                    'key' => 'value',
+        self::assertSame([
+            'field1' => [
+                [
+                    'code' => 'error: 1',
+                    'template' => 'template',
+                    'variables' => [
+                        'key' => 'value',
+                    ],
+                ],
+                [
+                    'code' => 'error: 12',
+                    'template' => 'template',
+                    'variables' => [
+                        'key' => 'value',
+                    ],
                 ],
             ],
-            [
-                'code' => 'error: 12',
-                'template' => 'template',
-                'variables' => [
-                    'key' => 'value',
-                ],
-            ],
-        ],
             'field2' => [
                 [
                     'code' => 'error: 2',
