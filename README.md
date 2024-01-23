@@ -128,6 +128,10 @@ $p->int()->gte(5);
 $p->int()->lt(5);
 $p->int()->lte(5);
 $p->int()->positive();
+$p->int()->nonNegative();
+$p->int()->negative();
+$p->int()->nonPositive();
+$p->int()->multipleOf(5);
 
 // transformations
 

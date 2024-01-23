@@ -24,8 +24,8 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_LTE_CODE = 'int.lte';
     public const ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
-    public const ERROR_POSITIVE_CODE = 'int.positive';
-    public const ERROR_POSITIVE_TEMPLATE = 'Value should be positive, {{given}} given';
+    public const ERROR_MULTIPLEOF_CODE = 'int.multipleOf';
+    public const ERROR_MULTIPLEOF_TEMPLATE = 'Value should be multiple of {{multipleOf}}, {{given}} given';
 
     public function parse(mixed $input): mixed
     {
@@ -126,13 +126,33 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function positive(): static
     {
-        return $this->transform(static function (int $output) {
-            if ($output <= 0) {
+        return $this->gt(0);
+    }
+
+    public function nonNegative(): static
+    {
+        return $this->gte(0);
+    }
+
+    public function negative(): static
+    {
+        return $this->lt(0);
+    }
+
+    public function nonPositive(): static
+    {
+        return $this->lte(0);
+    }
+
+    public function multipleOf(int $multipleOf): static
+    {
+        return $this->transform(static function (int $output) use ($multipleOf) {
+            if (0 !== $output % $multipleOf) {
                 throw new ParserErrorException(
                     new Error(
-                        self::ERROR_POSITIVE_CODE,
-                        self::ERROR_POSITIVE_TEMPLATE,
-                        ['given' => $output]
+                        self::ERROR_MULTIPLEOF_CODE,
+                        self::ERROR_MULTIPLEOF_TEMPLATE,
+                        ['multipleOf' => $multipleOf, 'given' => $output]
                     )
                 );
             }

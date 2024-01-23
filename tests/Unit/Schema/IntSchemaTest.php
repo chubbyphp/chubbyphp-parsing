@@ -329,9 +329,144 @@ final class IntSchemaTest extends AbstractTestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 [
-                    'code' => 'int.positive',
-                    'template' => 'Value should be positive, {{given}} given',
+                    'code' => 'int.gt',
+                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
                     'variables' => [
+                        'gt' => 0,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidNonNegative(): void
+    {
+        $input = 0;
+
+        $schema = (new IntSchema())->nonNegative();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidNonNegative(): void
+    {
+        $input = -1;
+
+        $schema = (new IntSchema())->nonNegative();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.gte',
+                    'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                    'variables' => [
+                        'gte' => 0,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidNegative(): void
+    {
+        $input = -1;
+
+        $schema = (new IntSchema())->negative();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidNegative(): void
+    {
+        $input = 0;
+
+        $schema = (new IntSchema())->negative();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.lt',
+                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                    'variables' => [
+                        'lt' => 0,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidNonPositive(): void
+    {
+        $input = 0;
+
+        $schema = (new IntSchema())->nonPositive();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidNonPositive(): void
+    {
+        $input = 1;
+
+        $schema = (new IntSchema())->nonPositive();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.lte',
+                    'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
+                    'variables' => [
+                        'lte' => 0,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidMultipleOf(): void
+    {
+        $input = 25;
+        $multipleOf = 5;
+
+        $schema = (new IntSchema())->multipleOf($multipleOf);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMultipleOf(): void
+    {
+        $input = 23;
+        $multipleOf = 5;
+
+        $schema = (new IntSchema())->multipleOf($multipleOf);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.multipleOf',
+                    'template' => 'Value should be multiple of {{multipleOf}}, {{given}} given',
+                    'variables' => [
+                        'multipleOf' => $multipleOf,
                         'given' => $input,
                     ],
                 ],
