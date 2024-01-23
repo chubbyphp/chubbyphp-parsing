@@ -127,7 +127,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     public function positive(): static
     {
         return $this->transform(static function (int $output) {
-            if (!($output > 0)) {
+            if ($output <= 0) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_POSITIVE_CODE,
