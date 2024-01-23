@@ -391,73 +391,11 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseWithIpWithInvalidOption(): void
-    {
-        try {
-            (new StringSchema())->ip(99);
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid option "99" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidIpV4WithoutOption(): void
-    {
-        $input1 = '192.168.1.1';
-        $input2 = '2001:0db8:85a3:0000:0000:8a2e:0370:7334';
-
-        $schema = (new StringSchema())->ip();
-
-        self::assertSame($input1, $schema->parse($input1));
-        self::assertSame($input2, $schema->parse($input2));
-    }
-
-    public function testParseWithInvalidIpV4WithoutOption(): void
-    {
-        $input1 = '256.202.56.89';
-        $input2 = '2001:0db8:85a3:0000:0000:8a2e:0370:733g';
-
-        $schema = (new StringSchema())->ip();
-
-        try {
-            $schema->parse($input1);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'string.ip',
-                    'template' => 'Invalid ip "{{given}}"',
-                    'variables' => [
-                        'given' => '256.202.56.89',
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-
-        try {
-            $schema->parse($input2);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'string.ip',
-                    'template' => 'Invalid ip "{{given}}"',
-                    'variables' => [
-                        'given' => '2001:0db8:85a3:0000:0000:8a2e:0370:733g',
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
     public function testParseWithValidIpV4(): void
     {
         $input = '192.168.1.1';
 
-        $schema = (new StringSchema())->ip(FILTER_FLAG_IPV4);
+        $schema = (new StringSchema())->ipV4();
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -466,7 +404,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '256.202.56.89';
 
-        $schema = (new StringSchema())->ip(FILTER_FLAG_IPV4);
+        $schema = (new StringSchema())->ipV4();
 
         try {
             $schema->parse($input);
@@ -476,8 +414,9 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.ip',
-                    'template' => 'Invalid ip "{{given}}"',
+                    'template' => 'Invalid ip {{version}} "{{given}}"',
                     'variables' => [
+                        'version' => 'v4',
                         'given' => '256.202.56.89',
                     ],
                 ],
@@ -489,7 +428,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '2001:0db8:85a3:0000:0000:8a2e:0370:7334';
 
-        $schema = (new StringSchema())->ip(FILTER_FLAG_IPV6);
+        $schema = (new StringSchema())->ipV6();
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -498,7 +437,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '2001:0db8:85a3:0000:0000:8a2e:0370:733g';
 
-        $schema = (new StringSchema())->ip(FILTER_FLAG_IPV6);
+        $schema = (new StringSchema())->ipV6();
 
         try {
             $schema->parse($input);
@@ -508,23 +447,13 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.ip',
-                    'template' => 'Invalid ip "{{given}}"',
+                    'template' => 'Invalid ip {{version}} "{{given}}"',
                     'variables' => [
+                        'version' => 'v6',
                         'given' => '2001:0db8:85a3:0000:0000:8a2e:0370:733g',
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
-    public function testParseWithUrlWithInvalidOption(): void
-    {
-        try {
-            (new StringSchema())->url(99);
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid option "99" given', $e->getMessage());
         }
     }
 
@@ -560,153 +489,11 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseWithValidUrlPathReqired(): void
-    {
-        $input = 'https://localhost/';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUrlPathReqired(): void
-    {
-        $input = 'https://localhost';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'string.url',
-                    'template' => 'Invalid url "{{given}}"',
-                    'variables' => [
-                        'given' => 'https://localhost',
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
-    public function testParseWithValidUrlQueryReqired(): void
-    {
-        $input = 'https://localhost?key=value';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_QUERY_REQUIRED);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUrlQueryReqired(): void
-    {
-        $input = 'https://localhost';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_QUERY_REQUIRED);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'string.url',
-                    'template' => 'Invalid url "{{given}}"',
-                    'variables' => [
-                        'given' => 'https://localhost',
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
-    public function testParseWithValidUrlPathAndQueryReqired(): void
-    {
-        $input = 'https://localhost/?key=value';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUrlPathAndQueryReqired(): void
-    {
-        $input = 'https://localhost';
-
-        $schema = (new StringSchema())->url(FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'string.url',
-                    'template' => 'Invalid url "{{given}}"',
-                    'variables' => [
-                        'given' => 'https://localhost',
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
-    public function testParseWithUuidWithInvalidOption(): void
-    {
-        try {
-            (new StringSchema())->uuid(99);
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid option "99" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidUuid(): void
-    {
-        $input1 = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
-        $input2 = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuid();
-
-        self::assertSame($input1, $schema->parse($input1));
-        self::assertSame($input2, $schema->parse($input2));
-    }
-
-    public function testParseWithInvalidUuid(): void
-    {
-        $input = '960b0533-da17-72d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuid();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'string.uuid',
-                    'template' => 'Invalid uuid {{version}} "{{given}}"',
-                    'variables' => [
-                        'version' => '4|5',
-                        'given' => '960b0533-da17-72d8-a0a4-dd2ab7213caf',
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
     public function testParseWithValidUuidV4(): void
     {
         $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
 
-        $schema = (new StringSchema())->uuid(StringSchema::UUID_V4);
+        $schema = (new StringSchema())->uuidV4();
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -715,7 +502,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
 
-        $schema = (new StringSchema())->uuid(StringSchema::UUID_V4);
+        $schema = (new StringSchema())->uuidV4();
 
         try {
             $schema->parse($input);
@@ -727,7 +514,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.uuid',
                     'template' => 'Invalid uuid {{version}} "{{given}}"',
                     'variables' => [
-                        'version' => '4',
+                        'version' => 'v4',
                         'given' => '960b0533-da17-52d8-a0a4-dd2ab7213caf',
                     ],
                 ],
@@ -739,7 +526,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
 
-        $schema = (new StringSchema())->uuid(StringSchema::UUID_V5);
+        $schema = (new StringSchema())->uuidV5();
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -748,7 +535,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
 
-        $schema = (new StringSchema())->uuid(StringSchema::UUID_V5);
+        $schema = (new StringSchema())->uuidV5();
 
         try {
             $schema->parse($input);
@@ -760,7 +547,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.uuid',
                     'template' => 'Invalid uuid {{version}} "{{given}}"',
                     'variables' => [
-                        'version' => '5',
+                        'version' => 'v5',
                         'given' => '960b0533-da17-42d8-a0a4-dd2ab7213caf',
                     ],
                 ],

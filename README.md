@@ -171,9 +171,11 @@ $p->string()->startsWith('exa');
 $p->string()->endsWith('mpl');
 $p->string()->regex('/^[a-z]+$/i');
 $p->string()->email();
-$p->string()->ip();
+$p->string()->ipV4();
+$p->string()->ipV6();
 $p->string()->url();
-$p->string()->uuid();
+$p->string()->uuidV4();
+$p->string()->uuidV5();
 
 // transformations
 $p->string()->trim();

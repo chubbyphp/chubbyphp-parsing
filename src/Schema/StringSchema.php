@@ -9,9 +9,6 @@ use Chubbyphp\Parsing\ParserErrorException;
 
 final class StringSchema extends AbstractSchema implements SchemaInterface
 {
-    public const UUID_V4 = 4;
-    public const UUID_V5 = 5;
-
     public const ERROR_TYPE_CODE = 'string.type';
     public const ERROR_TYPE_TEMPLATE = 'Type should be "string", "{{given}}" given';
 
@@ -40,7 +37,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_EMAIL_TEMPLATE = 'Invalid email "{{given}}"';
 
     public const ERROR_IP_CODE = 'string.ip';
-    public const ERROR_IP_TEMPLATE = 'Invalid ip "{{given}}"';
+    public const ERROR_IP_TEMPLATE = 'Invalid ip {{version}} "{{given}}"';
 
     public const ERROR_URL_CODE = 'string.url';
     public const ERROR_URL_TEMPLATE = 'Invalid url "{{given}}"';
@@ -54,26 +51,8 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_DATETIME_CODE = 'string.datetime';
     public const ERROR_DATETIME_TEMPLATE = 'Invalid datetime "{{given}}"';
 
-    private const VALID_URL_OPTIONS = [
-        0,
-        FILTER_FLAG_PATH_REQUIRED,
-        FILTER_FLAG_QUERY_REQUIRED,
-        FILTER_FLAG_PATH_REQUIRED | FILTER_FLAG_QUERY_REQUIRED,
-    ];
-
-    private const VALID_IP_OPTIONS = [
-        0,
-        FILTER_FLAG_IPV4,
-        FILTER_FLAG_IPV6,
-        FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6,
-    ];
-
-    private const VALID_UUID_OPTIONS = [0, self::UUID_V4, self::UUID_V5];
-
     private const UUID_V4_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
     private const UUID_V5_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
-
-    private const INVALID_OPTION_TEMPLATE = 'Invalid option "%s" given';
 
     public function parse(mixed $input): mixed
     {
@@ -250,22 +229,15 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    /**
-     * @param 0|FILTER_FLAG_IPV4|FILTER_FLAG_IPV6 $options
-     */
-    public function ip(int $options = 0): static
+    public function ipV4(): static
     {
-        if (!\in_array($options, self::VALID_IP_OPTIONS, true)) {
-            throw new \InvalidArgumentException(sprintf(self::INVALID_OPTION_TEMPLATE, $options));
-        }
-
-        return $this->transform(static function (string $output) use ($options) {
-            if (!filter_var($output, FILTER_VALIDATE_IP, $options)) {
+        return $this->transform(static function (string $output) {
+            if (!filter_var($output, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_IP_CODE,
                         self::ERROR_IP_TEMPLATE,
-                        ['given' => $output]
+                        ['version' => 'v4', 'given' => $output]
                     )
                 );
             }
@@ -274,17 +246,27 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    /**
-     * @param 0|FILTER_FLAG_PATH_REQUIRED|FILTER_FLAG_QUERY_REQUIRED $options
-     */
-    public function url(int $options = 0): static
+    public function ipV6(): static
     {
-        if (!\in_array($options, self::VALID_URL_OPTIONS, true)) {
-            throw new \InvalidArgumentException(sprintf(self::INVALID_OPTION_TEMPLATE, $options));
-        }
+        return $this->transform(static function (string $output) {
+            if (!filter_var($output, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_IP_CODE,
+                        self::ERROR_IP_TEMPLATE,
+                        ['version' => 'v6', 'given' => $output]
+                    )
+                );
+            }
 
-        return $this->transform(static function (string $output) use ($options) {
-            if (!filter_var($output, FILTER_VALIDATE_URL, $options)) {
+            return $output;
+        });
+    }
+
+    public function url(): static
+    {
+        return $this->transform(static function (string $output) {
+            if (!filter_var($output, FILTER_VALIDATE_URL)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_URL_CODE,
@@ -298,50 +280,32 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    /**
-     * @param 0|self::UUID_V4|self::UUID_V5 $options
-     */
-    public function uuid(int $options = 0): static
+    public function uuidV4(): static
     {
-        if (!\in_array($options, self::VALID_UUID_OPTIONS, true)) {
-            throw new \InvalidArgumentException(sprintf(self::INVALID_OPTION_TEMPLATE, $options));
-        }
-
-        return $this->transform(static function (string $output) use ($options) {
-            if (self::UUID_V4 === $options) {
-                if (0 === preg_match(self::UUID_V4_PATTERN, $output)) {
-                    throw new ParserErrorException(
-                        new Error(
-                            self::ERROR_UUID_CODE,
-                            self::ERROR_UUID_TEMPLATE,
-                            ['version' => '4', 'given' => $output]
-                        )
-                    );
-                }
-
-                return $output;
-            }
-
-            if (self::UUID_V5 === $options) {
-                if (0 === preg_match(self::UUID_V5_PATTERN, $output)) {
-                    throw new ParserErrorException(
-                        new Error(
-                            self::ERROR_UUID_CODE,
-                            self::ERROR_UUID_TEMPLATE,
-                            ['version' => '5', 'given' => $output]
-                        )
-                    );
-                }
-
-                return $output;
-            }
-
-            if (0 === preg_match(self::UUID_V4_PATTERN, $output) && 0 === preg_match(self::UUID_V5_PATTERN, $output)) {
+        return $this->transform(static function (string $output) {
+            if (0 === preg_match(self::UUID_V4_PATTERN, $output)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_UUID_CODE,
                         self::ERROR_UUID_TEMPLATE,
-                        ['version' => '4|5', 'given' => $output]
+                        ['version' => 'v4', 'given' => $output]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function uuidV5(): static
+    {
+        return $this->transform(static function (string $output) {
+            if (0 === preg_match(self::UUID_V5_PATTERN, $output)) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_UUID_CODE,
+                        self::ERROR_UUID_TEMPLATE,
+                        ['version' => 'v5', 'given' => $output]
                     )
                 );
             }
