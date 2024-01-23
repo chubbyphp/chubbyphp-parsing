@@ -143,7 +143,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'template' => 'Min length {{min}}, {{given}} given',
                     'variables' => [
                         'min' => 5,
-                        'given' => 4,
+                        'given' => \strlen($input),
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -176,7 +176,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'template' => 'Max length {{max}}, {{given}} given',
                     'variables' => [
                         'max' => 3,
-                        'given' => 4,
+                        'given' => \strlen($input),
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -209,7 +209,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'template' => 'Length {{length}}, {{given}} given',
                     'variables' => [
                         'length' => 5,
-                        'given' => 4,
+                        'given' => \strlen($input),
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -241,7 +241,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.contains',
                     'template' => '"{{given}}" does not contain "{{contain}}"',
                     'variables' => [
-                        'given' => 'example',
+                        'given' => $input,
                         'contain' => 'lee',
                     ],
                 ],
@@ -274,7 +274,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.startsWith',
                     'template' => '"{{given}}" does not starts with "{{startsWith}}"',
                     'variables' => [
-                        'given' => 'example',
+                        'given' => $input,
                         'startsWith' => 'xam',
                     ],
                 ],
@@ -307,7 +307,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.endsWith',
                     'template' => '"{{given}}" does not ends with "{{endsWith}}"',
                     'variables' => [
-                        'given' => 'example',
+                        'given' => $input,
                         'endsWith' => 'mpl',
                     ],
                 ],
@@ -351,7 +351,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.regex',
                     'template' => '"{{given}}" does not regex "{{regex}}"',
                     'variables' => [
-                        'given' => 'a1B2C3d4',
+                        'given' => $input,
                         'regex' => '/^[a-z]+$/i',
                     ],
                 ],
@@ -384,7 +384,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.email',
                     'template' => 'Invalid email "{{given}}"',
                     'variables' => [
-                        'given' => 'test',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -417,7 +417,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'template' => 'Invalid ip {{version}} "{{given}}"',
                     'variables' => [
                         'version' => 'v4',
-                        'given' => '256.202.56.89',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -450,7 +450,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'template' => 'Invalid ip {{version}} "{{given}}"',
                     'variables' => [
                         'version' => 'v6',
-                        'given' => '2001:0db8:85a3:0000:0000:8a2e:0370:733g',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -482,7 +482,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.url',
                     'template' => 'Invalid url "{{given}}"',
                     'variables' => [
-                        'given' => 'test',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -515,7 +515,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'template' => 'Invalid uuid {{version}} "{{given}}"',
                     'variables' => [
                         'version' => 'v4',
-                        'given' => '960b0533-da17-52d8-a0a4-dd2ab7213caf',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -548,7 +548,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'template' => 'Invalid uuid {{version}} "{{given}}"',
                     'variables' => [
                         'version' => 'v5',
-                        'given' => '960b0533-da17-42d8-a0a4-dd2ab7213caf',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -607,7 +607,7 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.int',
                     'template' => 'Invalid int "{{given}}"',
                     'variables' => [
-                        'given' => '42cars',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
