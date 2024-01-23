@@ -352,16 +352,24 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->transform(static function (string $output) {
             try {
-                return new \DateTimeImmutable($output);
-            } catch (\Exception $e) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_DATETIME_CODE,
-                        self::ERROR_DATETIME_TEMPLATE,
-                        ['given' => $output]
-                    )
-                );
+                $dateTime = new \DateTimeImmutable($output);
+
+                $errors = \DateTimeImmutable::getLastErrors();
+
+                // @infection-ignore-all: php < 8.2 returned an array even if there are no errors
+                if (false === $errors || 0 === $errors['warning_count'] && 0 === $errors['error_count']) {
+                    return $dateTime;
+                }
+            } catch (\Exception) {
             }
+
+            throw new ParserErrorException(
+                new Error(
+                    self::ERROR_DATETIME_CODE,
+                    self::ERROR_DATETIME_TEMPLATE,
+                    ['given' => $output]
+                )
+            );
         });
     }
 }

@@ -555,6 +555,33 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
+    public function testParseWithTrim(): void
+    {
+        $input = '   test ';
+
+        $schema = (new StringSchema())->trim();
+
+        self::assertSame(trim($input), $schema->parse($input));
+    }
+
+    public function testParseWithLower(): void
+    {
+        $input = 'TEST';
+
+        $schema = (new StringSchema())->lower();
+
+        self::assertSame(strtolower($input), $schema->parse($input));
+    }
+
+    public function testParseWithUpper(): void
+    {
+        $input = 'test';
+
+        $schema = (new StringSchema())->upper();
+
+        self::assertSame(strtoupper($input), $schema->parse($input));
+    }
+
     public function testParseWithValidtoInt(): void
     {
         $input = '42';
@@ -596,7 +623,76 @@ final class StringSchemaTest extends AbstractTestCase
         self::assertEquals(new \DateTimeImmutable($input), $schema->parse($input));
     }
 
-    public function testParseWithInvalidToDateTime(): void
+    public function testParseWithInvalidToDateTimeWithInvalidMonth(): void
+    {
+        $input = '2017-13-01';
+
+        $schema = (new StringSchema())->toDateTime();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.datetime',
+                    'template' => 'Invalid datetime "{{given}}"',
+                    'variables' => [
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithInvalidToDateTimeWithInvalidDay(): void
+    {
+        $input = '2017-02-31';
+
+        $schema = (new StringSchema())->toDateTime();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.datetime',
+                    'template' => 'Invalid datetime "{{given}}"',
+                    'variables' => [
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithInvalidToDateTimeWithAllZero(): void
+    {
+        $input = '0000-00-00';
+
+        $schema = (new StringSchema())->toDateTime();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.datetime',
+                    'template' => 'Invalid datetime "{{given}}"',
+                    'variables' => [
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithInvalidToDateTimeWithText(): void
     {
         $input = 'test';
 
@@ -612,37 +708,10 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.datetime',
                     'template' => 'Invalid datetime "{{given}}"',
                     'variables' => [
-                        'given' => 'test',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
-    }
-
-    public function testParseWithTrim(): void
-    {
-        $input = '   test ';
-
-        $schema = (new StringSchema())->trim();
-
-        self::assertSame(trim($input), $schema->parse($input));
-    }
-
-    public function testParseWithLower(): void
-    {
-        $input = 'TEST';
-
-        $schema = (new StringSchema())->lower();
-
-        self::assertSame(strtolower($input), $schema->parse($input));
-    }
-
-    public function testParseWithUpper(): void
-    {
-        $input = 'test';
-
-        $schema = (new StringSchema())->upper();
-
-        self::assertSame(strtoupper($input), $schema->parse($input));
     }
 }
