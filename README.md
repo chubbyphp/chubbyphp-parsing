@@ -115,6 +115,26 @@ $schema = $p->int();
 $data = $schema->parse(1337);
 ```
 
+#### Predefined transformers
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+// validations
+$p->int()->gt(5);
+$p->int()->gte(5);
+$p->int()->lt(5);
+$p->int()->lte(5);
+$p->int()->positive();
+
+// transformations
+
+// conversions
+$p->int()->toString();
+```
+
 ### literal
 
 ```php

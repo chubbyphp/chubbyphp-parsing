@@ -12,6 +12,21 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_TYPE_CODE = 'int.type';
     public const ERROR_TYPE_TEMPLATE = 'Type should be "int", "{{given}}" given';
 
+    public const ERROR_GT_CODE = 'int.gt';
+    public const ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
+
+    public const ERROR_GTE_CODE = 'int.gte';
+    public const ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
+
+    public const ERROR_LT_CODE = 'int.lt';
+    public const ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
+
+    public const ERROR_LTE_CODE = 'int.lte';
+    public const ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
+
+    public const ERROR_POSITIVE_CODE = 'int.positive';
+    public const ERROR_POSITIVE_TEMPLATE = 'Value should be positive, {{given}} given';
+
     public function parse(mixed $input): mixed
     {
         $input ??= $this->default;
@@ -39,5 +54,95 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
             throw $parserErrorException;
         }
+    }
+
+    public function gt(int $gt): static
+    {
+        return $this->transform(static function (int $output) use ($gt) {
+            if ($output <= $gt) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_GT_CODE,
+                        self::ERROR_GT_TEMPLATE,
+                        ['gt' => $gt, 'given' => $output]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function gte(int $gte): static
+    {
+        return $this->transform(static function (int $output) use ($gte) {
+            if ($output < $gte) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_GTE_CODE,
+                        self::ERROR_GTE_TEMPLATE,
+                        ['gte' => $gte, 'given' => $output]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function lt(int $lt): static
+    {
+        return $this->transform(static function (int $output) use ($lt) {
+            if ($output >= $lt) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_LT_CODE,
+                        self::ERROR_LT_TEMPLATE,
+                        ['lt' => $lt, 'given' => $output]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function lte(int $lte): static
+    {
+        return $this->transform(static function (int $output) use ($lte) {
+            if ($output > $lte) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_LTE_CODE,
+                        self::ERROR_LTE_TEMPLATE,
+                        ['lte' => $lte, 'given' => $output]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function positive(): static
+    {
+        return $this->transform(static function (int $output) {
+            if (!($output > 0)) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_POSITIVE_CODE,
+                        self::ERROR_POSITIVE_TEMPLATE,
+                        ['given' => $output]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function toString(): static
+    {
+        return $this->transform(static fn (int $output) => (string) $output);
     }
 }

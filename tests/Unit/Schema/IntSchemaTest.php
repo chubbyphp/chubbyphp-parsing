@@ -116,4 +116,235 @@ final class IntSchemaTest extends AbstractTestCase
             ],
         ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
+
+    public function testParseWithValidGt(): void
+    {
+        $input = 5;
+        $gt = 4;
+
+        $schema = (new IntSchema())->gt($gt);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidGtEqual(): void
+    {
+        $input = 5;
+        $gt = 5;
+
+        $schema = (new IntSchema())->gt($gt);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.gt',
+                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
+                    'variables' => [
+                        'gt' => $gt,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithInvalidGtLesser(): void
+    {
+        $input = 4;
+        $gt = 5;
+
+        $schema = (new IntSchema())->gt($gt);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.gt',
+                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
+                    'variables' => [
+                        'gt' => $gt,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidGte(): void
+    {
+        $input = 5;
+        $gte = 5;
+
+        $schema = (new IntSchema())->gte($gte);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidGte(): void
+    {
+        $input = 4;
+        $gte = 5;
+
+        $schema = (new IntSchema())->gte($gte);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.gte',
+                    'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                    'variables' => [
+                        'gte' => $gte,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidLt(): void
+    {
+        $input = 4;
+        $lt = 5;
+
+        $schema = (new IntSchema())->lt($lt);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidLtEqual(): void
+    {
+        $input = 5;
+        $lt = 5;
+
+        $schema = (new IntSchema())->lt($lt);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.lt',
+                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                    'variables' => [
+                        'lt' => $lt,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithInvalidLtLesser(): void
+    {
+        $input = 5;
+        $lt = 4;
+
+        $schema = (new IntSchema())->lt($lt);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.lt',
+                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                    'variables' => [
+                        'lt' => $lt,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidLte(): void
+    {
+        $input = 5;
+        $lte = 5;
+
+        $schema = (new IntSchema())->lte($lte);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidLte(): void
+    {
+        $input = 5;
+        $lte = 4;
+
+        $schema = (new IntSchema())->lte($lte);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.lte',
+                    'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
+                    'variables' => [
+                        'lte' => $lte,
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidPositive(): void
+    {
+        $input = 1;
+
+        $schema = (new IntSchema())->positive();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidPositive(): void
+    {
+        $input = 0;
+
+        $schema = (new IntSchema())->positive();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'int.positive',
+                    'template' => 'Value should be positive, {{given}} given',
+                    'variables' => [
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithToString(): void
+    {
+        $input = 42;
+
+        $schema = (new IntSchema())->toString();
+
+        self::assertSame((string) $input, $schema->parse($input));
+    }
 }
