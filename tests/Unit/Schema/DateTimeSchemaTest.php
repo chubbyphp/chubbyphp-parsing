@@ -16,6 +16,16 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  */
 final class DateTimeSchemaTest extends AbstractTestCase
 {
+    public function testImmutability(): void
+    {
+        $schema = new DateTimeSchema();
+
+        self::assertNotSame($schema, $schema->transform(static fn (\DateTimeInterface $output) => $output));
+        self::assertNotSame($schema, $schema->default(new \DateTimeImmutable('2024-01-20T09:15:00Z')));
+        self::assertNotSame($schema, $schema->catch(static fn (\DateTimeInterface $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->nullable());
+    }
+
     public function testParseSuccess(): void
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00Z');

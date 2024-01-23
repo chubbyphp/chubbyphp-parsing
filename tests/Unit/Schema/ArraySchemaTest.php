@@ -17,6 +17,16 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  */
 final class ArraySchemaTest extends AbstractTestCase
 {
+    public function testImmutability(): void
+    {
+        $schema = new ArraySchema(new StringSchema());
+
+        self::assertNotSame($schema, $schema->transform(static fn (array $output) => $output));
+        self::assertNotSame($schema, $schema->default(['test']));
+        self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->nullable());
+    }
+
     public function testParseSuccess(): void
     {
         $input = ['test'];

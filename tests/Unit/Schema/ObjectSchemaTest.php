@@ -19,6 +19,16 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  */
 final class ObjectSchemaTest extends AbstractTestCase
 {
+    public function testImmutability(): void
+    {
+        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+
+        self::assertNotSame($schema, $schema->transform(static fn (\stdClass $output) => $output));
+        self::assertNotSame($schema, $schema->default([]));
+        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->nullable());
+    }
+
     public function testConstructWithoutFieldName(): void
     {
         try {

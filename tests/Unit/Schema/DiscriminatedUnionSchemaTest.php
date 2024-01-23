@@ -19,6 +19,19 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  */
 final class DiscriminatedUnionSchemaTest extends AbstractTestCase
 {
+    public function testImmutability(): void
+    {
+        $schema = new DiscriminatedUnionSchema([
+            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
+            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+        ], 'field1');
+
+        self::assertNotSame($schema, $schema->transform(static fn (\stdClass $output) => $output));
+        self::assertNotSame($schema, $schema->default([]));
+        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->nullable());
+    }
+
     public function testConstructWithoutObjectSchema(): void
     {
         try {

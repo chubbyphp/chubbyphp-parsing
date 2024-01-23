@@ -37,16 +37,20 @@ abstract class AbstractSchema implements SchemaInterface
      */
     final public function transform(\Closure $transform): static
     {
-        $this->transform[] = $transform;
+        $clone = clone $this;
 
-        return $this;
+        $clone->transform[] = $transform;
+
+        return $clone;
     }
 
     final public function default(mixed $default): static
     {
-        $this->default = $default;
+        $clone = clone $this;
 
-        return $this;
+        $clone->default = $default;
+
+        return $clone;
     }
 
     /**
@@ -54,16 +58,20 @@ abstract class AbstractSchema implements SchemaInterface
      */
     final public function catch(\Closure $catch): static
     {
-        $this->catch = $catch;
+        $clone = clone $this;
 
-        return $this;
+        $clone->catch = $catch;
+
+        return $clone;
     }
 
     final public function nullable(): static
     {
-        $this->nullable = true;
+        $clone = clone $this;
 
-        return $this;
+        $clone->nullable = true;
+
+        return $clone;
     }
 
     protected function transformOutput(mixed $output): mixed

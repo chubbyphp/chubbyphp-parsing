@@ -18,6 +18,16 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  */
 final class UnionSchemaTest extends AbstractTestCase
 {
+    public function testImmutability(): void
+    {
+        $schema = new UnionSchema([new StringSchema(), new IntSchema()]);
+
+        self::assertNotSame($schema, $schema->transform(static fn (int|string $output) => $output));
+        self::assertNotSame($schema, $schema->default('test'));
+        self::assertNotSame($schema, $schema->catch(static fn (int|string $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->nullable());
+    }
+
     public function testConstructWithWrongArgument(): void
     {
         try {
