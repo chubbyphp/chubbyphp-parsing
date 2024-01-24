@@ -519,6 +519,15 @@ final class IntSchemaTest extends AbstractTestCase
         }
     }
 
+    public function testParseWithToFloat(): void
+    {
+        $input = 42;
+
+        $schema = (new IntSchema())->toFloat();
+
+        self::assertSame((float) $input, $schema->parse($input));
+    }
+
     public function testParseWithToString(): void
     {
         $input = 42;

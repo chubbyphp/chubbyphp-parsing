@@ -181,6 +181,11 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
+    public function toFloat(): static
+    {
+        return $this->transform(static fn (int $output) => (float) $output);
+    }
+
     public function toString(): static
     {
         return $this->transform(static fn (int $output) => (string) $output);

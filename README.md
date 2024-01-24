@@ -137,6 +137,7 @@ $p->int()->divisorOf(25);
 // transformations
 
 // conversions
+$p->int()->toFloat();
 $p->int()->toString();
 ```
 
