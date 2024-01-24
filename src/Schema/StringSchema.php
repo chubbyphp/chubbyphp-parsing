@@ -360,7 +360,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                 if (false === $errors || 0 === $errors['warning_count'] && 0 === $errors['error_count']) {
                     return $dateTime;
                 }
-            } catch (\Exception) {
+            } catch (\Exception) { // NOSONAR: supress the exception to throw a more specific one
             }
 
             throw new ParserErrorException(
