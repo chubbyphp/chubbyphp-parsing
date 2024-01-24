@@ -40,4 +40,14 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
             throw $parserErrorException;
         }
     }
+
+    public function toInt(): static
+    {
+        return $this->transform(static fn (bool $output) => true === $output ? 1 : 0);
+    }
+
+    public function toString(): static
+    {
+        return $this->transform(static fn (bool $output) => true === $output ? 'true' : 'false');
+    }
 }

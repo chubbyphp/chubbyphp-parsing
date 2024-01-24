@@ -64,6 +64,22 @@ $schema = $p->boolean();
 $data = $schema->parse(true);
 ```
 
+#### Predefined transformers
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+// validations
+
+// transformations
+
+// conversions
+$p->bool()->toInt();
+$p->bool()->toString();
+```
+
 ### dateTime
 
 ```php
