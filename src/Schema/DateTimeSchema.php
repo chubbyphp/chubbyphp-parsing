@@ -40,4 +40,14 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
             throw $parserErrorException;
         }
     }
+
+    public function toInt(): static
+    {
+        return $this->transform(static fn (\DateTimeInterface $output) => $output->getTimestamp());
+    }
+
+    public function toString(): static
+    {
+        return $this->transform(static fn (\DateTimeInterface $output) => $output->format('c'));
+    }
 }

@@ -626,7 +626,7 @@ final class StringSchemaTest extends AbstractTestCase
 
     public function testParseWithValidToDateTime(): void
     {
-        $input = '2024-01-20T09:15:00Z';
+        $input = '2024-01-20T09:15:00+00:00';
 
         $schema = (new StringSchema())->toDateTime();
 

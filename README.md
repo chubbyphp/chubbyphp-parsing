@@ -89,7 +89,23 @@ $p = new Parser();
 
 $schema = $p->dateTime();
 
-$data = $schema->parse(new \DateTimeImmutable('2024-01-20T09:15:00Z'));
+$data = $schema->parse(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
+```
+
+#### Predefined transformers
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+// validations
+
+// transformations
+
+// conversions
+$p->dateTime()->toInt();
+$p->dateTime()->toString();
 ```
 
 ### discriminatedUnion

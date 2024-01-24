@@ -21,14 +21,14 @@ final class DateTimeSchemaTest extends AbstractTestCase
         $schema = new DateTimeSchema();
 
         self::assertNotSame($schema, $schema->transform(static fn (\DateTimeInterface $output) => $output));
-        self::assertNotSame($schema, $schema->default(new \DateTimeImmutable('2024-01-20T09:15:00Z')));
+        self::assertNotSame($schema, $schema->default(new \DateTimeImmutable('2024-01-20T09:15:00+00:00')));
         self::assertNotSame($schema, $schema->catch(static fn (\DateTimeInterface $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
     }
 
     public function testParseSuccess(): void
     {
-        $input = new \DateTimeImmutable('2024-01-20T09:15:00Z');
+        $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
         $schema = new DateTimeSchema();
 
@@ -37,7 +37,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $input = new \DateTimeImmutable('2024-01-20T09:15:00Z');
+        $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
         $schema = (new DateTimeSchema())->default($input);
 
@@ -74,7 +74,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithTransform(): void
     {
-        $input = new \DateTimeImmutable('2024-01-20T09:15:00Z');
+        $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
         $schema = (new DateTimeSchema())->transform(static fn (\DateTimeInterface $output) => $output->format('c'));
 
@@ -105,7 +105,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
 
     public function testSafeParseSuccess(): void
     {
-        $input = new \DateTimeImmutable('2024-01-20T09:15:00Z');
+        $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
         $schema = new DateTimeSchema();
 
@@ -125,5 +125,25 @@ final class DateTimeSchemaTest extends AbstractTestCase
                 ],
             ],
         ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+    }
+
+    public function testParseWithToInt(): void
+    {
+        $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+
+        $schema = (new DateTimeSchema())->toInt();
+
+        self::assertSame($input->getTimestamp(), $schema->parse($input));
+    }
+
+    public function testParseWithToString(): void
+    {
+        $inputString = '2024-01-20T09:15:00+00:00';
+
+        $input = new \DateTimeImmutable($inputString);
+
+        $schema = (new DateTimeSchema())->toString();
+
+        self::assertSame($inputString, $schema->parse($input));
     }
 }

@@ -29,8 +29,8 @@ final class ParserTest extends TestCase
                 "bool": true,
                 "dateTime": {
                     "date": "2024-01-20 09:15:00.000000",
-                    "timezone_type": 2,
-                    "timezone": "Z"
+                    "timezone_type": 1,
+                    "timezone": "+00:00"
                 },
                 "discriminatedUnion": {
                     "literal": "type1",
@@ -51,7 +51,7 @@ final class ParserTest extends TestCase
         self::assertEquals($ouputAsJson, json_encode($schema->parse([
             'array' => ['test1', 'test2'],
             'bool' => true,
-            'dateTime' => new \DateTimeImmutable('2024-01-20T09:15:00Z'),
+            'dateTime' => new \DateTimeImmutable('2024-01-20T09:15:00+00:00'),
             'discriminatedUnion' => ['literal' => 'type1', 'string' => 'test'],
             'float' => 1.5,
             'int' => 5,
