@@ -7,7 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ParserErrorException;
 
-final class LiteralSchema extends AbstractSchema implements LiteralSchemaInterface
+final class LiteralSchema extends AbstractSchema
 {
     public const ERROR_TYPE_CODE = 'literal.type';
     public const ERROR_TYPE_TEMPLATE = 'Type should be "bool|float|int|string", "{{given}}" given';

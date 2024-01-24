@@ -46,19 +46,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
                         'Argument #1 value of #%s #%s ($objectSchemas) must contain %s',
                         $i,
                         $discriminatorFieldName,
-                        LiteralSchemaInterface::class,
-                    )
-                );
-            }
-
-            if (!$discriminatorFieldSchema instanceof LiteralSchemaInterface) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Argument #1 value of #%s #%s ($objectSchemas) must be of type %s, %s given',
-                        $i,
-                        $discriminatorFieldName,
-                        LiteralSchemaInterface::class,
-                        $this->getDataType($discriminatorFieldSchema)
+                        SchemaInterface::class,
                     )
                 );
             }
@@ -113,7 +101,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
         $parserErrorException = new ParserErrorException();
 
         foreach ($this->objectSchemas as $objectSchema) {
-            /** @var LiteralSchemaInterface $discriminatorFieldSchema */
+            /** @var SchemaInterface $discriminatorFieldSchema */
             $discriminatorFieldSchema = $objectSchema->getFieldSchema($this->discriminatorFieldName);
 
             try {

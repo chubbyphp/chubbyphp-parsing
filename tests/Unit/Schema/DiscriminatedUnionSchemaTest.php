@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
+use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
@@ -54,21 +56,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
             self::assertSame(
-                'Argument #1 value of #0 #field1 ($objectSchemas) must contain Chubbyphp\Parsing\Schema\LiteralSchemaInterface',
-                $invalidArgumentException->getMessage()
-            );
-        }
-    }
-
-    public function testConstructWithFieldSchemaIsNotLiteral(): void
-    {
-        try {
-            new DiscriminatedUnionSchema([new ObjectSchema(['field1' => new StringSchema()])], 'field1');
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $invalidArgumentException) {
-            self::assertSame(
-                'Argument #1 value of #0 #field1 ($objectSchemas) must be of type Chubbyphp\Parsing\Schema\LiteralSchemaInterface, Chubbyphp\Parsing\Schema\StringSchema given',
+                'Argument #1 value of #0 #field1 ($objectSchemas) must contain Chubbyphp\Parsing\Schema\SchemaInterface',
                 $invalidArgumentException->getMessage()
             );
         }
@@ -81,6 +69,22 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         $schema = new DiscriminatedUnionSchema([
             new ObjectSchema(['field1' => new LiteralSchema('type1')]),
             new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+        ], 'field1');
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame($input, (array) $output);
+    }
+
+    public function testParseSuccessWithArrayDiscriminator(): void
+    {
+        $input = ['field1' => [5], 'field2' => 'test'];
+
+        $schema = new DiscriminatedUnionSchema([
+            new ObjectSchema(['field1' => new ArraySchema(new StringSchema())]),
+            new ObjectSchema(['field1' => new ArraySchema(new IntSchema()), 'field2' => new StringSchema()]),
         ], 'field1');
 
         $output = $schema->parse($input);
