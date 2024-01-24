@@ -74,7 +74,7 @@ abstract class AbstractSchema implements SchemaInterface
         return $clone;
     }
 
-    protected function transformOutput(mixed $output): mixed
+    final protected function transformOutput(mixed $output): mixed
     {
         foreach ($this->transform as $transform) {
             $output = $transform($output);
@@ -83,7 +83,7 @@ abstract class AbstractSchema implements SchemaInterface
         return $output;
     }
 
-    protected function getDataType(mixed $input): string
+    final protected function getDataType(mixed $input): string
     {
         return \is_object($input) ? $input::class : \gettype($input);
     }
