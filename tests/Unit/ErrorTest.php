@@ -17,13 +17,14 @@ final class ErrorTest extends TestCase
     public function testToString(): void
     {
         $code = 'some.error';
-        $template = '{{bool}},{{int}},{{float}},{{string}},{{stringable}}';
-        $variables = ['bool' => true, 'int' => 1337, 'float' => 4.2, 'string' => 'test', 'stringable' => new class() implements \Stringable {
-            public function __toString(): string
-            {
-                return 'stringable';
-            }
-        }];
+        $template = '{{bool}},{{int}},{{float}},{{string}},{{array}}';
+        $variables = [
+            'bool' => true,
+            'int' => 1337,
+            'float' => 4.2,
+            'string' => 'test',
+            'array' => ['bool' => true, 'int' => 1337, 'float' => 4.2, 'string' => 'test'],
+        ];
 
         $error = new Error($code, $template, $variables);
 
@@ -31,6 +32,25 @@ final class ErrorTest extends TestCase
         self::assertSame($template, $error->template);
         self::assertSame($variables, $error->variables);
 
-        self::assertSame('true,1337,4.2,"test","stringable"', (string) $error);
+        self::assertSame('true,1337,4.2,"test",{"bool":true,"int":1337,"float":4.2,"string":"test"}', (string) $error);
+    }
+
+    public function testToStringWithError(): void
+    {
+        $resource = fopen('php://memory', 'r');
+
+        $code = 'some.error';
+        $template = '{{resource}}';
+        $variables = [
+            'resource' => $resource,
+        ];
+
+        $error = new Error($code, $template, $variables);
+
+        self::assertSame($code, $error->code);
+        self::assertSame($template, $error->template);
+        self::assertSame($variables, $error->variables);
+
+        self::assertSame('<cannot_be_encoded>', (string) $error);
     }
 }
