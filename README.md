@@ -100,6 +100,8 @@ use Chubbyphp\Parsing\Parser;
 $p = new Parser();
 
 // validations
+$p->string()->min(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
+$p->string()->max(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
 
 // transformations
 

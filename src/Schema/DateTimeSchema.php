@@ -12,6 +12,12 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_TYPE_CODE = 'datetime.type';
     public const ERROR_TYPE_TEMPLATE = 'Type should be "\DateTimeInterface", "{{given}}" given';
 
+    public const ERROR_MIN_CODE = 'datetime.min';
+    public const ERROR_MIN_TEMPLATE = 'Min datetime {{min}}, {{given}} given';
+
+    public const ERROR_MAX_CODE = 'datetime.max';
+    public const ERROR_MAX_TEMPLATE = 'Max datetime {{max}}, {{given}} given';
+
     public function parse(mixed $input): mixed
     {
         $input ??= $this->default;
@@ -39,6 +45,40 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
             throw $parserErrorException;
         }
+    }
+
+    public function min(\DateTimeImmutable $min): static
+    {
+        return $this->transform(static function (\DateTimeImmutable $output) use ($min) {
+            if ($output < $min) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_MIN_CODE,
+                        self::ERROR_MIN_TEMPLATE,
+                        ['min' => $min->format('c'), 'given' => $output->format('c')]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function max(\DateTimeImmutable $max): static
+    {
+        return $this->transform(static function (\DateTimeImmutable $output) use ($max) {
+            if ($output > $max) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_MAX_CODE,
+                        self::ERROR_MAX_TEMPLATE,
+                        ['max' => $max->format('c'), 'given' => $output->format('c')]
+                    )
+                );
+            }
+
+            return $output;
+        });
     }
 
     public function toInt(): static
