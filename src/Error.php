@@ -16,7 +16,11 @@ final class Error
         $message = $this->template;
         foreach ($this->variables as $name => $value) {
             $encodedValue = json_encode($value);
-            $message = str_replace('{{'.$name.'}}', false !== $encodedValue ? $encodedValue : '<cannot_be_encoded>', $message);
+            $message = str_replace(
+                '{{'.$name.'}}',
+                false !== $encodedValue ? $encodedValue : '<cannot_be_encoded>',
+                $message
+            );
         }
 
         return $message;
