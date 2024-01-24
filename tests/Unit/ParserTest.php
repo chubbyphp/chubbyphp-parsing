@@ -6,6 +6,7 @@ namespace Chubbyphp\Tests\Parsing\Unit;
 
 use Chubbyphp\Parsing\Parser;
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\BackedEnumSchema;
 use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
@@ -16,6 +17,14 @@ use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
 use PHPUnit\Framework\TestCase;
+
+enum BackedSuit: string
+{
+    case Hearts = 'H';
+    case Diamonds = 'D';
+    case Clubs = 'C';
+    case Spades = 'S';
+}
 
 /**
  * @covers \Chubbyphp\Parsing\Parser
@@ -31,6 +40,15 @@ final class ParserTest extends TestCase
         $arraySchema = $p->array($p->string());
 
         self::assertInstanceOf(ArraySchema::class, $arraySchema);
+    }
+
+    public function testBackedEnum(): void
+    {
+        $p = new Parser();
+
+        $BoolSchema = $p->backedEnum(BackedSuit::class);
+
+        self::assertInstanceOf(BackedEnumSchema::class, $BoolSchema);
     }
 
     public function testBool(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing;
 
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\BackedEnumSchema;
 use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
@@ -22,6 +23,14 @@ final class Parser
     public function array(SchemaInterface $itemSchema): ArraySchema
     {
         return new ArraySchema($itemSchema);
+    }
+
+    /**
+     * @param class-string<\BackedEnum> $backedEnumClass
+     */
+    public function backedEnum(string $backedEnumClass): BackedEnumSchema
+    {
+        return new BackedEnumSchema($backedEnumClass);
     }
 
     public function bool(): BoolSchema

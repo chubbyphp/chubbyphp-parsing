@@ -52,6 +52,26 @@ $schema = $p->array($p->string());
 $data = $schema->parse(['John Doe']);
 ```
 
+### backedEnum
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+enum BackedSuit: string
+{
+    case Hearts = 'H';
+    case Diamonds = 'D';
+    case Clubs = 'C';
+    case Spades = 'S';
+}
+
+$p = new Parser();
+
+$schema = $p->backedEnum(BackedSuit::class);
+
+$data = $schema->parse('D');
+```
+
 ### boolean
 
 ```php
