@@ -128,7 +128,7 @@ final class BoolSchemaTest extends AbstractTestCase
         ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 
-    public function testParseWithToInt(): void
+    public function testParseWithToIntTrue(): void
     {
         $input = true;
 
@@ -137,9 +137,27 @@ final class BoolSchemaTest extends AbstractTestCase
         self::assertSame(true === $input ? 1 : 0, $schema->parse($input));
     }
 
-    public function testParseWithToString(): void
+    public function testParseWithToIntFalse(): void
+    {
+        $input = false;
+
+        $schema = (new BoolSchema())->toInt();
+
+        self::assertSame(true === $input ? 1 : 0, $schema->parse($input));
+    }
+
+    public function testParseWithToStringTrue(): void
     {
         $input = true;
+
+        $schema = (new BoolSchema())->toString();
+
+        self::assertSame(true === $input ? 'true' : 'false', $schema->parse($input));
+    }
+
+    public function testParseWithToStringFalse(): void
+    {
+        $input = false;
 
         $schema = (new BoolSchema())->toString();
 
