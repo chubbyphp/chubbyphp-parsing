@@ -173,4 +173,103 @@ final class ArraySchemaTest extends AbstractTestCase
             $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors())
         );
     }
+
+    public function testParseWithValidMin(): void
+    {
+        $input = ['test', 'test', 'test', 'test'];
+
+        $schema = (new ArraySchema(new StringSchema()))->min(4);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMin(): void
+    {
+        $input = ['test', 'test', 'test', 'test'];
+
+        $schema = (new ArraySchema(new StringSchema()))->min(5);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'array.min',
+                    'template' => 'Min length {{min}}, {{given}} given',
+                    'variables' => [
+                        'min' => 5,
+                        'given' => \count($input),
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidMax(): void
+    {
+        $input = ['test', 'test', 'test', 'test'];
+
+        $schema = (new ArraySchema(new StringSchema()))->max(4);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMax(): void
+    {
+        $input = ['test', 'test', 'test', 'test'];
+
+        $schema = (new ArraySchema(new StringSchema()))->max(3);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'array.max',
+                    'template' => 'Max length {{max}}, {{given}} given',
+                    'variables' => [
+                        'max' => 3,
+                        'given' => \count($input),
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidLength(): void
+    {
+        $input = ['test', 'test', 'test', 'test'];
+
+        $schema = (new ArraySchema(new StringSchema()))->length(4);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidLength(): void
+    {
+        $input = ['test', 'test', 'test', 'test'];
+
+        $schema = (new ArraySchema(new StringSchema()))->length(5);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'array.length',
+                    'template' => 'Length {{length}}, {{given}} given',
+                    'variables' => [
+                        'length' => 5,
+                        'given' => \count($input),
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
 }

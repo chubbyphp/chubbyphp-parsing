@@ -52,6 +52,23 @@ $schema = $p->array($p->string());
 $data = $schema->parse(['John Doe']);
 ```
 
+#### Predefined transformers
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+// validations
+$p->array($p->string())->min(5);
+$p->array($p->string())->max(5);
+$p->array($p->string())->length(5);
+
+// transformations
+
+// conversions
+```
+
 ### backedEnum
 
 ```php
