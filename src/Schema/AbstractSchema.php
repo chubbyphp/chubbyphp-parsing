@@ -9,37 +9,25 @@ use Chubbyphp\Parsing\Result;
 
 abstract class AbstractSchema implements SchemaInterface
 {
+    protected bool $nullable = false;
+
+    protected mixed $default = null;
+
     /**
      * @var array<\Closure(mixed): mixed>
      */
-    protected array $transform = [];
-
-    protected mixed $default = null;
+    protected array $middlewares = [];
 
     /**
      * @var \Closure(mixed, ParserErrorException): mixed
      */
     protected null|\Closure $catch = null;
 
-    protected bool $nullable = false;
-
-    final public function safeParse(mixed $input): Result
-    {
-        try {
-            return new Result($this->parse($input), null);
-        } catch (ParserErrorException $parserErrorException) {
-            return new Result(null, $parserErrorException);
-        }
-    }
-
-    /**
-     * @param \Closure(mixed $input): mixed $transform
-     */
-    final public function transform(\Closure $transform): static
+    final public function nullable(): static
     {
         $clone = clone $this;
 
-        $clone->transform[] = $transform;
+        $clone->nullable = true;
 
         return $clone;
     }
@@ -49,6 +37,18 @@ abstract class AbstractSchema implements SchemaInterface
         $clone = clone $this;
 
         $clone->default = $default;
+
+        return $clone;
+    }
+
+    /**
+     * @param \Closure(mixed $input): mixed $middleware
+     */
+    final public function middleware(\Closure $middleware): static
+    {
+        $clone = clone $this;
+
+        $clone->middlewares[] = $middleware;
 
         return $clone;
     }
@@ -65,22 +65,22 @@ abstract class AbstractSchema implements SchemaInterface
         return $clone;
     }
 
-    final public function nullable(): static
+    final public function safeParse(mixed $input): Result
     {
-        $clone = clone $this;
-
-        $clone->nullable = true;
-
-        return $clone;
+        try {
+            return new Result($this->parse($input), null);
+        } catch (ParserErrorException $parserErrorException) {
+            return new Result(null, $parserErrorException);
+        }
     }
 
-    final protected function transformOutput(mixed $output): mixed
+    final protected function dispatchMiddlewares(mixed $data): mixed
     {
-        foreach ($this->transform as $transform) {
-            $output = $transform($output);
+        foreach ($this->middlewares as $middleware) {
+            $data = $middleware($data);
         }
 
-        return $output;
+        return $data;
     }
 
     final protected function getDataType(mixed $input): string

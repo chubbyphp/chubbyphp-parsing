@@ -40,7 +40,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->transformOutput($input);
+            return $this->dispatchMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -52,62 +52,62 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function min(\DateTimeImmutable $min): static
     {
-        return $this->transform(static function (\DateTimeImmutable $output) use ($min) {
-            if ($output < $min) {
+        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($min) {
+            if ($datetime < $min) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_MIN_CODE,
                         self::ERROR_MIN_TEMPLATE,
-                        ['min' => $min->format('c'), 'given' => $output->format('c')]
+                        ['min' => $min->format('c'), 'given' => $datetime->format('c')]
                     )
                 );
             }
 
-            return $output;
+            return $datetime;
         });
     }
 
     public function max(\DateTimeImmutable $max): static
     {
-        return $this->transform(static function (\DateTimeImmutable $output) use ($max) {
-            if ($output > $max) {
+        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($max) {
+            if ($datetime > $max) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_MAX_CODE,
                         self::ERROR_MAX_TEMPLATE,
-                        ['max' => $max->format('c'), 'given' => $output->format('c')]
+                        ['max' => $max->format('c'), 'given' => $datetime->format('c')]
                     )
                 );
             }
 
-            return $output;
+            return $datetime;
         });
     }
 
     public function range(\DateTimeImmutable $min, \DateTimeImmutable $max): static
     {
-        return $this->transform(static function (\DateTimeImmutable $output) use ($min, $max) {
-            if ($output < $min || $output > $max) {
+        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($min, $max) {
+            if ($datetime < $min || $datetime > $max) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_RANGE_CODE,
                         self::ERROR_RANGE_TEMPLATE,
-                        ['min' => $min->format('c'), 'max' => $max->format('c'), 'given' => $output->format('c')]
+                        ['min' => $min->format('c'), 'max' => $max->format('c'), 'given' => $datetime->format('c')]
                     )
                 );
             }
 
-            return $output;
+            return $datetime;
         });
     }
 
     public function toInt(): static
     {
-        return $this->transform(static fn (\DateTimeInterface $output) => $output->getTimestamp());
+        return $this->middleware(static fn (\DateTimeInterface $datetime) => $datetime->getTimestamp());
     }
 
     public function toString(): static
     {
-        return $this->transform(static fn (\DateTimeInterface $output) => $output->format('c'));
+        return $this->middleware(static fn (\DateTimeInterface $datetime) => $datetime->format('c'));
     }
 }

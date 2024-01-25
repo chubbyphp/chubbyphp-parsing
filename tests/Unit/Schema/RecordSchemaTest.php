@@ -21,10 +21,10 @@ final class RecordSchemaTest extends AbstractTestCase
     {
         $schema = new RecordSchema(new StringSchema());
 
-        self::assertNotSame($schema, $schema->transform(static fn (\stdClass $output) => $output));
-        self::assertNotSame($schema, $schema->default([]));
-        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default([]));
+        self::assertNotSame($schema, $schema->middleware(static fn (\stdClass $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -106,11 +106,11 @@ final class RecordSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithTransform(): void
+    public function testParseSuccessWithmiddleware(): void
     {
         $input = ['field1' => 'value1'];
 
-        $schema = (new RecordSchema(new StringSchema()))->transform(static function (\stdClass $output) {
+        $schema = (new RecordSchema(new StringSchema()))->middleware(static function (\stdClass $output) {
             $output->field2 = 'value2';
 
             return $output;

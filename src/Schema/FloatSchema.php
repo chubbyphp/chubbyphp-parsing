@@ -46,7 +46,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->transformOutput($input);
+            return $this->dispatchMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -58,69 +58,69 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
 
     public function gt(float $gt): static
     {
-        return $this->transform(static function (float $output) use ($gt) {
-            if ($output <= $gt) {
+        return $this->middleware(static function (float $float) use ($gt) {
+            if ($float <= $gt) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_GT_CODE,
                         self::ERROR_GT_TEMPLATE,
-                        ['gt' => $gt, 'given' => $output]
+                        ['gt' => $gt, 'given' => $float]
                     )
                 );
             }
 
-            return $output;
+            return $float;
         });
     }
 
     public function gte(float $gte): static
     {
-        return $this->transform(static function (float $output) use ($gte) {
-            if ($output < $gte) {
+        return $this->middleware(static function (float $float) use ($gte) {
+            if ($float < $gte) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_GTE_CODE,
                         self::ERROR_GTE_TEMPLATE,
-                        ['gte' => $gte, 'given' => $output]
+                        ['gte' => $gte, 'given' => $float]
                     )
                 );
             }
 
-            return $output;
+            return $float;
         });
     }
 
     public function lt(float $lt): static
     {
-        return $this->transform(static function (float $output) use ($lt) {
-            if ($output >= $lt) {
+        return $this->middleware(static function (float $float) use ($lt) {
+            if ($float >= $lt) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_LT_CODE,
                         self::ERROR_LT_TEMPLATE,
-                        ['lt' => $lt, 'given' => $output]
+                        ['lt' => $lt, 'given' => $float]
                     )
                 );
             }
 
-            return $output;
+            return $float;
         });
     }
 
     public function lte(float $lte): static
     {
-        return $this->transform(static function (float $output) use ($lte) {
-            if ($output > $lte) {
+        return $this->middleware(static function (float $float) use ($lte) {
+            if ($float > $lte) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_LTE_CODE,
                         self::ERROR_LTE_TEMPLATE,
-                        ['lte' => $lte, 'given' => $output]
+                        ['lte' => $lte, 'given' => $float]
                     )
                 );
             }
 
-            return $output;
+            return $float;
         });
     }
 
@@ -146,15 +146,15 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): static
     {
-        return $this->transform(static function (float $output) {
-            $intOutput = (int) $output;
+        return $this->middleware(static function (float $float) {
+            $intOutput = (int) $float;
 
-            if ((float) $intOutput !== $output) {
+            if ((float) $intOutput !== $float) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_INT_CODE,
                         self::ERROR_INT_TEMPLATE,
-                        ['given' => $output]
+                        ['given' => $float]
                     )
                 );
             }
@@ -165,6 +165,6 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
 
     public function toString(): static
     {
-        return $this->transform(static fn (float $output) => (string) $output);
+        return $this->middleware(static fn (float $float) => (string) $float);
     }
 }

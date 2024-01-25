@@ -21,10 +21,10 @@ final class ArraySchemaTest extends AbstractTestCase
     {
         $schema = new ArraySchema(new StringSchema());
 
-        self::assertNotSame($schema, $schema->transform(static fn (array $output) => $output));
-        self::assertNotSame($schema, $schema->default(['test']));
-        self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default(['test']));
+        self::assertNotSame($schema, $schema->middleware(static fn (array $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -110,12 +110,12 @@ final class ArraySchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithTransform(): void
+    public function testParseSuccessWithmiddleware(): void
     {
         $input = ['test1'];
 
         $schema = (new ArraySchema(new StringSchema()))
-            ->transform(static fn (array $output) => array_merge($output, ['test2']))
+            ->middleware(static fn (array $output) => array_merge($output, ['test2']))
         ;
 
         self::assertSame(array_merge($input, ['test2']), $schema->parse($input));

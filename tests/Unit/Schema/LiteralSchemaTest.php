@@ -20,10 +20,10 @@ final class LiteralSchemaTest extends AbstractTestCase
     {
         $schema = new LiteralSchema('test');
 
-        self::assertNotSame($schema, $schema->transform(static fn (string $output) => $output));
-        self::assertNotSame($schema, $schema->default('test'));
-        self::assertNotSame($schema, $schema->catch(static fn (string $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default('test'));
+        self::assertNotSame($schema, $schema->middleware(static fn (string $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (string $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccessWithBool(): void
@@ -187,11 +187,11 @@ final class LiteralSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithTransform(): void
+    public function testParseSuccessWithmiddleware(): void
     {
         $input = 'test1';
 
-        $schema = (new LiteralSchema($input))->transform(static fn (string $output) => $output.'1');
+        $schema = (new LiteralSchema($input))->middleware(static fn (string $output) => $output.'1');
 
         self::assertSame('test11', $schema->parse($input));
     }

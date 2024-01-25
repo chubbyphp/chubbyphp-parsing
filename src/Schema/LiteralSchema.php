@@ -46,7 +46,7 @@ final class LiteralSchema extends AbstractSchema
                 );
             }
 
-            return $this->transformOutput($input);
+            return $this->dispatchMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);

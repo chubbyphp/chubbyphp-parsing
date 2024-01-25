@@ -20,10 +20,10 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $schema = new StringSchema();
 
-        self::assertNotSame($schema, $schema->transform(static fn (string $output) => $output));
-        self::assertNotSame($schema, $schema->default(42));
-        self::assertNotSame($schema, $schema->catch(static fn (string $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default(42));
+        self::assertNotSame($schema, $schema->middleware(static fn (string $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (string $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -72,11 +72,11 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithTransform(): void
+    public function testParseSuccessWithmiddleware(): void
     {
         $input = '1';
 
-        $schema = (new StringSchema())->transform(static fn (string $output) => (int) $output);
+        $schema = (new StringSchema())->middleware(static fn (string $output) => (int) $output);
 
         self::assertSame((int) $input, $schema->parse($input));
     }

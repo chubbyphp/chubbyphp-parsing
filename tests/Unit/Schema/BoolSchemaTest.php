@@ -20,10 +20,10 @@ final class BoolSchemaTest extends AbstractTestCase
     {
         $schema = new BoolSchema();
 
-        self::assertNotSame($schema, $schema->transform(static fn (bool $output) => $output));
-        self::assertNotSame($schema, $schema->default(true));
-        self::assertNotSame($schema, $schema->catch(static fn (bool $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default(true));
+        self::assertNotSame($schema, $schema->middleware(static fn (bool $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (bool $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -72,11 +72,11 @@ final class BoolSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithTransform(): void
+    public function testParseSuccessWithmiddleware(): void
     {
         $input = true;
 
-        $schema = (new BoolSchema())->transform(static fn (bool $output) => (bool) $output);
+        $schema = (new BoolSchema())->middleware(static fn (bool $output) => (bool) $output);
 
         self::assertSame((bool) $input, $schema->parse($input));
     }

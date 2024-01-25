@@ -38,10 +38,10 @@ final class BackedEnumSchemaTest extends AbstractTestCase
     {
         $schema = new BackedEnumSchema(BackedSuit::class);
 
-        self::assertNotSame($schema, $schema->transform(static fn (BackedSuit $output) => $output->value));
-        self::assertNotSame($schema, $schema->default(true));
-        self::assertNotSame($schema, $schema->catch(static fn (BackedSuit $output, ParserErrorException $e) => $output->value));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default(true));
+        self::assertNotSame($schema, $schema->middleware(static fn (BackedSuit $output) => $output->value));
+        self::assertNotSame($schema, $schema->catch(static fn (BackedSuit $output, ParserErrorException $e) => $output->value));
     }
 
     public function testConstructWithoutEnumClass(): void
@@ -156,12 +156,12 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithTransform(): void
+    public function testParseSuccessWithmiddleware(): void
     {
         $enum = BackedSuit::Diamonds;
         $input = $enum->value;
 
-        $schema = (new BackedEnumSchema(BackedSuit::class))->transform(static fn (BackedSuit $output) => $output->value);
+        $schema = (new BackedEnumSchema(BackedSuit::class))->middleware(static fn (BackedSuit $output) => $output->value);
 
         self::assertSame($input, $schema->parse($input));
     }

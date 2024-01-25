@@ -20,10 +20,10 @@ final class DateTimeSchemaTest extends AbstractTestCase
     {
         $schema = new DateTimeSchema();
 
-        self::assertNotSame($schema, $schema->transform(static fn (\DateTimeInterface $output) => $output));
-        self::assertNotSame($schema, $schema->default(new \DateTimeImmutable('2024-01-20T09:15:00+00:00')));
-        self::assertNotSame($schema, $schema->catch(static fn (\DateTimeInterface $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default(new \DateTimeImmutable('2024-01-20T09:15:00+00:00')));
+        self::assertNotSame($schema, $schema->middleware(static fn (\DateTimeInterface $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (\DateTimeInterface $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -72,11 +72,11 @@ final class DateTimeSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithTransform(): void
+    public function testParseSuccessWithmiddleware(): void
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
-        $schema = (new DateTimeSchema())->transform(static fn (\DateTimeInterface $output) => $output->format('c'));
+        $schema = (new DateTimeSchema())->middleware(static fn (\DateTimeInterface $output) => $output->format('c'));
 
         self::assertSame($input->format('c'), $schema->parse($input));
     }

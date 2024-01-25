@@ -22,10 +22,10 @@ final class UnionSchemaTest extends AbstractTestCase
     {
         $schema = new UnionSchema([new StringSchema(), new IntSchema()]);
 
-        self::assertNotSame($schema, $schema->transform(static fn (int|string $output) => $output));
-        self::assertNotSame($schema, $schema->default('test'));
-        self::assertNotSame($schema, $schema->catch(static fn (int|string $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default('test'));
+        self::assertNotSame($schema, $schema->middleware(static fn (int|string $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (int|string $output, ParserErrorException $e) => $output));
     }
 
     public function testConstructWithWrongArgument(): void
@@ -113,20 +113,20 @@ final class UnionSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithStringAndTransform(): void
+    public function testParseSuccessWithStringAndmiddleware(): void
     {
         $input = '1';
 
-        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->transform(static fn (string $output) => (int) $output);
+        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->middleware(static fn (string $output) => (int) $output);
 
         self::assertSame((int) $input, $schema->parse($input));
     }
 
-    public function testParseSuccessWithIntAndTransform(): void
+    public function testParseSuccessWithIntAndmiddleware(): void
     {
         $input = 1;
 
-        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->transform(static fn (int $output) => (string) $output);
+        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->middleware(static fn (int $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

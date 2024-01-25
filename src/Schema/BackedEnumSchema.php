@@ -66,9 +66,9 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            $output = ($this->backedEnum)::tryFrom($input);
+            $enum = ($this->backedEnum)::tryFrom($input);
 
-            if (null === $output) {
+            if (null === $enum) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_VALUE_CODE,
@@ -81,7 +81,7 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->transformOutput($output);
+            return $this->dispatchMiddlewares($enum);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);

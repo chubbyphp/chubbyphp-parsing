@@ -49,7 +49,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->transformOutput($input);
+            return $this->dispatchMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -61,69 +61,69 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function gt(int $gt): static
     {
-        return $this->transform(static function (int $output) use ($gt) {
-            if ($output <= $gt) {
+        return $this->middleware(static function (int $int) use ($gt) {
+            if ($int <= $gt) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_GT_CODE,
                         self::ERROR_GT_TEMPLATE,
-                        ['gt' => $gt, 'given' => $output]
+                        ['gt' => $gt, 'given' => $int]
                     )
                 );
             }
 
-            return $output;
+            return $int;
         });
     }
 
     public function gte(int $gte): static
     {
-        return $this->transform(static function (int $output) use ($gte) {
-            if ($output < $gte) {
+        return $this->middleware(static function (int $int) use ($gte) {
+            if ($int < $gte) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_GTE_CODE,
                         self::ERROR_GTE_TEMPLATE,
-                        ['gte' => $gte, 'given' => $output]
+                        ['gte' => $gte, 'given' => $int]
                     )
                 );
             }
 
-            return $output;
+            return $int;
         });
     }
 
     public function lt(int $lt): static
     {
-        return $this->transform(static function (int $output) use ($lt) {
-            if ($output >= $lt) {
+        return $this->middleware(static function (int $int) use ($lt) {
+            if ($int >= $lt) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_LT_CODE,
                         self::ERROR_LT_TEMPLATE,
-                        ['lt' => $lt, 'given' => $output]
+                        ['lt' => $lt, 'given' => $int]
                     )
                 );
             }
 
-            return $output;
+            return $int;
         });
     }
 
     public function lte(int $lte): static
     {
-        return $this->transform(static function (int $output) use ($lte) {
-            if ($output > $lte) {
+        return $this->middleware(static function (int $int) use ($lte) {
+            if ($int > $lte) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_LTE_CODE,
                         self::ERROR_LTE_TEMPLATE,
-                        ['lte' => $lte, 'given' => $output]
+                        ['lte' => $lte, 'given' => $int]
                     )
                 );
             }
 
-            return $output;
+            return $int;
         });
     }
 
@@ -149,11 +149,11 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function toFloat(): static
     {
-        return $this->transform(static fn (int $output) => (float) $output);
+        return $this->middleware(static fn (int $int) => (float) $int);
     }
 
     public function toString(): static
     {
-        return $this->transform(static fn (int $output) => (string) $output);
+        return $this->middleware(static fn (int $int) => (string) $int);
     }
 }

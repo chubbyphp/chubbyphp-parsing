@@ -73,7 +73,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->transformOutput($input);
+            return $this->dispatchMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -85,109 +85,109 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function min(int $min): static
     {
-        return $this->transform(static function (string $output) use ($min) {
-            $outputLength = \strlen($output);
+        return $this->middleware(static function (string $string) use ($min) {
+            $stringLength = \strlen($string);
 
-            if ($outputLength < $min) {
+            if ($stringLength < $min) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_MIN_CODE,
                         self::ERROR_MIN_TEMPLATE,
-                        ['min' => $min, 'given' => $outputLength]
+                        ['min' => $min, 'given' => $stringLength]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function max(int $max): static
     {
-        return $this->transform(static function (string $output) use ($max) {
-            $outputLength = \strlen($output);
+        return $this->middleware(static function (string $string) use ($max) {
+            $stringLength = \strlen($string);
 
-            if ($outputLength > $max) {
+            if ($stringLength > $max) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_MAX_CODE,
                         self::ERROR_MAX_TEMPLATE,
-                        ['max' => $max, 'given' => $outputLength]
+                        ['max' => $max, 'given' => $stringLength]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function length(int $length): static
     {
-        return $this->transform(static function (string $output) use ($length) {
-            $outputLength = \strlen($output);
+        return $this->middleware(static function (string $string) use ($length) {
+            $stringLength = \strlen($string);
 
-            if ($outputLength !== $length) {
+            if ($stringLength !== $length) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_LENGTH_CODE,
                         self::ERROR_LENGTH_TEMPLATE,
-                        ['length' => $length, 'given' => $outputLength]
+                        ['length' => $length, 'given' => $stringLength]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function contains(string $contains): static
     {
-        return $this->transform(static function (string $output) use ($contains) {
-            if (!str_contains($output, $contains)) {
+        return $this->middleware(static function (string $string) use ($contains) {
+            if (!str_contains($string, $contains)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_CONTAINS_CODE,
                         self::ERROR_CONTAINS_TEMPLATE,
-                        ['given' => $output, 'contain' => $contains]
+                        ['given' => $string, 'contain' => $contains]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function startsWith(string $startsWith): static
     {
-        return $this->transform(static function (string $output) use ($startsWith) {
-            if (!str_starts_with($output, $startsWith)) {
+        return $this->middleware(static function (string $string) use ($startsWith) {
+            if (!str_starts_with($string, $startsWith)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_STARTSWITH_CODE,
                         self::ERROR_STARTSWITH_TEMPLATE,
-                        ['given' => $output, 'startsWith' => $startsWith]
+                        ['given' => $string, 'startsWith' => $startsWith]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function endsWith(string $endsWith): static
     {
-        return $this->transform(static function (string $output) use ($endsWith) {
-            if (!str_ends_with($output, $endsWith)) {
+        return $this->middleware(static function (string $string) use ($endsWith) {
+            if (!str_ends_with($string, $endsWith)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_ENDSWITH_CODE,
                         self::ERROR_ENDSWITH_TEMPLATE,
-                        ['given' => $output, 'endsWith' => $endsWith]
+                        ['given' => $string, 'endsWith' => $endsWith]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
@@ -197,149 +197,149 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             throw new \InvalidArgumentException(sprintf('Invalid regex "%s" given', $regex));
         }
 
-        return $this->transform(static function (string $output) use ($regex) {
-            if (0 === preg_match($regex, $output)) {
+        return $this->middleware(static function (string $string) use ($regex) {
+            if (0 === preg_match($regex, $string)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_REGEX_CODE,
                         self::ERROR_REGEX_TEMPLATE,
-                        ['given' => $output, 'regex' => $regex]
+                        ['given' => $string, 'regex' => $regex]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function email(): static
     {
-        return $this->transform(static function (string $output) {
-            if (!filter_var($output, FILTER_VALIDATE_EMAIL)) {
+        return $this->middleware(static function (string $string) {
+            if (!filter_var($string, FILTER_VALIDATE_EMAIL)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_EMAIL_CODE,
                         self::ERROR_EMAIL_TEMPLATE,
-                        ['given' => $output]
+                        ['given' => $string]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function ipV4(): static
     {
-        return $this->transform(static function (string $output) {
-            if (!filter_var($output, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        return $this->middleware(static function (string $string) {
+            if (!filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_IP_CODE,
                         self::ERROR_IP_TEMPLATE,
-                        ['version' => 'v4', 'given' => $output]
+                        ['version' => 'v4', 'given' => $string]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function ipV6(): static
     {
-        return $this->transform(static function (string $output) {
-            if (!filter_var($output, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        return $this->middleware(static function (string $string) {
+            if (!filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_IP_CODE,
                         self::ERROR_IP_TEMPLATE,
-                        ['version' => 'v6', 'given' => $output]
+                        ['version' => 'v6', 'given' => $string]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function url(): static
     {
-        return $this->transform(static function (string $output) {
-            if (!filter_var($output, FILTER_VALIDATE_URL)) {
+        return $this->middleware(static function (string $string) {
+            if (!filter_var($string, FILTER_VALIDATE_URL)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_URL_CODE,
                         self::ERROR_URL_TEMPLATE,
-                        ['given' => $output]
+                        ['given' => $string]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function uuidV4(): static
     {
-        return $this->transform(static function (string $output) {
-            if (0 === preg_match(self::UUID_V4_PATTERN, $output)) {
+        return $this->middleware(static function (string $string) {
+            if (0 === preg_match(self::UUID_V4_PATTERN, $string)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_UUID_CODE,
                         self::ERROR_UUID_TEMPLATE,
-                        ['version' => 'v4', 'given' => $output]
+                        ['version' => 'v4', 'given' => $string]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function uuidV5(): static
     {
-        return $this->transform(static function (string $output) {
-            if (0 === preg_match(self::UUID_V5_PATTERN, $output)) {
+        return $this->middleware(static function (string $string) {
+            if (0 === preg_match(self::UUID_V5_PATTERN, $string)) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_UUID_CODE,
                         self::ERROR_UUID_TEMPLATE,
-                        ['version' => 'v5', 'given' => $output]
+                        ['version' => 'v5', 'given' => $string]
                     )
                 );
             }
 
-            return $output;
+            return $string;
         });
     }
 
     public function trim(): static
     {
-        return $this->transform(static fn (string $output) => trim($output));
+        return $this->middleware(static fn (string $string) => trim($string));
     }
 
     public function lower(): static
     {
-        return $this->transform(static fn (string $output) => strtolower($output));
+        return $this->middleware(static fn (string $string) => strtolower($string));
     }
 
     public function upper(): static
     {
-        return $this->transform(static fn (string $output) => strtoupper($output));
+        return $this->middleware(static fn (string $string) => strtoupper($string));
     }
 
     public function toInt(): static
     {
-        return $this->transform(static function (string $output) {
-            $intOutput = (int) $output;
+        return $this->middleware(static function (string $string) {
+            $intOutput = (int) $string;
 
-            if ((string) $intOutput !== $output) {
+            if ((string) $intOutput !== $string) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_INT_CODE,
                         self::ERROR_INT_TEMPLATE,
-                        ['given' => $output]
+                        ['given' => $string]
                     )
                 );
             }
@@ -350,9 +350,9 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function toDateTime(): static
     {
-        return $this->transform(static function (string $output) {
+        return $this->middleware(static function (string $string) {
             try {
-                $dateTime = new \DateTimeImmutable($output);
+                $dateTime = new \DateTimeImmutable($string);
 
                 $errors = \DateTimeImmutable::getLastErrors();
 
@@ -367,7 +367,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                 new Error(
                     self::ERROR_DATETIME_CODE,
                     self::ERROR_DATETIME_TEMPLATE,
-                    ['given' => $output]
+                    ['given' => $string]
                 )
             );
         });

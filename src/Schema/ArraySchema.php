@@ -42,13 +42,13 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            $output = [];
+            $array = [];
 
             $childrenParserErrorException = new ParserErrorException();
 
             foreach ($input as $i => $item) {
                 try {
-                    $output[$i] = $this->itemSchema->parse($item);
+                    $array[$i] = $this->itemSchema->parse($item);
                 } catch (ParserErrorException $childParserErrorException) {
                     $childrenParserErrorException->addParserErrorException($childParserErrorException, $i);
                 }
@@ -58,7 +58,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
                 throw $childrenParserErrorException;
             }
 
-            return $this->transformOutput($output);
+            return $this->dispatchMiddlewares($array);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -70,58 +70,58 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
 
     public function min(int $min): static
     {
-        return $this->transform(static function (array $output) use ($min) {
-            $outputLength = \count($output);
+        return $this->middleware(static function (array $array) use ($min) {
+            $arrayLength = \count($array);
 
-            if ($outputLength < $min) {
+            if ($arrayLength < $min) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_MIN_CODE,
                         self::ERROR_MIN_TEMPLATE,
-                        ['min' => $min, 'given' => $outputLength]
+                        ['min' => $min, 'given' => $arrayLength]
                     )
                 );
             }
 
-            return $output;
+            return $array;
         });
     }
 
     public function max(int $max): static
     {
-        return $this->transform(static function (array $output) use ($max) {
-            $outputLength = \count($output);
+        return $this->middleware(static function (array $array) use ($max) {
+            $arrayLength = \count($array);
 
-            if ($outputLength > $max) {
+            if ($arrayLength > $max) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_MAX_CODE,
                         self::ERROR_MAX_TEMPLATE,
-                        ['max' => $max, 'given' => $outputLength]
+                        ['max' => $max, 'given' => $arrayLength]
                     )
                 );
             }
 
-            return $output;
+            return $array;
         });
     }
 
     public function length(int $length): static
     {
-        return $this->transform(static function (array $output) use ($length) {
-            $outputLength = \count($output);
+        return $this->middleware(static function (array $array) use ($length) {
+            $arrayLength = \count($array);
 
-            if ($outputLength !== $length) {
+            if ($arrayLength !== $length) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_LENGTH_CODE,
                         self::ERROR_LENGTH_TEMPLATE,
-                        ['length' => $length, 'given' => $outputLength]
+                        ['length' => $length, 'given' => $arrayLength]
                     )
                 );
             }
 
-            return $output;
+            return $array;
         });
     }
 }

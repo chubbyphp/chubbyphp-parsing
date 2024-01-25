@@ -20,10 +20,10 @@ final class IntSchemaTest extends AbstractTestCase
     {
         $schema = new IntSchema();
 
-        self::assertNotSame($schema, $schema->transform(static fn (int $output) => $output));
-        self::assertNotSame($schema, $schema->default(42));
-        self::assertNotSame($schema, $schema->catch(static fn (int $output, ParserErrorException $e) => $output));
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->default(42));
+        self::assertNotSame($schema, $schema->middleware(static fn (int $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (int $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -72,11 +72,11 @@ final class IntSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithTransform(): void
+    public function testParseSuccessWithmiddleware(): void
     {
         $input = 1;
 
-        $schema = (new IntSchema())->transform(static fn (int $output) => (string) $output);
+        $schema = (new IntSchema())->middleware(static fn (int $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

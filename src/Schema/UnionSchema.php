@@ -43,9 +43,7 @@ final class UnionSchema extends AbstractSchema implements SchemaInterface
         }
 
         try {
-            $output = $this->parseSchemas($input);
-
-            return $this->transformOutput($output);
+            return $this->dispatchMiddlewares($this->parseSchemas($input));
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);

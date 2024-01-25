@@ -84,9 +84,9 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
                 );
             }
 
-            $output = $this->parseObjectSchemas($input, $input[$this->discriminatorFieldName]);
+            $object = $this->parseObjectSchemas($input, $input[$this->discriminatorFieldName]);
 
-            return $this->transformOutput($output);
+            return $this->dispatchMiddlewares($object);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);

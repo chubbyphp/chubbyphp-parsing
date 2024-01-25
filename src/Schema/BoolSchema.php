@@ -31,7 +31,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->transformOutput($input);
+            return $this->dispatchMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -43,11 +43,11 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): static
     {
-        return $this->transform(static fn (bool $output) => true === $output ? 1 : 0);
+        return $this->middleware(static fn (bool $bool) => true === $bool ? 1 : 0);
     }
 
     public function toString(): static
     {
-        return $this->transform(static fn (bool $output) => true === $output ? 'true' : 'false');
+        return $this->middleware(static fn (bool $bool) => true === $bool ? 'true' : 'false');
     }
 }
