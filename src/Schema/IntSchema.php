@@ -147,40 +147,6 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
         return $this->lte(0);
     }
 
-    public function multipleOf(int $multipleOf): static
-    {
-        return $this->transform(static function (int $output) use ($multipleOf) {
-            if (0 !== $output % $multipleOf) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_MULTIPLEOF_CODE,
-                        self::ERROR_MULTIPLEOF_TEMPLATE,
-                        ['multipleOf' => $multipleOf, 'given' => $output]
-                    )
-                );
-            }
-
-            return $output;
-        });
-    }
-
-    public function divisorOf(int $divisorOf): static
-    {
-        return $this->transform(static function (int $output) use ($divisorOf) {
-            if (0 !== $divisorOf % $output) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_DIVISOROF_CODE,
-                        self::ERROR_DIVISOROF_TEMPLATE,
-                        ['divisorOf' => $divisorOf, 'given' => $output]
-                    )
-                );
-            }
-
-            return $output;
-        });
-    }
-
     public function toFloat(): static
     {
         return $this->transform(static fn (int $output) => (float) $output);

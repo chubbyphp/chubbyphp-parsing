@@ -186,8 +186,6 @@ $schema->positive();
 $schema->nonNegative();
 $schema->negative();
 $schema->nonPositive();
-$schema->multipleOf(5);
-$schema->divisorOf(25);
 
 // transformations
 
