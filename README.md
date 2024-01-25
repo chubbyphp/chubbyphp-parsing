@@ -50,19 +50,11 @@ $p = new Parser();
 $schema = $p->array($p->string());
 
 $data = $schema->parse(['John Doe']);
-```
-
-#### Predefined transformers
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
 
 // validations
-$p->array($p->string())->min(5);
-$p->array($p->string())->max(5);
-$p->array($p->string())->length(5);
+$schema->min(5);
+$schema->max(5);
+$schema->length(5);
 
 // transformations
 
@@ -89,32 +81,24 @@ $schema = $p->backedEnum(BackedSuit::class);
 $data = $schema->parse('D');
 ```
 
-### boolean
+### bool
 
 ```php
 use Chubbyphp\Parsing\Parser;
 
 $p = new Parser();
 
-$schema = $p->boolean();
+$schema = $p->bool();
 
 $data = $schema->parse(true);
-```
-
-#### Predefined transformers
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
 
 // validations
 
 // transformations
 
 // conversions
-$p->bool()->toInt();
-$p->bool()->toString();
+$schema->toInt();
+$schema->toString();
 ```
 
 ### dateTime
@@ -127,24 +111,16 @@ $p = new Parser();
 $schema = $p->dateTime();
 
 $data = $schema->parse(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
-```
-
-#### Predefined transformers
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
 
 // validations
-$p->string()->min(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
-$p->string()->max(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
+$schema->min(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
+$schema->max(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
 
 // transformations
 
 // conversions
-$p->dateTime()->toInt();
-$p->dateTime()->toString();
+$schema->toInt();
+$schema->toString();
 ```
 
 ### discriminatedUnion
@@ -184,32 +160,24 @@ $p = new Parser();
 $schema = $p->int();
 
 $data = $schema->parse(1337);
-```
-
-#### Predefined transformers
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
 
 // validations
-$p->int()->gt(5);
-$p->int()->gte(5);
-$p->int()->lt(5);
-$p->int()->lte(5);
-$p->int()->positive();
-$p->int()->nonNegative();
-$p->int()->negative();
-$p->int()->nonPositive();
-$p->int()->multipleOf(5);
-$p->int()->divisorOf(25);
+$schema->gt(5);
+$schema->gte(5);
+$schema->lt(5);
+$schema->lte(5);
+$schema->positive();
+$schema->nonNegative();
+$schema->negative();
+$schema->nonPositive();
+$schema->multipleOf(5);
+$schema->divisorOf(25);
 
 // transformations
 
 // conversions
-$p->int()->toFloat();
-$p->int()->toString();
+$schema->toFloat();
+$schema->toString();
 ```
 
 ### literal
@@ -250,38 +218,30 @@ $p = new Parser();
 $schema = $p->string();
 
 $data = $schema->parse('John Doe');
-```
-
-#### Predefined transformers
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
 
 // validations
-$p->string()->min(5);
-$p->string()->max(5);
-$p->string()->length(5);
-$p->string()->contains();
-$p->string()->startsWith('exa');
-$p->string()->endsWith('mpl');
-$p->string()->regex('/^[a-z]+$/i');
-$p->string()->email();
-$p->string()->ipV4();
-$p->string()->ipV6();
-$p->string()->url();
-$p->string()->uuidV4();
-$p->string()->uuidV5();
+$schema->min(5);
+$schema->max(5);
+$schema->length(5);
+$schema->contains();
+$schema->startsWith('exa');
+$schema->endsWith('mpl');
+$schema->regex('/^[a-z]+$/i');
+$schema->email();
+$schema->ipV4();
+$schema->ipV6();
+$schema->url();
+$schema->uuidV4();
+$schema->uuidV5();
 
 // transformations
-$p->string()->trim();
-$p->string()->lower();
-$p->string()->upper();
+$schema->trim();
+$schema->lower();
+$schema->upper();
 
 // conversions
-$p->string()->toInt();
-$p->string()->toDateTime();
+$schema->toInt();
+$schema->toDateTime();
 ```
 
 ### union
