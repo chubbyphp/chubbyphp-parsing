@@ -115,6 +115,10 @@ $data = $schema->parse(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
 // validations
 $schema->min(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
 $schema->max(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
+$schema->range(
+    new \DateTimeImmutable('2024-01-20T09:10:00+00:00'),
+    new \DateTimeImmutable('2024-01-20T09:20:00+00:00')
+);
 
 // transformations
 

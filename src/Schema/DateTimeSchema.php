@@ -18,6 +18,9 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_MAX_CODE = 'datetime.max';
     public const ERROR_MAX_TEMPLATE = 'Max datetime {{max}}, {{given}} given';
 
+    public const ERROR_RANGE_CODE = 'datetime.range';
+    public const ERROR_RANGE_TEMPLATE = 'Min datetime {{min}}, Max datetime {{max}}, {{given}} given';
+
     public function parse(mixed $input): mixed
     {
         $input ??= $this->default;
@@ -73,6 +76,23 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
                         self::ERROR_MAX_CODE,
                         self::ERROR_MAX_TEMPLATE,
                         ['max' => $max->format('c'), 'given' => $output->format('c')]
+                    )
+                );
+            }
+
+            return $output;
+        });
+    }
+
+    public function range(\DateTimeImmutable $min, \DateTimeImmutable $max): static
+    {
+        return $this->transform(static function (\DateTimeImmutable $output) use ($min, $max) {
+            if ($output < $min || $output > $max) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_RANGE_CODE,
+                        self::ERROR_RANGE_TEMPLATE,
+                        ['min' => $min->format('c'), 'max' => $max->format('c'), 'given' => $output->format('c')]
                     )
                 );
             }
