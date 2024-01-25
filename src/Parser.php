@@ -16,6 +16,7 @@ use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
 use Chubbyphp\Parsing\Schema\StringSchema;
+use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
 
 final class Parser
@@ -78,6 +79,14 @@ final class Parser
     public function string(): StringSchema
     {
         return new StringSchema();
+    }
+
+    /**
+     * @param array<SchemaInterface> $schemas
+     */
+    public function tuple(array $schemas): TupleSchema
+    {
+        return new TupleSchema($schemas);
     }
 
     /**

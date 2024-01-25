@@ -262,6 +262,18 @@ $schema->toInt();
 $schema->toDateTime();
 ```
 
+### tuple
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->tuple([$p->float(), $p->float()]);
+
+$data = $schema->parse([47.1, 8.2]);
+```
+
 ### union
 
 ```php
