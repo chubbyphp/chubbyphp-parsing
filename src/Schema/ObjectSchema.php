@@ -73,11 +73,11 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
             $output = new $this->classname();
 
-            $parserErrorException = new ParserErrorException();
+            $childrenParserErrorException = new ParserErrorException();
 
             foreach (array_keys($input) as $fieldName) {
                 if (!isset($this->fieldSchemas[$fieldName])) {
-                    $parserErrorException->addError(new Error(
+                    $childrenParserErrorException->addError(new Error(
                         self::ERROR_UNKNOWN_FIELD_CODE,
                         self::ERROR_UNKNOWN_FIELD_TEMPLATE,
                         ['fieldName' => $fieldName]
@@ -89,21 +89,21 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 try {
                     $output->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
                 } catch (ParserErrorException $childParserErrorException) {
-                    $parserErrorException->addParserErrorException($childParserErrorException, $fieldName);
+                    $childrenParserErrorException->addParserErrorException($childParserErrorException, $fieldName);
                 }
             }
 
-            if ($parserErrorException->hasError()) {
-                throw $parserErrorException;
+            if ($childrenParserErrorException->hasError()) {
+                throw $childrenParserErrorException;
             }
 
             return $this->transformOutput($output);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ParserErrorException $childrenParserErrorException) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $childrenParserErrorException);
             }
 
-            throw $parserErrorException;
+            throw $childrenParserErrorException;
         }
     }
 
