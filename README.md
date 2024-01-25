@@ -226,6 +226,21 @@ $data = $schema->parse(['name' => 'John Doe']);
 $data = $schema->parse(['name' => 'John Doe'], SampleNamespace\SampleClass::class);
 ```
 
+### record
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->record($p->string());
+
+$data = $schema->parse([
+    'key1' => 'value1',
+    'key2' => 'value2'
+]);
+```
+
 ### string
 
 ```php

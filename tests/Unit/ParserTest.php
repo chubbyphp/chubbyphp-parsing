@@ -14,6 +14,7 @@ use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
+use Chubbyphp\Parsing\Schema\RecordSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
@@ -128,6 +129,15 @@ final class ParserTest extends TestCase
         $stringSchema = $p->string();
 
         self::assertInstanceOf(StringSchema::class, $stringSchema);
+    }
+
+    public function testRecord(): void
+    {
+        $p = new Parser();
+
+        $recordSchema = $p->record($p->string());
+
+        self::assertInstanceOf(RecordSchema::class, $recordSchema);
     }
 
     public function testTuple(): void

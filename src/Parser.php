@@ -14,6 +14,7 @@ use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
+use Chubbyphp\Parsing\Schema\RecordSchema;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\TupleSchema;
@@ -74,6 +75,11 @@ final class Parser
     public function object(array $fieldSchemas, string $classname = \stdClass::class): ObjectSchema
     {
         return new ObjectSchema($fieldSchemas, $classname);
+    }
+
+    public function record(SchemaInterface $fieldSchema): RecordSchema
+    {
+        return new RecordSchema($fieldSchema);
     }
 
     public function string(): StringSchema
