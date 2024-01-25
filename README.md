@@ -148,6 +148,22 @@ $p = new Parser();
 $schema = $p->float();
 
 $data = $schema->parse(4.2);
+
+// validations
+$schema->gt(5);
+$schema->gte(5);
+$schema->lt(5);
+$schema->lte(5);
+$schema->positive();
+$schema->nonNegative();
+$schema->negative();
+$schema->nonPositive();
+
+// transformations
+
+// conversions
+$schema->toInt();
+$schema->toString();
 ```
 
 ### int
