@@ -40,6 +40,20 @@ composer require chubbyphp/chubbyphp-parsing "^1.0"
 
 ## Usage
 
+```php
+use Chubbyphp\Parsing\Schema\SchemaInterface;
+
+/** @var SchemaInterface $schema */
+$schema = ...;
+
+$schema->nullable();
+$schema->default('test');
+$schema->middleware(static fn (string $output) => $output);
+$schema->catch(static fn (string $output, ParserErrorException $e) => $output);
+$schema->parse('test');
+$schema->safeParse('test');
+```
+
 ### array
 
 ```php
