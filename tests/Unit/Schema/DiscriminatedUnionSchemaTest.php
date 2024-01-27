@@ -78,6 +78,40 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         self::assertSame($input, (array) $output);
     }
 
+    public function testParseSuccessWithStdClass(): void
+    {
+        $input = new \stdClass();
+        $input->field1 = 'type2';
+        $input->field2 = 'test';
+
+        $schema = new DiscriminatedUnionSchema([
+            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
+            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+        ], 'field1');
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame((array) $input, (array) $output);
+    }
+
+    public function testParseSuccessWithIterator(): void
+    {
+        $input = new \ArrayIterator(['field1' => 'type2', 'field2' => 'test']);
+
+        $schema = new DiscriminatedUnionSchema([
+            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
+            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+        ], 'field1');
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame((array) $input, (array) $output);
+    }
+
     public function testParseSuccessWithArrayDiscriminator(): void
     {
         $input = ['field1' => [5], 'field2' => 'test'];
@@ -135,7 +169,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'discriminatedUnion.type',
-                    'template' => 'Type should be "array", "{{given}}" given',
+                    'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -232,7 +266,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'discriminatedUnion.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -268,7 +302,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'discriminatedUnion.type',
-                'template' => 'Type should be "array", "{{given}}" given',
+                'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

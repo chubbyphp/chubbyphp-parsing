@@ -40,6 +40,34 @@ final class RecordSchemaTest extends AbstractTestCase
         self::assertSame($input, (array) $output);
     }
 
+    public function testParseSuccessWithStdClass(): void
+    {
+        $input = new \stdClass();
+        $input->field1 = 'value1';
+        $input->field2 = 'value2';
+
+        $schema = new RecordSchema(new StringSchema());
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame((array) $input, (array) $output);
+    }
+
+    public function testParseSuccessWithIterator(): void
+    {
+        $input = new \ArrayIterator(['field1' => 'value1', 'field2' => 'value2']);
+
+        $schema = new RecordSchema(new StringSchema());
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame((array) $input, (array) $output);
+    }
+
     public function testParseSuccessWithDefault(): void
     {
         $input = ['field1' => 'value1', 'field2' => 'value2'];
@@ -72,7 +100,7 @@ final class RecordSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'record.type',
-                    'template' => 'Type should be "array", "{{given}}" given',
+                    'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -127,7 +155,7 @@ final class RecordSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'record.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -157,7 +185,7 @@ final class RecordSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'record.type',
-                'template' => 'Type should be "array", "{{given}}" given',
+                'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

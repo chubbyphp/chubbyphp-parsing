@@ -131,7 +131,7 @@ final class ParserTest extends TestCase
                 'discriminatedUnion' => [
                     [
                         'code' => 'discriminatedUnion.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -167,7 +167,7 @@ final class ParserTest extends TestCase
                 'object' => [
                     [
                         'code' => 'object.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -176,7 +176,7 @@ final class ParserTest extends TestCase
                 'record' => [
                     [
                         'code' => 'record.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
                         'variables' => [
                             'given' => 'NULL',
                         ],

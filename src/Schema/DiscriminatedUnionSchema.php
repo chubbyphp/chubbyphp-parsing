@@ -10,7 +10,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInterface
 {
     public const ERROR_TYPE_CODE = 'discriminatedUnion.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", "{{given}}" given';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", "{{given}}" given';
 
     public const ERROR_DISCRIMINATOR_FIELD_CODE = 'discriminatedUnion.discriminatorField';
     public const ERROR_DISCRIMINATOR_FIELD_TEMPLATE
@@ -64,6 +64,10 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
         }
 
         try {
+            if ($input instanceof \stdClass || $input instanceof \Traversable) {
+                $input = (array) $input;
+            }
+
             if (!\is_array($input)) {
                 throw new ParserErrorException(
                     new Error(
