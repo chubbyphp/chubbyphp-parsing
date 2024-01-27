@@ -6,6 +6,7 @@ namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
@@ -267,6 +268,89 @@ final class ArraySchemaTest extends AbstractTestCase
                     'variables' => [
                         'maxLength' => 3,
                         'given' => \count($input),
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidContains(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime2);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidContainsWithEqualButNotSame(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime2Equal, false);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidContainsWithEqualButNotSame(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime2Equal);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'array.contains',
+                    'template' => '"{{given}}" does not contain "{{contains}}"',
+                    'variables' => [
+                        'contains' => json_decode(json_encode($dateTime2Equal), true),
+                        'given' => json_decode(json_encode($input), true),
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithInvalidContains(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+        $dateTime3 = new \DateTimeImmutable('2024-01-22T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime3);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'array.contains',
+                    'template' => '"{{given}}" does not contain "{{contains}}"',
+                    'variables' => [
+                        'contains' => json_decode(json_encode($dateTime3), true),
+                        'given' => json_decode(json_encode($input), true),
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));

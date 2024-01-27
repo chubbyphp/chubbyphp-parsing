@@ -63,12 +63,13 @@ $p = new Parser();
 
 $schema = $p->array($p->string());
 
-$data = $schema->parse(['John Doe']);
+$data = $schema->parse(['example']);
 
 // validations
 $schema->length(5);
 $schema->minLength(5);
 $schema->maxLength(5);
+$schema->contains('example');
 
 // transformations
 

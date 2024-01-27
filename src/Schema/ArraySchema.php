@@ -21,6 +21,9 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     public const ERROR_MAX_LENGTH_CODE = 'array.maxLength';
     public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
+    public const ERROR_CONTAINS_CODE = 'array.contains';
+    public const ERROR_CONTAINS_TEMPLATE = '"{{given}}" does not contain "{{contains}}"';
+
     public function __construct(private SchemaInterface $itemSchema) {}
 
     public function parse(mixed $input): mixed
@@ -117,6 +120,23 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
                         self::ERROR_MAX_LENGTH_CODE,
                         self::ERROR_MAX_LENGTH_TEMPLATE,
                         ['maxLength' => $maxLength, 'given' => $arrayLength]
+                    )
+                );
+            }
+
+            return $array;
+        });
+    }
+
+    public function contains(mixed $contains, bool $strict = true): static
+    {
+        return $this->middleware(static function (array $array) use ($contains, $strict) {
+            if (!\in_array($contains, $array, $strict)) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_CONTAINS_CODE,
+                        self::ERROR_CONTAINS_TEMPLATE,
+                        ['contains' => $contains, 'given' => $array]
                     )
                 );
             }
