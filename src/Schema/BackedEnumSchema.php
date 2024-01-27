@@ -15,6 +15,9 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_VALUE_CODE = 'backedEnum.value';
     public const ERROR_VALUE_TEMPLATE = 'Value should be one of {{cases}}, {{given}} given';
 
+    public const ERROR_INT_CODE = 'backedEnum.int';
+    public const ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
+
     private \BackedEnum $backedEnum;
 
     /**
@@ -89,6 +92,32 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
 
             throw $parserErrorException;
         }
+    }
+
+    public function toInt(): static
+    {
+        return $this->middleware(static function (\BackedEnum $enum) {
+            $value = $enum->value;
+
+            $intValue = (int) $value;
+
+            if ((string) $intValue !== $value) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_INT_CODE,
+                        self::ERROR_INT_TEMPLATE,
+                        ['given' => $value]
+                    )
+                );
+            }
+
+            return $intValue;
+        });
+    }
+
+    public function toString(): static
+    {
+        return $this->middleware(static fn (\BackedEnum $enum) => (string) $enum->value);
     }
 
     /**

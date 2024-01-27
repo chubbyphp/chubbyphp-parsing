@@ -24,6 +24,22 @@ enum BackedSuit: string
     case Spades = 'S';
 }
 
+enum BackedSuitIntString: string
+{
+    case Hearts = '1';
+    case Diamonds = '2';
+    case Clubs = '3';
+    case Spades = '4';
+}
+
+enum BackedSuitInt: int
+{
+    case Hearts = 1;
+    case Diamonds = 2;
+    case Clubs = 3;
+    case Spades = 4;
+}
+
 enum BackedEmpty: string {}
 
 /**
@@ -211,5 +227,59 @@ final class BackedEnumSchemaTest extends AbstractTestCase
                 ],
             ],
         ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+    }
+
+    public function testParseWithValidtoInt(): void
+    {
+        $enum = BackedSuitIntString::Diamonds;
+        $input = $enum->value;
+
+        $schema = (new BackedEnumSchema(BackedSuitIntString::class))->toInt();
+
+        self::assertSame((int) $input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidtoInt(): void
+    {
+        $enum = BackedSuit::Diamonds;
+        $input = $enum->value;
+
+        $schema = (new BackedEnumSchema(BackedSuit::class))->toInt();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'backedEnum.int',
+                    'template' => 'Cannot convert {{given}} to int',
+                    'variables' => [
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidtoStringWithStringEnum(): void
+    {
+        $enum = BackedSuit::Diamonds;
+        $input = $enum->value;
+
+        $schema = (new BackedEnumSchema(BackedSuit::class))->toString();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidtoStringWithIntEnum(): void
+    {
+        $enum = BackedSuitInt::Diamonds;
+        $input = $enum->value;
+
+        $schema = (new BackedEnumSchema(BackedSuitInt::class))->toString();
+
+        self::assertSame((string) $input, $schema->parse($input));
     }
 }

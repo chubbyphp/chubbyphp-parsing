@@ -99,6 +99,14 @@ $p = new Parser();
 $schema = $p->backedEnum(BackedSuit::class);
 
 $data = $schema->parse('D');
+
+// validations
+
+// transformations
+
+// conversions
+$schema->toInt();
+$schema->toString();
 ```
 
 ### bool
