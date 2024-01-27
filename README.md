@@ -164,10 +164,10 @@ $schema = $p->float();
 $data = $schema->parse(4.2);
 
 // validations
-$schema->gt(5);
-$schema->gte(5);
-$schema->lt(5);
-$schema->lte(5);
+$schema->gt(5.0);
+$schema->gte(5.0);
+$schema->lt(5.0);
+$schema->lte(5.0);
 $schema->positive();
 $schema->nonNegative();
 $schema->negative();
