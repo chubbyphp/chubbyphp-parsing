@@ -251,8 +251,8 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.contains',
                     'template' => '"{{given}}" does not contain "{{contains}}"',
                     'variables' => [
-                        'given' => $input,
                         'contains' => 'lee',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -284,8 +284,8 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.startsWith',
                     'template' => '"{{given}}" does not starts with "{{startsWith}}"',
                     'variables' => [
-                        'given' => $input,
                         'startsWith' => 'xam',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -317,8 +317,8 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.endsWith',
                     'template' => '"{{given}}" does not ends with "{{endsWith}}"',
                     'variables' => [
-                        'given' => $input,
                         'endsWith' => 'mpl',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
@@ -361,8 +361,8 @@ final class StringSchemaTest extends AbstractTestCase
                     'code' => 'string.regex',
                     'template' => '"{{given}}" does not regex "{{regex}}"',
                     'variables' => [
-                        'given' => $input,
                         'regex' => '/^[a-z]+$/i',
+                        'given' => $input,
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));

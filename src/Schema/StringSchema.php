@@ -148,7 +148,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                     new Error(
                         self::ERROR_CONTAINS_CODE,
                         self::ERROR_CONTAINS_TEMPLATE,
-                        ['given' => $string, 'contains' => $contains]
+                        ['contains' => $contains, 'given' => $string]
                     )
                 );
             }
@@ -165,7 +165,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                     new Error(
                         self::ERROR_STARTSWITH_CODE,
                         self::ERROR_STARTSWITH_TEMPLATE,
-                        ['given' => $string, 'startsWith' => $startsWith]
+                        ['startsWith' => $startsWith, 'given' => $string]
                     )
                 );
             }
@@ -182,7 +182,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                     new Error(
                         self::ERROR_ENDSWITH_CODE,
                         self::ERROR_ENDSWITH_TEMPLATE,
-                        ['given' => $string, 'endsWith' => $endsWith]
+                        ['endsWith' => $endsWith, 'given' => $string]
                     )
                 );
             }
@@ -203,7 +203,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                     new Error(
                         self::ERROR_REGEX_CODE,
                         self::ERROR_REGEX_TEMPLATE,
-                        ['given' => $string, 'regex' => $regex]
+                        ['regex' => $regex, 'given' => $string]
                     )
                 );
             }
