@@ -127,22 +127,22 @@ final class DateTimeSchemaTest extends AbstractTestCase
         ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 
-    public function testParseWithValidMin(): void
+    public function testParseWithValidFrom(): void
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
         $min = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
-        $schema = (new DateTimeSchema())->min($min);
+        $schema = (new DateTimeSchema())->from($min);
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidMin(): void
+    public function testParseWithInvalidFrom(): void
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
         $min = new \DateTimeImmutable('2024-01-20T09:15:01+00:00');
 
-        $schema = (new DateTimeSchema())->min($min);
+        $schema = (new DateTimeSchema())->from($min);
 
         try {
             $schema->parse($input);
@@ -151,10 +151,10 @@ final class DateTimeSchemaTest extends AbstractTestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 [
-                    'code' => 'datetime.min',
-                    'template' => 'Min datetime {{min}}, {{given}} given',
+                    'code' => 'datetime.from',
+                    'template' => 'From datetime {{from}}, {{given}} given',
                     'variables' => [
-                        'min' => $min->format('c'),
+                        'from' => $min->format('c'),
                         'given' => $input->format('c'),
                     ],
                 ],
@@ -162,22 +162,22 @@ final class DateTimeSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseWithValidMax(): void
+    public function testParseWithValidTo(): void
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
         $max = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
-        $schema = (new DateTimeSchema())->max($max);
+        $schema = (new DateTimeSchema())->to($max);
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidMax(): void
+    public function testParseWithInvalidTo(): void
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:01+00:00');
         $max = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
-        $schema = (new DateTimeSchema())->max($max);
+        $schema = (new DateTimeSchema())->to($max);
 
         try {
             $schema->parse($input);
@@ -186,75 +186,10 @@ final class DateTimeSchemaTest extends AbstractTestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 [
-                    'code' => 'datetime.max',
-                    'template' => 'Max datetime {{max}}, {{given}} given',
+                    'code' => 'datetime.to',
+                    'template' => 'To datetime {{to}}, {{given}} given',
                     'variables' => [
-                        'max' => $max->format('c'),
-                        'given' => $input->format('c'),
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
-    public function testParseWithValidRange(): void
-    {
-        $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
-        $min = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
-        $max = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
-
-        $schema = (new DateTimeSchema())->range($min, $max);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidRangeBellowMin(): void
-    {
-        $input = new \DateTimeImmutable('2024-01-20T09:15:01+00:00');
-        $min = new \DateTimeImmutable('2024-01-20T09:15:02+00:00');
-        $max = new \DateTimeImmutable('2024-01-20T09:15:03+00:00');
-
-        $schema = (new DateTimeSchema())->range($min, $max);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'datetime.range',
-                    'template' => 'Min datetime {{min}}, Max datetime {{max}}, {{given}} given',
-                    'variables' => [
-                        'min' => $min->format('c'),
-                        'max' => $max->format('c'),
-                        'given' => $input->format('c'),
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
-    public function testParseWithInvalidRangeAboveMax(): void
-    {
-        $input = new \DateTimeImmutable('2024-01-20T09:15:03+00:00');
-        $min = new \DateTimeImmutable('2024-01-20T09:15:01+00:00');
-        $max = new \DateTimeImmutable('2024-01-20T09:15:02+00:00');
-
-        $schema = (new DateTimeSchema())->range($min, $max);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'datetime.range',
-                    'template' => 'Min datetime {{min}}, Max datetime {{max}}, {{given}} given',
-                    'variables' => [
-                        'min' => $min->format('c'),
-                        'max' => $max->format('c'),
+                        'to' => $max->format('c'),
                         'given' => $input->format('c'),
                     ],
                 ],

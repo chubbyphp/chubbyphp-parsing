@@ -12,14 +12,11 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_TYPE_CODE = 'datetime.type';
     public const ERROR_TYPE_TEMPLATE = 'Type should be "\DateTimeInterface", "{{given}}" given';
 
-    public const ERROR_MIN_CODE = 'datetime.min';
-    public const ERROR_MIN_TEMPLATE = 'Min datetime {{min}}, {{given}} given';
+    public const ERROR_FROM_CODE = 'datetime.from';
+    public const ERROR_FROM_TEMPLATE = 'From datetime {{from}}, {{given}} given';
 
-    public const ERROR_MAX_CODE = 'datetime.max';
-    public const ERROR_MAX_TEMPLATE = 'Max datetime {{max}}, {{given}} given';
-
-    public const ERROR_RANGE_CODE = 'datetime.range';
-    public const ERROR_RANGE_TEMPLATE = 'Min datetime {{min}}, Max datetime {{max}}, {{given}} given';
+    public const ERROR_TO_CODE = 'datetime.to';
+    public const ERROR_TO_TEMPLATE = 'To datetime {{to}}, {{given}} given';
 
     public function parse(mixed $input): mixed
     {
@@ -50,15 +47,15 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
         }
     }
 
-    public function min(\DateTimeImmutable $min): static
+    public function from(\DateTimeImmutable $from): static
     {
-        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($min) {
-            if ($datetime < $min) {
+        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($from) {
+            if ($datetime < $from) {
                 throw new ParserErrorException(
                     new Error(
-                        self::ERROR_MIN_CODE,
-                        self::ERROR_MIN_TEMPLATE,
-                        ['min' => $min->format('c'), 'given' => $datetime->format('c')]
+                        self::ERROR_FROM_CODE,
+                        self::ERROR_FROM_TEMPLATE,
+                        ['from' => $from->format('c'), 'given' => $datetime->format('c')]
                     )
                 );
             }
@@ -67,32 +64,15 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    public function max(\DateTimeImmutable $max): static
+    public function to(\DateTimeImmutable $to): static
     {
-        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($max) {
-            if ($datetime > $max) {
+        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($to) {
+            if ($datetime > $to) {
                 throw new ParserErrorException(
                     new Error(
-                        self::ERROR_MAX_CODE,
-                        self::ERROR_MAX_TEMPLATE,
-                        ['max' => $max->format('c'), 'given' => $datetime->format('c')]
-                    )
-                );
-            }
-
-            return $datetime;
-        });
-    }
-
-    public function range(\DateTimeImmutable $min, \DateTimeImmutable $max): static
-    {
-        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($min, $max) {
-            if ($datetime < $min || $datetime > $max) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_RANGE_CODE,
-                        self::ERROR_RANGE_TEMPLATE,
-                        ['min' => $min->format('c'), 'max' => $max->format('c'), 'given' => $datetime->format('c')]
+                        self::ERROR_TO_CODE,
+                        self::ERROR_TO_TEMPLATE,
+                        ['to' => $to->format('c'), 'given' => $datetime->format('c')]
                     )
                 );
             }

@@ -12,14 +12,14 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_TYPE_CODE = 'string.type';
     public const ERROR_TYPE_TEMPLATE = 'Type should be "string", "{{given}}" given';
 
-    public const ERROR_MIN_CODE = 'string.min';
-    public const ERROR_MIN_TEMPLATE = 'Min length {{min}}, {{given}} given';
-
-    public const ERROR_MAX_CODE = 'string.max';
-    public const ERROR_MAX_TEMPLATE = 'Max length {{max}}, {{given}} given';
-
     public const ERROR_LENGTH_CODE = 'string.length';
     public const ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
+
+    public const ERROR_MIN_LENGTH_CODE = 'string.minLength';
+    public const ERROR_MIN_LENGTH_TEMPLATE = 'Min length {{min}}, {{given}} given';
+
+    public const ERROR_MAX_LENGTH_CODE = 'string.maxLength';
+    public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
     public const ERROR_CONTAINS_CODE = 'string.contains';
     public const ERROR_CONTAINS_TEMPLATE = '"{{given}}" does not contain "{{contain}}"';
@@ -83,44 +83,6 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         }
     }
 
-    public function min(int $min): static
-    {
-        return $this->middleware(static function (string $string) use ($min) {
-            $stringLength = \strlen($string);
-
-            if ($stringLength < $min) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_MIN_CODE,
-                        self::ERROR_MIN_TEMPLATE,
-                        ['min' => $min, 'given' => $stringLength]
-                    )
-                );
-            }
-
-            return $string;
-        });
-    }
-
-    public function max(int $max): static
-    {
-        return $this->middleware(static function (string $string) use ($max) {
-            $stringLength = \strlen($string);
-
-            if ($stringLength > $max) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_MAX_CODE,
-                        self::ERROR_MAX_TEMPLATE,
-                        ['max' => $max, 'given' => $stringLength]
-                    )
-                );
-            }
-
-            return $string;
-        });
-    }
-
     public function length(int $length): static
     {
         return $this->middleware(static function (string $string) use ($length) {
@@ -132,6 +94,44 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                         self::ERROR_LENGTH_CODE,
                         self::ERROR_LENGTH_TEMPLATE,
                         ['length' => $length, 'given' => $stringLength]
+                    )
+                );
+            }
+
+            return $string;
+        });
+    }
+
+    public function minLength(int $minLength): static
+    {
+        return $this->middleware(static function (string $string) use ($minLength) {
+            $stringLength = \strlen($string);
+
+            if ($stringLength < $minLength) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_MIN_LENGTH_CODE,
+                        self::ERROR_MIN_LENGTH_TEMPLATE,
+                        ['minLength' => $minLength, 'given' => $stringLength]
+                    )
+                );
+            }
+
+            return $string;
+        });
+    }
+
+    public function maxLength(int $maxLength): static
+    {
+        return $this->middleware(static function (string $string) use ($maxLength) {
+            $stringLength = \strlen($string);
+
+            if ($stringLength > $maxLength) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_MAX_LENGTH_CODE,
+                        self::ERROR_MAX_LENGTH_TEMPLATE,
+                        ['maxLength' => $maxLength, 'given' => $stringLength]
                     )
                 );
             }

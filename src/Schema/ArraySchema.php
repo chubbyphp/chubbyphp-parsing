@@ -12,14 +12,14 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     public const ERROR_TYPE_CODE = 'array.type';
     public const ERROR_TYPE_TEMPLATE = 'Type should be "array", "{{given}}" given';
 
-    public const ERROR_MIN_CODE = 'array.min';
-    public const ERROR_MIN_TEMPLATE = 'Min length {{min}}, {{given}} given';
-
-    public const ERROR_MAX_CODE = 'array.max';
-    public const ERROR_MAX_TEMPLATE = 'Max length {{max}}, {{given}} given';
-
     public const ERROR_LENGTH_CODE = 'array.length';
     public const ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
+
+    public const ERROR_MIN_LENGTH_CODE = 'array.minLength';
+    public const ERROR_MIN_LENGTH_TEMPLATE = 'Min length {{min}}, {{given}} given';
+
+    public const ERROR_MAX_LENGTH_CODE = 'array.maxLength';
+    public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
     public function __construct(private SchemaInterface $itemSchema) {}
 
@@ -68,44 +68,6 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
         }
     }
 
-    public function min(int $min): static
-    {
-        return $this->middleware(static function (array $array) use ($min) {
-            $arrayLength = \count($array);
-
-            if ($arrayLength < $min) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_MIN_CODE,
-                        self::ERROR_MIN_TEMPLATE,
-                        ['min' => $min, 'given' => $arrayLength]
-                    )
-                );
-            }
-
-            return $array;
-        });
-    }
-
-    public function max(int $max): static
-    {
-        return $this->middleware(static function (array $array) use ($max) {
-            $arrayLength = \count($array);
-
-            if ($arrayLength > $max) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_MAX_CODE,
-                        self::ERROR_MAX_TEMPLATE,
-                        ['max' => $max, 'given' => $arrayLength]
-                    )
-                );
-            }
-
-            return $array;
-        });
-    }
-
     public function length(int $length): static
     {
         return $this->middleware(static function (array $array) use ($length) {
@@ -117,6 +79,44 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
                         self::ERROR_LENGTH_CODE,
                         self::ERROR_LENGTH_TEMPLATE,
                         ['length' => $length, 'given' => $arrayLength]
+                    )
+                );
+            }
+
+            return $array;
+        });
+    }
+
+    public function minLength(int $minLength): static
+    {
+        return $this->middleware(static function (array $array) use ($minLength) {
+            $arrayLength = \count($array);
+
+            if ($arrayLength < $minLength) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_MIN_LENGTH_CODE,
+                        self::ERROR_MIN_LENGTH_TEMPLATE,
+                        ['minLength' => $minLength, 'given' => $arrayLength]
+                    )
+                );
+            }
+
+            return $array;
+        });
+    }
+
+    public function maxLength(int $maxLength): static
+    {
+        return $this->middleware(static function (array $array) use ($maxLength) {
+            $arrayLength = \count($array);
+
+            if ($arrayLength > $maxLength) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_MAX_LENGTH_CODE,
+                        self::ERROR_MAX_LENGTH_TEMPLATE,
+                        ['maxLength' => $maxLength, 'given' => $arrayLength]
                     )
                 );
             }

@@ -66,9 +66,9 @@ $schema = $p->array($p->string());
 $data = $schema->parse(['John Doe']);
 
 // validations
-$schema->min(5);
-$schema->max(5);
 $schema->length(5);
+$schema->minLength(5);
+$schema->maxLength(5);
 
 // transformations
 
@@ -127,12 +127,8 @@ $schema = $p->dateTime();
 $data = $schema->parse(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
 
 // validations
-$schema->min(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
-$schema->max(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
-$schema->range(
-    new \DateTimeImmutable('2024-01-20T09:10:00+00:00'),
-    new \DateTimeImmutable('2024-01-20T09:20:00+00:00')
-);
+$schema->from(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
+$schema->to(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
 
 // transformations
 
@@ -267,9 +263,9 @@ $schema = $p->string();
 $data = $schema->parse('John Doe');
 
 // validations
-$schema->min(5);
-$schema->max(5);
 $schema->length(5);
+$schema->minLength(5);
+$schema->maxLength(5);
 $schema->contains();
 $schema->startsWith('exa');
 $schema->endsWith('mpl');
