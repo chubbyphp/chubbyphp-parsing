@@ -21,8 +21,8 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_MAX_LENGTH_CODE = 'string.maxLength';
     public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
-    public const ERROR_CONTAINS_CODE = 'string.contains';
-    public const ERROR_CONTAINS_TEMPLATE = '"{{given}}" does not contain "{{contains}}"';
+    public const ERROR_INCLUDES_CODE = 'string.includes';
+    public const ERROR_INCLUDES_TEMPLATE = '"{{given}}" does not include "{{includes}}"';
 
     public const ERROR_STARTSWITH_CODE = 'string.startsWith';
     public const ERROR_STARTSWITH_TEMPLATE = '"{{given}}" does not starts with "{{startsWith}}"';
@@ -30,8 +30,8 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_ENDSWITH_CODE = 'string.endsWith';
     public const ERROR_ENDSWITH_TEMPLATE = '"{{given}}" does not ends with "{{endsWith}}"';
 
-    public const ERROR_REGEX_CODE = 'string.regex';
-    public const ERROR_REGEX_TEMPLATE = '"{{given}}" does not regex "{{regex}}"';
+    public const ERROR_MATCH_CODE = 'string.match';
+    public const ERROR_MATCH_TEMPLATE = '"{{given}}" does not match "{{match}}"';
 
     public const ERROR_EMAIL_CODE = 'string.email';
     public const ERROR_EMAIL_TEMPLATE = 'Invalid email "{{given}}"';
@@ -143,15 +143,15 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    public function contains(string $contains): static
+    public function includes(string $includes): static
     {
-        return $this->middleware(static function (string $string) use ($contains) {
-            if (!str_contains($string, $contains)) {
+        return $this->middleware(static function (string $string) use ($includes) {
+            if (!str_contains($string, $includes)) {
                 throw new ParserErrorException(
                     new Error(
-                        self::ERROR_CONTAINS_CODE,
-                        self::ERROR_CONTAINS_TEMPLATE,
-                        ['contains' => $contains, 'given' => $string]
+                        self::ERROR_INCLUDES_CODE,
+                        self::ERROR_INCLUDES_TEMPLATE,
+                        ['includes' => $includes, 'given' => $string]
                     )
                 );
             }
@@ -194,19 +194,19 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    public function regex(string $regex): static
+    public function match(string $match): static
     {
-        if (false === @preg_match($regex, '')) {
-            throw new \InvalidArgumentException(sprintf('Invalid regex "%s" given', $regex));
+        if (false === @preg_match($match, '')) {
+            throw new \InvalidArgumentException(sprintf('Invalid match "%s" given', $match));
         }
 
-        return $this->middleware(static function (string $string) use ($regex) {
-            if (0 === preg_match($regex, $string)) {
+        return $this->middleware(static function (string $string) use ($match) {
+            if (0 === preg_match($match, $string)) {
                 throw new ParserErrorException(
                     new Error(
-                        self::ERROR_REGEX_CODE,
-                        self::ERROR_REGEX_TEMPLATE,
-                        ['regex' => $regex, 'given' => $string]
+                        self::ERROR_MATCH_CODE,
+                        self::ERROR_MATCH_TEMPLATE,
+                        ['match' => $match, 'given' => $string]
                     )
                 );
             }
@@ -322,14 +322,49 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         return $this->middleware(static fn (string $string) => trim($string));
     }
 
-    public function lower(): static
+    public function trimStart(): static
+    {
+        return $this->middleware(static fn (string $string) => ltrim($string));
+    }
+
+    public function trimEnd(): static
+    {
+        return $this->middleware(static fn (string $string) => rtrim($string));
+    }
+
+    public function toLowerCase(): static
     {
         return $this->middleware(static fn (string $string) => strtolower($string));
     }
 
-    public function upper(): static
+    public function toUpperCase(): static
     {
         return $this->middleware(static fn (string $string) => strtoupper($string));
+    }
+
+    public function toDateTime(): static
+    {
+        return $this->middleware(static function (string $string) {
+            try {
+                $dateTime = new \DateTimeImmutable($string);
+
+                $errors = \DateTimeImmutable::getLastErrors();
+
+                // @infection-ignore-all: php < 8.2 returned an array even if there are no errors
+                if (false === $errors || 0 === $errors['warning_count'] && 0 === $errors['error_count']) {
+                    return $dateTime;
+                }
+            } catch (\Exception) { // NOSONAR: supress the exception to throw a more specific one
+            }
+
+            throw new ParserErrorException(
+                new Error(
+                    self::ERROR_DATETIME_CODE,
+                    self::ERROR_DATETIME_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
     }
 
     public function toFloat(): static
@@ -367,31 +402,6 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             }
 
             return $intOutput;
-        });
-    }
-
-    public function toDateTime(): static
-    {
-        return $this->middleware(static function (string $string) {
-            try {
-                $dateTime = new \DateTimeImmutable($string);
-
-                $errors = \DateTimeImmutable::getLastErrors();
-
-                // @infection-ignore-all: php < 8.2 returned an array even if there are no errors
-                if (false === $errors || 0 === $errors['warning_count'] && 0 === $errors['error_count']) {
-                    return $dateTime;
-                }
-            } catch (\Exception) { // NOSONAR: supress the exception to throw a more specific one
-            }
-
-            throw new ParserErrorException(
-                new Error(
-                    self::ERROR_DATETIME_CODE,
-                    self::ERROR_DATETIME_TEMPLATE,
-                    ['given' => $string]
-                )
-            );
         });
     }
 }

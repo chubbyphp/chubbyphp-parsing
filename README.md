@@ -69,7 +69,7 @@ $data = $schema->parse(['example']);
 $schema->length(5);
 $schema->minLength(5);
 $schema->maxLength(5);
-$schema->contains('example');
+$schema->includes('example');
 
 // transformations
 
@@ -268,10 +268,10 @@ $data = $schema->parse('example');
 $schema->length(5);
 $schema->minLength(5);
 $schema->maxLength(5);
-$schema->contains('amp');
+$schema->includes('amp');
 $schema->startsWith('exa');
 $schema->endsWith('mpl');
-$schema->regex('/^[a-z]+$/i');
+$schema->match('/^[a-z]+$/i');
 $schema->email();
 $schema->ipV4();
 $schema->ipV6();
@@ -281,13 +281,15 @@ $schema->uuidV5();
 
 // transformations
 $schema->trim();
-$schema->lower();
-$schema->upper();
+$schema->trimStart();
+$schema->trimEnd();
+$schema->toLowerCase();
+$schema->toUpperCase();
 
 // conversions
+$schema->toDateTime();
 $schema->toFloat();
 $schema->toInt();
-$schema->toDateTime();
 ```
 
 ### tuple

@@ -21,8 +21,8 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     public const ERROR_MAX_LENGTH_CODE = 'array.maxLength';
     public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
-    public const ERROR_CONTAINS_CODE = 'array.contains';
-    public const ERROR_CONTAINS_TEMPLATE = '"{{given}}" does not contain "{{contains}}"';
+    public const ERROR_INCLUDES_CODE = 'array.includes';
+    public const ERROR_INCLUDES_TEMPLATE = '"{{given}}" does not include "{{includes}}"';
 
     public function __construct(private SchemaInterface $itemSchema) {}
 
@@ -128,15 +128,15 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    public function contains(mixed $contains, bool $strict = true): static
+    public function includes(mixed $includes, bool $strict = true): static
     {
-        return $this->middleware(static function (array $array) use ($contains, $strict) {
-            if (!\in_array($contains, $array, $strict)) {
+        return $this->middleware(static function (array $array) use ($includes, $strict) {
+            if (!\in_array($includes, $array, $strict)) {
                 throw new ParserErrorException(
                     new Error(
-                        self::ERROR_CONTAINS_CODE,
-                        self::ERROR_CONTAINS_TEMPLATE,
-                        ['contains' => $contains, 'given' => $array]
+                        self::ERROR_INCLUDES_CODE,
+                        self::ERROR_INCLUDES_TEMPLATE,
+                        ['includes' => $includes, 'given' => $array]
                     )
                 );
             }

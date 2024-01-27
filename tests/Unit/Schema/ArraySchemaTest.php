@@ -274,19 +274,19 @@ final class ArraySchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseWithValidContains(): void
+    public function testParseWithValidIncludes(): void
     {
         $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
         $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
 
         $input = [$dateTime1, $dateTime2];
 
-        $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime2);
+        $schema = (new ArraySchema(new DateTimeSchema()))->includes($dateTime2);
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithValidContainsWithEqualButNotSame(): void
+    public function testParseWithValidIncludesWithEqualButNotSame(): void
     {
         $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
         $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
@@ -295,12 +295,12 @@ final class ArraySchemaTest extends AbstractTestCase
 
         $input = [$dateTime1, $dateTime2];
 
-        $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime2Equal, false);
+        $schema = (new ArraySchema(new DateTimeSchema()))->includes($dateTime2Equal, false);
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidContainsWithEqualButNotSame(): void
+    public function testParseWithInvalidIncludesWithEqualButNotSame(): void
     {
         $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
         $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
@@ -309,7 +309,7 @@ final class ArraySchemaTest extends AbstractTestCase
 
         $input = [$dateTime1, $dateTime2];
 
-        $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime2Equal);
+        $schema = (new ArraySchema(new DateTimeSchema()))->includes($dateTime2Equal);
 
         try {
             $schema->parse($input);
@@ -318,10 +318,10 @@ final class ArraySchemaTest extends AbstractTestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 [
-                    'code' => 'array.contains',
-                    'template' => '"{{given}}" does not contain "{{contains}}"',
+                    'code' => 'array.includes',
+                    'template' => '"{{given}}" does not include "{{includes}}"',
                     'variables' => [
-                        'contains' => json_decode(json_encode($dateTime2Equal), true),
+                        'includes' => json_decode(json_encode($dateTime2Equal), true),
                         'given' => json_decode(json_encode($input), true),
                     ],
                 ],
@@ -329,7 +329,7 @@ final class ArraySchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseWithInvalidContains(): void
+    public function testParseWithInvalidIncludes(): void
     {
         $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
         $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
@@ -337,7 +337,7 @@ final class ArraySchemaTest extends AbstractTestCase
 
         $input = [$dateTime1, $dateTime2];
 
-        $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime3);
+        $schema = (new ArraySchema(new DateTimeSchema()))->includes($dateTime3);
 
         try {
             $schema->parse($input);
@@ -346,10 +346,10 @@ final class ArraySchemaTest extends AbstractTestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 [
-                    'code' => 'array.contains',
-                    'template' => '"{{given}}" does not contain "{{contains}}"',
+                    'code' => 'array.includes',
+                    'template' => '"{{given}}" does not include "{{includes}}"',
                     'variables' => [
-                        'contains' => json_decode(json_encode($dateTime3), true),
+                        'includes' => json_decode(json_encode($dateTime3), true),
                         'given' => json_decode(json_encode($input), true),
                     ],
                 ],

@@ -226,20 +226,20 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseWithValidContains(): void
+    public function testParseWithValidIncludes(): void
     {
         $input = 'example';
 
-        $schema = (new StringSchema())->contains('amp');
+        $schema = (new StringSchema())->includes('amp');
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidContains(): void
+    public function testParseWithInvalidIncludes(): void
     {
         $input = 'example';
 
-        $schema = (new StringSchema())->contains('lee');
+        $schema = (new StringSchema())->includes('lee');
 
         try {
             $schema->parse($input);
@@ -248,10 +248,10 @@ final class StringSchemaTest extends AbstractTestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 [
-                    'code' => 'string.contains',
-                    'template' => '"{{given}}" does not contain "{{contains}}"',
+                    'code' => 'string.includes',
+                    'template' => '"{{given}}" does not include "{{includes}}"',
                     'variables' => [
-                        'contains' => 'lee',
+                        'includes' => 'lee',
                         'given' => $input,
                     ],
                 ],
@@ -325,31 +325,31 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseWithRegexWithInvalidPattern(): void
+    public function testParseWithMatchWithInvalidPattern(): void
     {
         try {
-            (new StringSchema())->regex('test');
+            (new StringSchema())->match('test');
 
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid regex "test" given', $e->getMessage());
+            self::assertSame('Invalid match "test" given', $e->getMessage());
         }
     }
 
-    public function testParseWithValidRegex(): void
+    public function testParseWithValidMatch(): void
     {
         $input = 'aBcDeFg';
 
-        $schema = (new StringSchema())->regex('/^[a-z]+$/i');
+        $schema = (new StringSchema())->match('/^[a-z]+$/i');
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidRegex(): void
+    public function testParseWithInvalidMatch(): void
     {
         $input = 'a1B2C3d4';
 
-        $schema = (new StringSchema())->regex('/^[a-z]+$/i');
+        $schema = (new StringSchema())->match('/^[a-z]+$/i');
 
         try {
             $schema->parse($input);
@@ -358,10 +358,10 @@ final class StringSchemaTest extends AbstractTestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 [
-                    'code' => 'string.regex',
-                    'template' => '"{{given}}" does not regex "{{regex}}"',
+                    'code' => 'string.match',
+                    'template' => '"{{given}}" does not match "{{match}}"',
                     'variables' => [
-                        'regex' => '/^[a-z]+$/i',
+                        'match' => '/^[a-z]+$/i',
                         'given' => $input,
                     ],
                 ],
@@ -574,86 +574,40 @@ final class StringSchemaTest extends AbstractTestCase
         self::assertSame(trim($input), $schema->parse($input));
     }
 
-    public function testParseWithLower(): void
+    public function testParseWithTrimStart(): void
+    {
+        $input = '   test ';
+
+        $schema = (new StringSchema())->trimStart();
+
+        self::assertSame(ltrim($input), $schema->parse($input));
+    }
+
+    public function testParseWithTrimEnd(): void
+    {
+        $input = '   test ';
+
+        $schema = (new StringSchema())->trimEnd();
+
+        self::assertSame(rtrim($input), $schema->parse($input));
+    }
+
+    public function testParseWithToLowerCase(): void
     {
         $input = 'TEST';
 
-        $schema = (new StringSchema())->lower();
+        $schema = (new StringSchema())->toLowerCase();
 
         self::assertSame(strtolower($input), $schema->parse($input));
     }
 
-    public function testParseWithUpper(): void
+    public function testParseWithToUpperCase(): void
     {
         $input = 'test';
 
-        $schema = (new StringSchema())->upper();
+        $schema = (new StringSchema())->toUpperCase();
 
         self::assertSame(strtoupper($input), $schema->parse($input));
-    }
-
-    public function testParseWithValidtoFloat(): void
-    {
-        $input = '4.2';
-
-        $schema = (new StringSchema())->toFloat();
-
-        self::assertSame((float) $input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidtoFloat(): void
-    {
-        $input = '4.2cars';
-
-        $schema = (new StringSchema())->toFloat();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'string.float',
-                    'template' => 'Cannot convert "{{given}}" to float',
-                    'variables' => [
-                        'given' => $input,
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
-    }
-
-    public function testParseWithValidtoInt(): void
-    {
-        $input = '42';
-
-        $schema = (new StringSchema())->toInt();
-
-        self::assertSame((int) $input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidtoInt(): void
-    {
-        $input = '42cars';
-
-        $schema = (new StringSchema())->toInt();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
-                [
-                    'code' => 'string.int',
-                    'template' => 'Cannot convert "{{given}}" to int',
-                    'variables' => [
-                        'given' => $input,
-                    ],
-                ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
-        }
     }
 
     public function testParseWithValidToDateTime(): void
@@ -749,6 +703,70 @@ final class StringSchemaTest extends AbstractTestCase
                 [
                     'code' => 'string.datetime',
                     'template' => 'Cannot convert "{{given}}" to datetime',
+                    'variables' => [
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidtoFloat(): void
+    {
+        $input = '4.2';
+
+        $schema = (new StringSchema())->toFloat();
+
+        self::assertSame((float) $input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidtoFloat(): void
+    {
+        $input = '4.2cars';
+
+        $schema = (new StringSchema())->toFloat();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.float',
+                    'template' => 'Cannot convert "{{given}}" to float',
+                    'variables' => [
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidtoInt(): void
+    {
+        $input = '42';
+
+        $schema = (new StringSchema())->toInt();
+
+        self::assertSame((int) $input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidtoInt(): void
+    {
+        $input = '42cars';
+
+        $schema = (new StringSchema())->toInt();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.int',
+                    'template' => 'Cannot convert "{{given}}" to int',
                     'variables' => [
                         'given' => $input,
                     ],
