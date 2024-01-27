@@ -449,6 +449,15 @@ final class IntSchemaTest extends AbstractTestCase
         }
     }
 
+    public function testParseWithValidToDateTime(): void
+    {
+        $input = 1705742100;
+
+        $schema = (new IntSchema())->toDateTime();
+
+        self::assertEquals(new \DateTimeImmutable('@'.$input), $schema->parse($input));
+    }
+
     public function testParseWithToFloat(): void
     {
         $input = 42;

@@ -205,6 +205,7 @@ $schema->nonPositive();
 // transformations
 
 // conversions
+$schema->toDateTime();
 $schema->toFloat();
 $schema->toString();
 ```
@@ -284,6 +285,7 @@ $schema->lower();
 $schema->upper();
 
 // conversions
+$schema->toFloat();
 $schema->toInt();
 $schema->toDateTime();
 ```

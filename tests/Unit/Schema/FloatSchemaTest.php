@@ -473,7 +473,7 @@ final class FloatSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'float.int',
-                    'template' => 'Invalid int "{{given}}"',
+                    'template' => 'Cannot convert {{given}} to int',
                     'variables' => [
                         'given' => $input,
                     ],

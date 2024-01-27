@@ -45,11 +45,14 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_UUID_CODE = 'string.uuid';
     public const ERROR_UUID_TEMPLATE = 'Invalid uuid {{version}} "{{given}}"';
 
+    public const ERROR_FLOAT_CODE = 'string.float';
+    public const ERROR_FLOAT_TEMPLATE = 'Cannot convert "{{given}}" to float';
+
     public const ERROR_INT_CODE = 'string.int';
-    public const ERROR_INT_TEMPLATE = 'Invalid int "{{given}}"';
+    public const ERROR_INT_TEMPLATE = 'Cannot convert "{{given}}" to int';
 
     public const ERROR_DATETIME_CODE = 'string.datetime';
-    public const ERROR_DATETIME_TEMPLATE = 'Invalid datetime "{{given}}"';
+    public const ERROR_DATETIME_TEMPLATE = 'Cannot convert "{{given}}" to datetime';
 
     private const UUID_V4_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
     private const UUID_V5_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
@@ -327,6 +330,25 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public function upper(): static
     {
         return $this->middleware(static fn (string $string) => strtoupper($string));
+    }
+
+    public function toFloat(): static
+    {
+        return $this->middleware(static function (string $string) {
+            $floatOutput = (float) $string;
+
+            if ((string) $floatOutput !== $string) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_FLOAT_CODE,
+                        self::ERROR_FLOAT_TEMPLATE,
+                        ['given' => $string]
+                    )
+                );
+            }
+
+            return $floatOutput;
+        });
     }
 
     public function toInt(): static

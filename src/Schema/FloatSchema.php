@@ -25,7 +25,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
     public const ERROR_INT_CODE = 'float.int';
-    public const ERROR_INT_TEMPLATE = 'Invalid int "{{given}}"';
+    public const ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
 
     public function parse(mixed $input): mixed
     {

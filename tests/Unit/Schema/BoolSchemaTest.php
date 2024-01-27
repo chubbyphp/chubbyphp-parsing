@@ -128,39 +128,30 @@ final class BoolSchemaTest extends AbstractTestCase
         ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
     }
 
-    public function testParseWithToIntTrue(): void
+    public function testParseWithToFloat(): void
+    {
+        $input = true;
+
+        $schema = (new BoolSchema())->toFloat();
+
+        self::assertSame((float) $input, $schema->parse($input));
+    }
+
+    public function testParseWithToInt(): void
     {
         $input = true;
 
         $schema = (new BoolSchema())->toInt();
 
-        self::assertSame(true === $input ? 1 : 0, $schema->parse($input));
+        self::assertSame((int) $input, $schema->parse($input));
     }
 
-    public function testParseWithToIntFalse(): void
-    {
-        $input = false;
-
-        $schema = (new BoolSchema())->toInt();
-
-        self::assertSame(true === $input ? 1 : 0, $schema->parse($input));
-    }
-
-    public function testParseWithToStringTrue(): void
+    public function testParseWithToString(): void
     {
         $input = true;
 
         $schema = (new BoolSchema())->toString();
 
-        self::assertSame(true === $input ? 'true' : 'false', $schema->parse($input));
-    }
-
-    public function testParseWithToStringFalse(): void
-    {
-        $input = false;
-
-        $schema = (new BoolSchema())->toString();
-
-        self::assertSame(true === $input ? 'true' : 'false', $schema->parse($input));
+        self::assertSame((string) $input, $schema->parse($input));
     }
 }

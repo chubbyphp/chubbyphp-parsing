@@ -41,13 +41,18 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
         }
     }
 
+    public function toFloat(): static
+    {
+        return $this->middleware(static fn (bool $bool) => (float) $bool);
+    }
+
     public function toInt(): static
     {
-        return $this->middleware(static fn (bool $bool) => true === $bool ? 1 : 0);
+        return $this->middleware(static fn (bool $bool) => (int) $bool);
     }
 
     public function toString(): static
     {
-        return $this->middleware(static fn (bool $bool) => true === $bool ? 'true' : 'false');
+        return $this->middleware(static fn (bool $bool) => (string) $bool);
     }
 }

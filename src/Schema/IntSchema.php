@@ -24,12 +24,6 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_LTE_CODE = 'int.lte';
     public const ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
-    public const ERROR_MULTIPLEOF_CODE = 'int.multipleOf';
-    public const ERROR_MULTIPLEOF_TEMPLATE = 'Value should be multiple of {{multipleOf}}, {{given}} given';
-
-    public const ERROR_DIVISOROF_CODE = 'int.divisorOf';
-    public const ERROR_DIVISOROF_TEMPLATE = 'Value should be divisor of {{divisorOf}}, {{given}} given';
-
     public function parse(mixed $input): mixed
     {
         $input ??= $this->default;
@@ -155,5 +149,10 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     public function toString(): static
     {
         return $this->middleware(static fn (int $int) => (string) $int);
+    }
+
+    public function toDateTime(): static
+    {
+        return $this->middleware(static fn (int $int) => new \DateTimeImmutable('@'.$int));
     }
 }

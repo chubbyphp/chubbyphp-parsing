@@ -592,6 +592,38 @@ final class StringSchemaTest extends AbstractTestCase
         self::assertSame(strtoupper($input), $schema->parse($input));
     }
 
+    public function testParseWithValidtoFloat(): void
+    {
+        $input = '4.2';
+
+        $schema = (new StringSchema())->toFloat();
+
+        self::assertSame((float) $input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidtoFloat(): void
+    {
+        $input = '4.2cars';
+
+        $schema = (new StringSchema())->toFloat();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.float',
+                    'template' => 'Cannot convert "{{given}}" to float',
+                    'variables' => [
+                        'given' => $input,
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
     public function testParseWithValidtoInt(): void
     {
         $input = '42';
@@ -615,7 +647,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.int',
-                    'template' => 'Invalid int "{{given}}"',
+                    'template' => 'Cannot convert "{{given}}" to int',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -647,7 +679,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.datetime',
-                    'template' => 'Invalid datetime "{{given}}"',
+                    'template' => 'Cannot convert "{{given}}" to datetime',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -670,7 +702,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.datetime',
-                    'template' => 'Invalid datetime "{{given}}"',
+                    'template' => 'Cannot convert "{{given}}" to datetime',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -693,7 +725,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.datetime',
-                    'template' => 'Invalid datetime "{{given}}"',
+                    'template' => 'Cannot convert "{{given}}" to datetime',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -716,7 +748,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.datetime',
-                    'template' => 'Invalid datetime "{{given}}"',
+                    'template' => 'Cannot convert "{{given}}" to datetime',
                     'variables' => [
                         'given' => $input,
                     ],
