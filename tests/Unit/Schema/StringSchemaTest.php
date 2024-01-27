@@ -249,10 +249,10 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.contains',
-                    'template' => '"{{given}}" does not contain "{{contain}}"',
+                    'template' => '"{{given}}" does not contain "{{contains}}"',
                     'variables' => [
                         'given' => $input,
-                        'contain' => 'lee',
+                        'contains' => 'lee',
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));

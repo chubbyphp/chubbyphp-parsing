@@ -22,7 +22,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
     public const ERROR_CONTAINS_CODE = 'string.contains';
-    public const ERROR_CONTAINS_TEMPLATE = '"{{given}}" does not contain "{{contain}}"';
+    public const ERROR_CONTAINS_TEMPLATE = '"{{given}}" does not contain "{{contains}}"';
 
     public const ERROR_STARTSWITH_CODE = 'string.startsWith';
     public const ERROR_STARTSWITH_TEMPLATE = '"{{given}}" does not starts with "{{startsWith}}"';
@@ -148,7 +148,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                     new Error(
                         self::ERROR_CONTAINS_CODE,
                         self::ERROR_CONTAINS_TEMPLATE,
-                        ['given' => $string, 'contain' => $contains]
+                        ['given' => $string, 'contains' => $contains]
                     )
                 );
             }
