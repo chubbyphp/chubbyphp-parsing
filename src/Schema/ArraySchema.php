@@ -144,4 +144,46 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
             return $array;
         });
     }
+
+    /**
+     * @param \Closure(mixed $value, int $index): mixed $filter
+     */
+    public function filter(\Closure $filter): static
+    {
+        return $this->middleware(
+            static fn (array $array) => array_values(array_filter($array, $filter, ARRAY_FILTER_USE_BOTH))
+        );
+    }
+
+    /**
+     * @param \Closure(mixed $value): mixed $map
+     */
+    public function map(\Closure $map): static
+    {
+        return $this->middleware(static fn (array $array) => array_map($map, $array));
+    }
+
+    /**
+     * @param null|\Closure(mixed $a, mixed $b): mixed $compare
+     */
+    public function sort(?\Closure $compare = null): static
+    {
+        return $this->middleware(static function (array $array) use ($compare) {
+            if ($compare) {
+                usort($array, $compare);
+            } else {
+                sort($array);
+            }
+
+            return $array;
+        });
+    }
+
+    /**
+     * @param \Closure(mixed $existing, mixed $current): mixed $reduce
+     */
+    public function reduce(\Closure $reduce, mixed $initial = null): static
+    {
+        return $this->middleware(static fn (array $array) => array_reduce($array, $reduce, $initial));
+    }
 }

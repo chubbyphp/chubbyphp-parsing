@@ -7,6 +7,7 @@ namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
+use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
@@ -355,5 +356,52 @@ final class ArraySchemaTest extends AbstractTestCase
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
+    }
+
+    public function testParseWithFilter(): void
+    {
+        $input = [1, 2, 3, 4, 5];
+
+        $schema = (new ArraySchema(new IntSchema()))->filter(static fn (int $value) => 0 === $value % 2);
+
+        self::assertSame([2, 4], $schema->parse($input));
+    }
+
+    public function testParseWithMap(): void
+    {
+        $input = [1, 2, 3, 4, 5];
+
+        $schema = (new ArraySchema(new IntSchema()))->map(static fn (int $value) => $value * 2);
+
+        self::assertSame([2, 4, 6, 8, 10], $schema->parse($input));
+    }
+
+    public function testParseWithSort(): void
+    {
+        $input = [5, 4, 3, 2, 1];
+
+        $schema = (new ArraySchema(new IntSchema()))->sort();
+
+        self::assertSame([5, 4, 3, 2, 1], $input); // make sure its not by reference
+        self::assertSame([1, 2, 3, 4, 5], $schema->parse($input));
+    }
+
+    public function testParseWithSortWithFunction(): void
+    {
+        $input = [1, 2, 3, 4, 5];
+
+        $schema = (new ArraySchema(new IntSchema()))->sort(static fn (int $a, int $b) => $b - $a);
+
+        self::assertSame([1, 2, 3, 4, 5], $input); // make sure its not by reference
+        self::assertSame([5, 4, 3, 2, 1], $schema->parse($input));
+    }
+
+    public function testParseWithReduce(): void
+    {
+        $input = [1, 2, 3, 4, 5];
+
+        $schema = (new ArraySchema(new IntSchema()))->reduce(static fn (int $sum, int $current) => $sum + $current, 0);
+
+        self::assertSame(array_sum($input), $schema->parse($input));
     }
 }

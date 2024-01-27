@@ -61,19 +61,24 @@ use Chubbyphp\Parsing\Parser;
 
 $p = new Parser();
 
-$schema = $p->array($p->string());
+$schema = $p->array($p->int());
 
-$data = $schema->parse(['example']);
+$data = $schema->parse([1, 2, 3, 4, 5]);
 
 // validations
 $schema->length(5);
 $schema->minLength(5);
 $schema->maxLength(5);
-$schema->includes('example');
+$schema->includes(5);
 
 // transformations
+$schema->filter(static fn (int $value) => 0 === $value % 2);
+$schema->map(static fn (int $value) => $value * 2);
+$schema->sort();
+$schema->sort(static fn (int $a, int $b) => $b - $a);
 
 // conversions
+$schema->reduce(static fn (int $sum, int $current) => $sum + $current, 0);
 ```
 
 ### backedEnum
