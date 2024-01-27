@@ -231,10 +231,10 @@ $p = new Parser();
 $schema = $p->object(['name' => $p->string()]);
 
 // stdClass object
-$data = $schema->parse(['name' => 'John Doe']);
+$data = $schema->parse(['name' => 'example']);
 
 // SampleClass object
-$data = $schema->parse(['name' => 'John Doe'], SampleNamespace\SampleClass::class);
+$data = $schema->parse(['name' => 'example'], SampleNamespace\SampleClass::class);
 ```
 
 ### record
@@ -261,13 +261,13 @@ $p = new Parser();
 
 $schema = $p->string();
 
-$data = $schema->parse('John Doe');
+$data = $schema->parse('example');
 
 // validations
 $schema->length(5);
 $schema->minLength(5);
 $schema->maxLength(5);
-$schema->contains();
+$schema->contains('amp');
 $schema->startsWith('exa');
 $schema->endsWith('mpl');
 $schema->regex('/^[a-z]+$/i');
