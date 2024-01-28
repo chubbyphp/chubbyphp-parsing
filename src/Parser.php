@@ -20,7 +20,7 @@ use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
 
-final class Parser
+final class Parser implements ParserInterface
 {
     public function array(SchemaInterface $itemSchema): ArraySchema
     {
