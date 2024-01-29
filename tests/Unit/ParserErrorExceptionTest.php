@@ -93,46 +93,86 @@ final class ParserErrorExceptionTest extends AbstractTestCase
 
     public function testNested(): void
     {
-        $i = 1;
+        $i = 0;
 
         $exception = (new ParserErrorException())
-            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field1')
-            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field2')
-            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field3')
+            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
+            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field3')
             ->addParserErrorException(
                 (new ParserErrorException())
-                    ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field1')
-                    ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field2')
+                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
                     ->addParserErrorException(
                         (new ParserErrorException())
-                            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field1')
-                            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field2'),
+                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2'),
                         'field3'
                     ),
                 'field4'
             )
             ->addParserErrorException(
                 (new ParserErrorException())
-                    ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field1')
-                    ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field2')
+                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
                     ->addParserErrorException(
                         (new ParserErrorException())
-                            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field1')
-                            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field2'),
+                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2'),
                         'field3'
                     ),
                 'field4'
             )
-            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']), 'field1')
+            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
             ->addParserErrorException(
                 (new ParserErrorException())
-                    ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']))
-                    ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']))
+                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]))
+                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]))
                     ->addParserErrorException(
                         (new ParserErrorException())
-                            ->addError(new Error('error: '.$i++, 'template', ['key' => 'value']))
+                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]))
                     ),
                 'field5'
+            )
+            ->addParserErrorException(
+                (new ParserErrorException())
+                    ->addParserErrorException(
+                        (new ParserErrorException())
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addParserErrorException(
+                                        (new ParserErrorException())
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field3'),
+                                    ),
+                                0
+                            )
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addParserErrorException(
+                                        (new ParserErrorException())
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field3'),
+                                    ),
+                                1
+                            )
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addParserErrorException(
+                                        (new ParserErrorException())
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
+                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field3'),
+                                    ),
+                                2
+                            )
+                    ),
+                'field6'
             )
         ;
 
@@ -140,34 +180,34 @@ final class ParserErrorExceptionTest extends AbstractTestCase
             'field1' => [
                 [
                     'code' => 'error: 1',
-                    'template' => 'template',
+                    'template' => 'value: {{value}}',
                     'variables' => [
-                        'key' => 'value',
+                        'value' => 1,
                     ],
                 ],
                 [
                     'code' => 'error: 12',
-                    'template' => 'template',
+                    'template' => 'value: {{value}}',
                     'variables' => [
-                        'key' => 'value',
+                        'value' => 12,
                     ],
                 ],
             ],
             'field2' => [
                 [
                     'code' => 'error: 2',
-                    'template' => 'template',
+                    'template' => 'value: {{value}}',
                     'variables' => [
-                        'key' => 'value',
+                        'value' => 2,
                     ],
                 ],
             ],
             'field3' => [
                 [
                     'code' => 'error: 3',
-                    'template' => 'template',
+                    'template' => 'value: {{value}}',
                     'variables' => [
-                        'key' => 'value',
+                        'value' => 3,
                     ],
                 ],
             ],
@@ -175,32 +215,32 @@ final class ParserErrorExceptionTest extends AbstractTestCase
                 'field1' => [
                     [
                         'code' => 'error: 4',
-                        'template' => 'template',
+                        'template' => 'value: {{value}}',
                         'variables' => [
-                            'key' => 'value',
+                            'value' => 4,
                         ],
                     ],
                     [
                         'code' => 'error: 8',
-                        'template' => 'template',
+                        'template' => 'value: {{value}}',
                         'variables' => [
-                            'key' => 'value',
+                            'value' => 8,
                         ],
                     ],
                 ],
                 'field2' => [
                     [
                         'code' => 'error: 5',
-                        'template' => 'template',
+                        'template' => 'value: {{value}}',
                         'variables' => [
-                            'key' => 'value',
+                            'value' => 5,
                         ],
                     ],
                     [
                         'code' => 'error: 9',
-                        'template' => 'template',
+                        'template' => 'value: {{value}}',
                         'variables' => [
-                            'key' => 'value',
+                            'value' => 9,
                         ],
                     ],
                 ],
@@ -208,32 +248,32 @@ final class ParserErrorExceptionTest extends AbstractTestCase
                     'field1' => [
                         [
                             'code' => 'error: 6',
-                            'template' => 'template',
+                            'template' => 'value: {{value}}',
                             'variables' => [
-                                'key' => 'value',
+                                'value' => 6,
                             ],
                         ],
                         [
                             'code' => 'error: 10',
-                            'template' => 'template',
+                            'template' => 'value: {{value}}',
                             'variables' => [
-                                'key' => 'value',
+                                'value' => 10,
                             ],
                         ],
                     ],
                     'field2' => [
                         [
                             'code' => 'error: 7',
-                            'template' => 'template',
+                            'template' => 'value: {{value}}',
                             'variables' => [
-                                'key' => 'value',
+                                'value' => 7,
                             ],
                         ],
                         [
                             'code' => 'error: 11',
-                            'template' => 'template',
+                            'template' => 'value: {{value}}',
                             'variables' => [
-                                'key' => 'value',
+                                'value' => 11,
                             ],
                         ],
                     ],
@@ -242,23 +282,133 @@ final class ParserErrorExceptionTest extends AbstractTestCase
             'field5' => [
                 [
                     'code' => 'error: 13',
-                    'template' => 'template',
+                    'template' => 'value: {{value}}',
                     'variables' => [
-                        'key' => 'value',
+                        'value' => 13,
                     ],
                 ],
                 [
                     'code' => 'error: 14',
-                    'template' => 'template',
+                    'template' => 'value: {{value}}',
                     'variables' => [
-                        'key' => 'value',
+                        'value' => 14,
                     ],
                 ],
                 [
                     'code' => 'error: 15',
-                    'template' => 'template',
+                    'template' => 'value: {{value}}',
                     'variables' => [
-                        'key' => 'value',
+                        'value' => 15,
+                    ],
+                ],
+            ],
+            'field6' => [
+                [
+                    'field1' => [
+                        [
+                            'code' => 'error: 16',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 16,
+                            ],
+                        ],
+                        [
+                            'code' => 'error: 17',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 17,
+                            ],
+                        ],
+                    ],
+                    'field2' => [
+                        [
+                            'code' => 'error: 18',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 18,
+                            ],
+                        ],
+                    ],
+                    'field3' => [
+                        [
+                            'code' => 'error: 19',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 19,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'field1' => [
+                        [
+                            'code' => 'error: 20',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 20,
+                            ],
+                        ],
+                        [
+                            'code' => 'error: 21',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 21,
+                            ],
+                        ],
+                    ],
+                    'field2' => [
+                        [
+                            'code' => 'error: 22',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 22,
+                            ],
+                        ],
+                    ],
+                    'field3' => [
+                        [
+                            'code' => 'error: 23',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 23,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'field1' => [
+                        [
+                            'code' => 'error: 24',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 24,
+                            ],
+                        ],
+                        [
+                            'code' => 'error: 25',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 25,
+                            ],
+                        ],
+                    ],
+                    'field2' => [
+                        [
+                            'code' => 'error: 26',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 26,
+                            ],
+                        ],
+                    ],
+                    'field3' => [
+                        [
+                            'code' => 'error: 27',
+                            'template' => 'value: {{value}}',
+                            'variables' => [
+                                'value' => 27,
+                            ],
+                        ],
                     ],
                 ],
             ],
