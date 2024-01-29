@@ -1,5 +1,5 @@
 parameters:
     ignoreErrors:
         -
-            message: '/type has no value type specified in iterable type array/'
+            message: '/type specified in iterable type array/'
             path: %currentWorkingDirectory%/src/ParserErrorException.php

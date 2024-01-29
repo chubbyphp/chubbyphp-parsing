@@ -57,4 +57,37 @@ final class ParserErrorException extends \RuntimeException
     {
         return 0 !== \count($this->errors);
     }
+
+    public function getApiProblemErrorMessages(): array
+    {
+        return $this->flatErrorsToApiProblemMessages($this->errors);
+    }
+
+    private function flatErrorsToApiProblemMessages(array $errors, string $path = ''): array
+    {
+        $errorsToApiProblemMessages = [];
+
+        foreach ($errors as $key => $error) {
+            if ($error instanceof Error) {
+                $errorsToApiProblemMessages[] = [
+                    'name' => $path,
+                    'reason' => (string) $error,
+                    'details' => [
+                        '_template' => $error->template,
+                        ...$error->variables,
+                    ],
+                ];
+            } else {
+                $errorsToApiProblemMessages = array_merge(
+                    $errorsToApiProblemMessages,
+                    $this->flatErrorsToApiProblemMessages(
+                        $error,
+                        '' === $path ? $key : $path.'['.$key.']'
+                    )
+                );
+            }
+        }
+
+        return $errorsToApiProblemMessages;
+    }
 }
