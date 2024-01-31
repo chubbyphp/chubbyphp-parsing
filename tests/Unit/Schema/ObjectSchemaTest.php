@@ -27,6 +27,8 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default([]));
         self::assertNotSame($schema, $schema->middleware(static fn (\stdClass $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
+
+        self::assertNotSame($schema, $schema->ignoreFieldNames([]));
     }
 
     public function testConstructWithoutFieldName(): void
@@ -96,6 +98,19 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertInstanceOf(\stdClass::class, $output);
 
         self::assertSame((array) $input, (array) $output);
+    }
+
+    public function testParseSuccessWithIgnoreFieldNames(): void
+    {
+        $input = ['field1' => 'test', 'field2' => 1];
+
+        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->ignoreFieldNames(['field2']);
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame(['field1' => 'test'], (array) $output);
     }
 
     public function testParseSuccessWithDefault(): void

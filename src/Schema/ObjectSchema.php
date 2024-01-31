@@ -21,6 +21,11 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     private array $fieldSchemas;
 
     /**
+     * @var array<string>
+     */
+    private array $ignoreFieldNames = [];
+
+    /**
      * @param array<string, SchemaInterface> $fieldSchemas
      * @param class-string                   $classname
      */
@@ -80,7 +85,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             $childrenParserErrorException = new ParserErrorException();
 
             foreach (array_keys($input) as $fieldName) {
-                if (!isset($this->fieldSchemas[$fieldName])) {
+                if (!\in_array($fieldName, $this->ignoreFieldNames, true) && !isset($this->fieldSchemas[$fieldName])) {
                     $childrenParserErrorException->addError(new Error(
                         self::ERROR_UNKNOWN_FIELD_CODE,
                         self::ERROR_UNKNOWN_FIELD_TEMPLATE,
@@ -114,5 +119,17 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     public function getFieldSchema(string $fieldName): null|SchemaInterface
     {
         return $this->fieldSchemas[$fieldName] ?? null;
+    }
+
+    /**
+     * @param array<string> $ignoreFieldNames
+     */
+    public function ignoreFieldNames(array $ignoreFieldNames): static
+    {
+        $clone = clone $this;
+
+        $clone->ignoreFieldNames = $ignoreFieldNames;
+
+        return $clone;
     }
 }
