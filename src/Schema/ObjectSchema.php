@@ -18,24 +18,24 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     /**
      * @var array<string, SchemaInterface>
      */
-    private array $fieldSchemas;
+    private array $fieldNameToSchema;
 
     /**
      * @var array<string>
      */
-    private array $ignoreFieldNames = [];
+    private array $ignore = [];
 
     /**
-     * @param array<string, SchemaInterface> $fieldSchemas
+     * @param array<string, SchemaInterface> $fieldNameToSchema
      * @param class-string                   $classname
      */
-    public function __construct(array $fieldSchemas, private string $classname = \stdClass::class)
+    public function __construct(array $fieldNameToSchema, private string $classname = \stdClass::class)
     {
-        foreach ($fieldSchemas as $fieldName => $fieldSchema) {
+        foreach ($fieldNameToSchema as $fieldName => $fieldSchema) {
             if (!\is_string($fieldName)) {
                 throw new \InvalidArgumentException(
                     sprintf(
-                        'Argument #1 name #%s ($fieldSchemas) must be of type string, %s given',
+                        'Argument #1 name #%s ($fieldNameToSchema) must be of type string, %s given',
                         $fieldName,
                         $this->getDataType($fieldName)
                     )
@@ -45,7 +45,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             if (!$fieldSchema instanceof SchemaInterface) {
                 throw new \InvalidArgumentException(
                     sprintf(
-                        'Argument #1 value of #%s ($fieldSchemas) must be of type %s, %s given',
+                        'Argument #1 value of #%s ($fieldNameToSchema) must be of type %s, %s given',
                         $fieldName,
                         SchemaInterface::class,
                         $this->getDataType($fieldSchema)
@@ -54,7 +54,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             }
         }
 
-        $this->fieldSchemas = $fieldSchemas;
+        $this->fieldNameToSchema = $fieldNameToSchema;
     }
 
     public function parse(mixed $input): mixed
@@ -85,7 +85,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             $childrenParserErrorException = new ParserErrorException();
 
             foreach (array_keys($input) as $fieldName) {
-                if (!\in_array($fieldName, $this->ignoreFieldNames, true) && !isset($this->fieldSchemas[$fieldName])) {
+                if (!\in_array($fieldName, $this->ignore, true) && !isset($this->fieldNameToSchema[$fieldName])) {
                     $childrenParserErrorException->addError(new Error(
                         self::ERROR_UNKNOWN_FIELD_CODE,
                         self::ERROR_UNKNOWN_FIELD_TEMPLATE,
@@ -94,7 +94,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 }
             }
 
-            foreach ($this->fieldSchemas as $fieldName => $fieldSchema) {
+            foreach ($this->fieldNameToSchema as $fieldName => $fieldSchema) {
                 try {
                     $object->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
                 } catch (ParserErrorException $childParserErrorException) {
@@ -118,17 +118,17 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
     public function getFieldSchema(string $fieldName): null|SchemaInterface
     {
-        return $this->fieldSchemas[$fieldName] ?? null;
+        return $this->fieldNameToSchema[$fieldName] ?? null;
     }
 
     /**
-     * @param array<string> $ignoreFieldNames
+     * @param array<string> $ignore
      */
-    public function ignoreFieldNames(array $ignoreFieldNames): static
+    public function ignore(array $ignore): static
     {
         $clone = clone $this;
 
-        $clone->ignoreFieldNames = $ignoreFieldNames;
+        $clone->ignore = $ignore;
 
         return $clone;
     }

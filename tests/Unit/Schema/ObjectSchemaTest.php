@@ -28,7 +28,7 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->middleware(static fn (\stdClass $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
 
-        self::assertNotSame($schema, $schema->ignoreFieldNames([]));
+        self::assertNotSame($schema, $schema->ignore([]));
     }
 
     public function testConstructWithoutFieldName(): void
@@ -39,7 +39,7 @@ final class ObjectSchemaTest extends AbstractTestCase
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
             self::assertSame(
-                'Argument #1 name #0 ($fieldSchemas) must be of type string, integer given',
+                'Argument #1 name #0 ($fieldNameToSchema) must be of type string, integer given',
                 $invalidArgumentException->getMessage()
             );
         }
@@ -53,7 +53,7 @@ final class ObjectSchemaTest extends AbstractTestCase
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
             self::assertSame(
-                'Argument #1 value of #field2 ($fieldSchemas) must be of type Chubbyphp\Parsing\Schema\SchemaInterface, string given',
+                'Argument #1 value of #field2 ($fieldNameToSchema) must be of type Chubbyphp\Parsing\Schema\SchemaInterface, string given',
                 $invalidArgumentException->getMessage()
             );
         }
@@ -100,11 +100,11 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertSame((array) $input, (array) $output);
     }
 
-    public function testParseSuccessWithIgnoreFieldNames(): void
+    public function testParseSuccessWithIgnore(): void
     {
         $input = ['field1' => 'test', 'field2' => 1];
 
-        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->ignoreFieldNames(['field2']);
+        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->ignore(['field2']);
 
         $output = $schema->parse($input);
 
