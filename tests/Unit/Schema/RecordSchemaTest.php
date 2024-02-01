@@ -134,7 +134,7 @@ final class RecordSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithmiddleware(): void
+    public function testParseSuccessWithMiddleware(): void
     {
         $input = ['field1' => 'value1'];
 

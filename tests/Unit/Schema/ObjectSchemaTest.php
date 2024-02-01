@@ -222,7 +222,7 @@ final class ObjectSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithmiddleware(): void
+    public function testParseSuccessWithMiddleware(): void
     {
         $input = ['field1' => 'test'];
 

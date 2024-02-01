@@ -172,7 +172,7 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithmiddleware(): void
+    public function testParseSuccessWithMiddleware(): void
     {
         $enum = BackedSuit::Diamonds;
         $input = $enum->value;

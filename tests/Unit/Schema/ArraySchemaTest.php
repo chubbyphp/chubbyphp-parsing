@@ -112,7 +112,7 @@ final class ArraySchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithmiddleware(): void
+    public function testParseSuccessWithMiddleware(): void
     {
         $input = ['test1'];
 

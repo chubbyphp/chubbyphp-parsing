@@ -72,7 +72,7 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithmiddleware(): void
+    public function testParseSuccessWithMiddleware(): void
     {
         $input = '1';
 

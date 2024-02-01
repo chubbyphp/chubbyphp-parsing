@@ -239,7 +239,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithmiddleware(): void
+    public function testParseSuccessWithMiddleware(): void
     {
         $input = ['field1' => 'type2', 'field2' => 'test'];
 

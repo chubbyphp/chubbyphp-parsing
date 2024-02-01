@@ -72,7 +72,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithmiddleware(): void
+    public function testParseSuccessWithMiddleware(): void
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
