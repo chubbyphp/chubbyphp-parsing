@@ -37,13 +37,13 @@ final class RecordSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            $object = new \stdClass();
+            $output = [];
 
             $childrenParserErrorException = new ParserErrorException();
 
             foreach ($input as $fieldName => $fieldValue) {
                 try {
-                    $object->{$fieldName} = $this->fieldSchema->parse($fieldValue);
+                    $output[$fieldName] = $this->fieldSchema->parse($fieldValue);
                 } catch (ParserErrorException $childParserErrorException) {
                     $childrenParserErrorException->addParserErrorException($childParserErrorException, $fieldName);
                 }
@@ -53,7 +53,7 @@ final class RecordSchema extends AbstractSchema implements SchemaInterface
                 throw $childrenParserErrorException;
             }
 
-            return $this->dispatchMiddlewares($object);
+            return $this->dispatchMiddlewares($output);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);

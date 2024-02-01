@@ -23,8 +23,8 @@ final class RecordSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default([]));
-        self::assertNotSame($schema, $schema->middleware(static fn (\stdClass $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->middleware(static fn (array $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -35,9 +35,7 @@ final class RecordSchemaTest extends AbstractTestCase
 
         $output = $schema->parse($input);
 
-        self::assertInstanceOf(\stdClass::class, $output);
-
-        self::assertSame($input, (array) $output);
+        self::assertSame($input, $output);
     }
 
     public function testParseSuccessWithStdClass(): void
@@ -50,9 +48,7 @@ final class RecordSchemaTest extends AbstractTestCase
 
         $output = $schema->parse($input);
 
-        self::assertInstanceOf(\stdClass::class, $output);
-
-        self::assertSame((array) $input, (array) $output);
+        self::assertSame((array) $input, $output);
     }
 
     public function testParseSuccessWithIterator(): void
@@ -63,9 +59,7 @@ final class RecordSchemaTest extends AbstractTestCase
 
         $output = $schema->parse($input);
 
-        self::assertInstanceOf(\stdClass::class, $output);
-
-        self::assertSame((array) $input, (array) $output);
+        self::assertSame((array) $input, $output);
     }
 
     public function testParseSuccessWithDefault(): void
@@ -76,9 +70,7 @@ final class RecordSchemaTest extends AbstractTestCase
 
         $output = $schema->parse(null);
 
-        self::assertInstanceOf(\stdClass::class, $output);
-
-        self::assertSame($input, (array) $output);
+        self::assertSame($input, $output);
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -138,8 +130,8 @@ final class RecordSchemaTest extends AbstractTestCase
     {
         $input = ['field1' => 'value1'];
 
-        $schema = (new RecordSchema(new StringSchema()))->middleware(static function (\stdClass $output) {
-            $output->field2 = 'value2';
+        $schema = (new RecordSchema(new StringSchema()))->middleware(static function (array $output) {
+            $output['field2'] = 'value2';
 
             return $output;
         });

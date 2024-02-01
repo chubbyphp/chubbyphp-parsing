@@ -238,7 +238,7 @@ final class ParserTest extends TestCase
             public int $int;
             public bool|float|int|string $literal;
             public object $object;
-            public object $record;
+            public array $record;
             public string $string;
             public array $tuple;
             public int|string $union;
