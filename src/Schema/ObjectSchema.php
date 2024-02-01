@@ -84,23 +84,9 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
             $childrenParserErrorException = new ParserErrorException();
 
-            foreach (array_keys($input) as $fieldName) {
-                if (!\in_array($fieldName, $this->ignore, true) && !isset($this->fieldNameToSchema[$fieldName])) {
-                    $childrenParserErrorException->addError(new Error(
-                        self::ERROR_UNKNOWN_FIELD_CODE,
-                        self::ERROR_UNKNOWN_FIELD_TEMPLATE,
-                        ['fieldName' => $fieldName]
-                    ), $fieldName);
-                }
-            }
+            $this->unknownFields($input, $childrenParserErrorException);
 
-            foreach ($this->fieldNameToSchema as $fieldName => $fieldSchema) {
-                try {
-                    $object->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
-                } catch (ParserErrorException $childParserErrorException) {
-                    $childrenParserErrorException->addParserErrorException($childParserErrorException, $fieldName);
-                }
-            }
+            $this->parseFields($input, $object, $childrenParserErrorException);
 
             if ($childrenParserErrorException->hasError()) {
                 throw $childrenParserErrorException;
@@ -131,5 +117,35 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
         $clone->ignore = $ignore;
 
         return $clone;
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function unknownFields(array $input, ParserErrorException $childrenParserErrorException): void
+    {
+        foreach (array_keys($input) as $fieldName) {
+            if (!\in_array($fieldName, $this->ignore, true) && !isset($this->fieldNameToSchema[$fieldName])) {
+                $childrenParserErrorException->addError(new Error(
+                    self::ERROR_UNKNOWN_FIELD_CODE,
+                    self::ERROR_UNKNOWN_FIELD_TEMPLATE,
+                    ['fieldName' => $fieldName]
+                ), $fieldName);
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function parseFields(array $input, object $object, ParserErrorException $childrenParserErrorException): void
+    {
+        foreach ($this->fieldNameToSchema as $fieldName => $fieldSchema) {
+            try {
+                $object->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
+            } catch (ParserErrorException $childParserErrorException) {
+                $childrenParserErrorException->addParserErrorException($childParserErrorException, $fieldName);
+            }
+        }
     }
 }
