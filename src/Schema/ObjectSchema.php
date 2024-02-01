@@ -80,19 +80,19 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 );
             }
 
-            $object = new $this->classname();
+            $output = new $this->classname();
 
             $childrenParserErrorException = new ParserErrorException();
 
             $this->unknownFields($input, $childrenParserErrorException);
 
-            $this->parseFields($input, $object, $childrenParserErrorException);
+            $this->parseFields($input, $output, $childrenParserErrorException);
 
             if ($childrenParserErrorException->hasError()) {
                 throw $childrenParserErrorException;
             }
 
-            return $this->dispatchMiddlewares($object);
+            return $this->dispatchMiddlewares($output);
         } catch (ParserErrorException $childrenParserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $childrenParserErrorException);

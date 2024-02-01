@@ -11,6 +11,12 @@ use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
+final class ObjectDemo
+{
+    public string $field1;
+    public int $field2;
+}
+
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\ObjectSchema
@@ -68,6 +74,19 @@ final class ObjectSchemaTest extends AbstractTestCase
         $output = $schema->parse($input);
 
         self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame($input, (array) $output);
+    }
+
+    public function testParseSuccessWithClass(): void
+    {
+        $input = ['field1' => 'test', 'field2' => 1];
+
+        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()], ObjectDemo::class);
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(ObjectDemo::class, $output);
 
         self::assertSame($input, (array) $output);
     }
