@@ -45,10 +45,10 @@ interface ParserInterface
     public function literal(bool|float|int|string $literal): LiteralSchema;
 
     /**
-     * @param array<string, SchemaInterface> $fieldSchemas
+     * @param array<string, SchemaInterface> $fieldNameToSchema
      * @param class-string                   $classname
      */
-    public function object(array $fieldSchemas, string $classname = \stdClass::class): ObjectSchema;
+    public function object(array $fieldNameToSchema, string $classname = \stdClass::class): ObjectSchema;
 
     public function record(SchemaInterface $fieldSchema): RecordSchema;
 
