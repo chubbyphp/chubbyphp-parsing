@@ -12,6 +12,7 @@ use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
+use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\RecordSchema;
@@ -100,6 +101,19 @@ final class ParserTest extends TestCase
         $intSchema = $p->int();
 
         self::assertInstanceOf(IntSchema::class, $intSchema);
+    }
+
+    public function testLazy(): void
+    {
+        $p = new Parser();
+
+        $lazySchema = $p->lazy(static function () use ($p, &$lazySchema) {
+            return $p->object([
+                'child' => $lazySchema,
+            ])->nullable();
+        });
+
+        self::assertInstanceOf(LazySchema::class, $lazySchema);
     }
 
     public function testLiteral(): void

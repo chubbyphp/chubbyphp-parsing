@@ -42,6 +42,11 @@ interface ParserInterface
 
     public function int(): IntSchema;
 
+    /**
+     * @param \Closure(): SchemaInterface $lazy
+     */
+    public function lazy(\Closure $lazy): SchemaInterface;
+
     public function literal(bool|float|int|string $literal): LiteralSchema;
 
     /**
