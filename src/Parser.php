@@ -11,6 +11,7 @@ use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
+use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
@@ -61,6 +62,14 @@ final class Parser implements ParserInterface
     public function int(): IntSchema
     {
         return new IntSchema();
+    }
+
+    /**
+     * @param \Closure(): SchemaInterface $lazy
+     */
+    public function lazy(\Closure $lazy): SchemaInterface
+    {
+        return new LazySchema($lazy);
     }
 
     public function literal(bool|float|int|string $literal): LiteralSchema

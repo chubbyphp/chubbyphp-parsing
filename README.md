@@ -223,6 +223,29 @@ $schema->toFloat();
 $schema->toString();
 ```
 
+### lazy
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+$schema = $p->lazy(static function () use ($p, &$schema) {
+    return $p->object([
+        'name' => $p->string(),
+        'child' => $schema,
+    ])->nullable();
+});
+
+$data = $schema->parse([
+    'name' => 'name1',
+    'child' => [
+        'name' => 'name2',
+        'child' => null
+    ],
+]);
+```
+
 ### literal
 
 ```php
