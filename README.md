@@ -47,11 +47,11 @@ use Chubbyphp\Parsing\Schema\SchemaInterface;
 $schema = ...;
 
 $schema->nullable();
-$schema->preMiddleware(static fn (string $output) => $output);
-$schema->postMiddleware(static fn (string $output) => $output);
-$schema->catch(static fn (string $output, ParserErrorException $e) => $output);
+$schema->preParse(static fn ($input) => $input);
+$schema->postParse(static fn (string $output) => $output);
 $schema->parse('test');
 $schema->safeParse('test');
+$schema->catch(static fn (string $output, ParserErrorException $e) => $output);
 ```
 
 ### array

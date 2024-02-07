@@ -50,7 +50,7 @@ final class TupleSchema extends AbstractSchema implements SchemaInterface
     public function parse(mixed $input): mixed
     {
         try {
-            $input = $this->dispatchPreMiddlewares($input);
+            $input = $this->dispatchPreParses($input);
 
             if (null === $input && $this->nullable) {
                 return null;
@@ -103,7 +103,7 @@ final class TupleSchema extends AbstractSchema implements SchemaInterface
                 throw $childrenParserErrorException;
             }
 
-            return $this->dispatchPostMiddlewares($output);
+            return $this->dispatchPostParses($output);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);

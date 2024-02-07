@@ -48,8 +48,8 @@ final class BackedEnumSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(true));
-        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
-        self::assertNotSame($schema, $schema->postMiddleware(static fn (BackedSuit $output) => $output->value));
+        self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postParse(static fn (BackedSuit $output) => $output->value));
         self::assertNotSame($schema, $schema->catch(static fn (BackedSuit $output, ParserErrorException $e) => $output->value));
     }
 
@@ -169,22 +169,22 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithPreMiddleware(): void
+    public function testParseSuccessWithPreParse(): void
     {
         $enum = BackedSuit::Diamonds;
         $input = $enum->value;
 
-        $schema = (new BackedEnumSchema(BackedSuit::class))->preMiddleware(static fn () => $input);
+        $schema = (new BackedEnumSchema(BackedSuit::class))->preParse(static fn () => $input);
 
         self::assertSame($enum, $schema->parse(null));
     }
 
-    public function testParseSuccessWithPostMiddleware(): void
+    public function testParseSuccessWithPostParse(): void
     {
         $enum = BackedSuit::Diamonds;
         $input = $enum->value;
 
-        $schema = (new BackedEnumSchema(BackedSuit::class))->postMiddleware(static fn (BackedSuit $output) => $output->value);
+        $schema = (new BackedEnumSchema(BackedSuit::class))->postParse(static fn (BackedSuit $output) => $output->value);
 
         self::assertSame($input, $schema->parse($input));
     }

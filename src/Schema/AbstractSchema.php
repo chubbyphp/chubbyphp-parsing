@@ -14,12 +14,12 @@ abstract class AbstractSchema implements SchemaInterface
     /**
      * @var array<\Closure(mixed): mixed>
      */
-    protected array $preMiddlewares = [];
+    protected array $preParses = [];
 
     /**
      * @var array<\Closure(mixed): mixed>
      */
-    protected array $postMiddlewares = [];
+    protected array $postParses = [];
 
     /**
      * @var \Closure(mixed, ParserErrorException): mixed
@@ -36,27 +36,36 @@ abstract class AbstractSchema implements SchemaInterface
     }
 
     /**
-     * @param \Closure(mixed $input): mixed $preMiddleware
+     * @param \Closure(mixed $input): mixed $preParse
      */
-    final public function preMiddleware(\Closure $preMiddleware): static
+    final public function preParse(\Closure $preParse): static
     {
         $clone = clone $this;
 
-        $clone->preMiddlewares[] = $preMiddleware;
+        $clone->preParses[] = $preParse;
 
         return $clone;
     }
 
     /**
-     * @param \Closure(mixed $input): mixed $postMiddleware
+     * @param \Closure(mixed $input): mixed $postParse
      */
-    final public function postMiddleware(\Closure $postMiddleware): static
+    final public function postParse(\Closure $postParse): static
     {
         $clone = clone $this;
 
-        $clone->postMiddlewares[] = $postMiddleware;
+        $clone->postParses[] = $postParse;
 
         return $clone;
+    }
+
+    final public function safeParse(mixed $input): Result
+    {
+        try {
+            return new Result($this->parse($input), null);
+        } catch (ParserErrorException $parserErrorException) {
+            return new Result(null, $parserErrorException);
+        }
     }
 
     /**
@@ -71,33 +80,24 @@ abstract class AbstractSchema implements SchemaInterface
         return $clone;
     }
 
-    final public function safeParse(mixed $input): Result
-    {
-        try {
-            return new Result($this->parse($input), null);
-        } catch (ParserErrorException $parserErrorException) {
-            return new Result(null, $parserErrorException);
-        }
-    }
-
     final public function default(mixed $default): static
     {
-        return $this->preMiddleware(static fn (mixed $input) => $input ?? $default);
+        return $this->preParse(static fn (mixed $input) => $input ?? $default);
     }
 
-    final protected function dispatchPreMiddlewares(mixed $data): mixed
+    final protected function dispatchPreParses(mixed $data): mixed
     {
-        foreach ($this->preMiddlewares as $preMiddleware) {
-            $data = $preMiddleware($data);
+        foreach ($this->preParses as $preParse) {
+            $data = $preParse($data);
         }
 
         return $data;
     }
 
-    final protected function dispatchPostMiddlewares(mixed $data): mixed
+    final protected function dispatchPostParses(mixed $data): mixed
     {
-        foreach ($this->postMiddlewares as $postMiddleware) {
-            $data = $postMiddleware($data);
+        foreach ($this->postParses as $postParse) {
+            $data = $postParse($data);
         }
 
         return $data;

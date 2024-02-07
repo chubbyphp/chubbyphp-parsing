@@ -21,7 +21,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
     public function parse(mixed $input): mixed
     {
         try {
-            $input = $this->dispatchPreMiddlewares($input);
+            $input = $this->dispatchPreParses($input);
 
             if (null === $input && $this->nullable) {
                 return null;
@@ -37,7 +37,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->dispatchPostMiddlewares($input);
+            return $this->dispatchPostParses($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -49,7 +49,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function from(\DateTimeImmutable $from): static
     {
-        return $this->postMiddleware(static function (\DateTimeImmutable $datetime) use ($from) {
+        return $this->postParse(static function (\DateTimeImmutable $datetime) use ($from) {
             if ($datetime < $from) {
                 throw new ParserErrorException(
                     new Error(
@@ -66,7 +66,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function to(\DateTimeImmutable $to): static
     {
-        return $this->postMiddleware(static function (\DateTimeImmutable $datetime) use ($to) {
+        return $this->postParse(static function (\DateTimeImmutable $datetime) use ($to) {
             if ($datetime > $to) {
                 throw new ParserErrorException(
                     new Error(
@@ -83,7 +83,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): IntSchema
     {
-        return (new IntSchema())->preMiddleware(function ($input) {
+        return (new IntSchema())->preParse(function ($input) {
             /** @var \DateTimeInterface */
             $input = $this->parse($input);
 
@@ -93,7 +93,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function toString(): StringSchema
     {
-        return (new StringSchema())->preMiddleware(function ($input) {
+        return (new StringSchema())->preParse(function ($input) {
             /** @var \DateTimeInterface */
             $input = $this->parse($input);
 

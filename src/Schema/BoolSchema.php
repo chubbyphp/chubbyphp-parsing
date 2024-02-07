@@ -15,7 +15,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
     public function parse(mixed $input): mixed
     {
         try {
-            $input = $this->dispatchPreMiddlewares($input);
+            $input = $this->dispatchPreParses($input);
 
             if (null === $input && $this->nullable) {
                 return null;
@@ -31,7 +31,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->dispatchPostMiddlewares($input);
+            return $this->dispatchPostParses($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -43,7 +43,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
     public function toFloat(): FloatSchema
     {
-        return (new FloatSchema())->preMiddleware(function ($input) {
+        return (new FloatSchema())->preParse(function ($input) {
             /** @var bool $input */
             $input = $this->parse($input);
 
@@ -53,7 +53,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): IntSchema
     {
-        return (new IntSchema())->preMiddleware(function ($input) {
+        return (new IntSchema())->preParse(function ($input) {
             /** @var bool $input */
             $input = $this->parse($input);
 
@@ -63,7 +63,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
     public function toString(): StringSchema
     {
-        return (new StringSchema())->preMiddleware(function ($input) {
+        return (new StringSchema())->preParse(function ($input) {
             /** @var bool $input */
             $input = $this->parse($input);
 

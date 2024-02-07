@@ -22,8 +22,8 @@ final class IntSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(42));
-        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
-        self::assertNotSame($schema, $schema->postMiddleware(static fn (int $output) => $output));
+        self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postParse(static fn (int $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (int $output, ParserErrorException $e) => $output));
     }
 
@@ -75,20 +75,20 @@ final class IntSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithPreMiddleware(): void
+    public function testParseSuccessWithPreParse(): void
     {
         $input = 1;
 
-        $schema = (new IntSchema())->preMiddleware(static fn () => $input);
+        $schema = (new IntSchema())->preParse(static fn () => $input);
 
         self::assertSame($input, $schema->parse(null));
     }
 
-    public function testParseSuccessWithPostMiddleware(): void
+    public function testParseSuccessWithPostParse(): void
     {
         $input = 1;
 
-        $schema = (new IntSchema())->postMiddleware(static fn (int $output) => (string) $output);
+        $schema = (new IntSchema())->postParse(static fn (int $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

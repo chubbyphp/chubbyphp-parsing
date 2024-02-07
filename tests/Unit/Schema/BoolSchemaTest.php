@@ -22,8 +22,8 @@ final class BoolSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(true));
-        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
-        self::assertNotSame($schema, $schema->postMiddleware(static fn (bool $output) => $output));
+        self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postParse(static fn (bool $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (bool $output, ParserErrorException $e) => $output));
     }
 
@@ -75,20 +75,20 @@ final class BoolSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithPreMiddleware(): void
+    public function testParseSuccessWithPreParse(): void
     {
         $input = true;
 
-        $schema = (new BoolSchema())->preMiddleware(static fn () => $input);
+        $schema = (new BoolSchema())->preParse(static fn () => $input);
 
         self::assertSame($input, $schema->parse(null));
     }
 
-    public function testParseSuccessWithPostMiddleware(): void
+    public function testParseSuccessWithPostParse(): void
     {
         $input = true;
 
-        $schema = (new BoolSchema())->postMiddleware(static fn (bool $output) => (bool) $output);
+        $schema = (new BoolSchema())->postParse(static fn (bool $output) => (bool) $output);
 
         self::assertSame((bool) $input, $schema->parse($input));
     }

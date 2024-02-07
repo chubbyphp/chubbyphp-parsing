@@ -12,21 +12,21 @@ interface SchemaInterface
     public function nullable(): static;
 
     /**
-     * @param \Closure(mixed $input): mixed $preMiddleware
+     * @param \Closure(mixed $input): mixed $preParse
      */
-    public function preMiddleware(\Closure $preMiddleware): static;
+    public function preParse(\Closure $preParse): static;
 
     /**
-     * @param \Closure(mixed $input): mixed $postMiddleware
+     * @param \Closure(mixed $input): mixed $postParse
      */
-    public function postMiddleware(\Closure $postMiddleware): static;
+    public function postParse(\Closure $postParse): static;
+
+    public function parse(mixed $input): mixed;
+
+    public function safeParse(mixed $input): Result;
 
     /**
      * @param \Closure(mixed $input, ParserErrorException $parserErrorException): mixed $catch
      */
     public function catch(\Closure $catch): static;
-
-    public function parse(mixed $input): mixed;
-
-    public function safeParse(mixed $input): Result;
 }

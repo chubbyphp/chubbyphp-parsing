@@ -23,8 +23,8 @@ final class TupleSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(['test']));
-        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
-        self::assertNotSame($schema, $schema->postMiddleware(static fn (array $output) => $output));
+        self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postParse(static fn (array $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
     }
 
@@ -177,21 +177,21 @@ final class TupleSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithPreMiddleware(): void
+    public function testParseSuccessWithPreParse(): void
     {
         $input = ['test', 'test'];
 
-        $schema = (new TupleSchema([new StringSchema(), new StringSchema()]))->preMiddleware(static fn () => $input);
+        $schema = (new TupleSchema([new StringSchema(), new StringSchema()]))->preParse(static fn () => $input);
 
         self::assertSame($input, $schema->parse(null));
     }
 
-    public function testParseSuccessWithPostMiddleware(): void
+    public function testParseSuccessWithPostParse(): void
     {
         $input = ['test', 'test'];
 
         $schema = (new TupleSchema([new StringSchema(), new StringSchema()]))
-            ->postMiddleware(static fn (array $output) => array_merge($output, ['test2']))
+            ->postParse(static fn (array $output) => array_merge($output, ['test2']))
         ;
 
         self::assertSame(array_merge($input, ['test2']), $schema->parse($input));

@@ -29,7 +29,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     public function parse(mixed $input): mixed
     {
         try {
-            $input = $this->dispatchPreMiddlewares($input);
+            $input = $this->dispatchPreParses($input);
 
             if (null === $input && $this->nullable) {
                 return null;
@@ -61,7 +61,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
                 throw $childrenParserErrorException;
             }
 
-            return $this->dispatchPostMiddlewares($array);
+            return $this->dispatchPostParses($array);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -73,7 +73,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
 
     public function length(int $length): static
     {
-        return $this->postMiddleware(static function (array $array) use ($length) {
+        return $this->postParse(static function (array $array) use ($length) {
             $arrayLength = \count($array);
 
             if ($arrayLength !== $length) {
@@ -92,7 +92,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
 
     public function minLength(int $minLength): static
     {
-        return $this->postMiddleware(static function (array $array) use ($minLength) {
+        return $this->postParse(static function (array $array) use ($minLength) {
             $arrayLength = \count($array);
 
             if ($arrayLength < $minLength) {
@@ -111,7 +111,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
 
     public function maxLength(int $maxLength): static
     {
-        return $this->postMiddleware(static function (array $array) use ($maxLength) {
+        return $this->postParse(static function (array $array) use ($maxLength) {
             $arrayLength = \count($array);
 
             if ($arrayLength > $maxLength) {
@@ -130,7 +130,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
 
     public function includes(mixed $includes, bool $strict = true): static
     {
-        return $this->postMiddleware(static function (array $array) use ($includes, $strict) {
+        return $this->postParse(static function (array $array) use ($includes, $strict) {
             if (!\in_array($includes, $array, $strict)) {
                 throw new ParserErrorException(
                     new Error(
@@ -150,7 +150,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
      */
     public function filter(\Closure $filter): static
     {
-        return $this->postMiddleware(
+        return $this->postParse(
             static fn (array $array) => array_values(array_filter($array, $filter, ARRAY_FILTER_USE_BOTH))
         );
     }
@@ -160,7 +160,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
      */
     public function map(\Closure $map): static
     {
-        return $this->postMiddleware(static fn (array $array) => array_map($map, $array));
+        return $this->postParse(static fn (array $array) => array_map($map, $array));
     }
 
     /**
@@ -168,7 +168,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
      */
     public function sort(?\Closure $compare = null): static
     {
-        return $this->postMiddleware(static function (array $array) use ($compare) {
+        return $this->postParse(static function (array $array) use ($compare) {
             if ($compare) {
                 usort($array, $compare);
             } else {
@@ -184,6 +184,6 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
      */
     public function reduce(\Closure $reduce, mixed $initial = null): static
     {
-        return $this->postMiddleware(static fn (array $array) => array_reduce($array, $reduce, $initial));
+        return $this->postParse(static fn (array $array) => array_reduce($array, $reduce, $initial));
     }
 }

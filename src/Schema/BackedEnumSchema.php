@@ -50,7 +50,7 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
     public function parse(mixed $input): mixed
     {
         try {
-            $input = $this->dispatchPreMiddlewares($input);
+            $input = $this->dispatchPreParses($input);
 
             if (null === $input && $this->nullable) {
                 return null;
@@ -81,7 +81,7 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->dispatchPostMiddlewares($output);
+            return $this->dispatchPostParses($output);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -93,7 +93,7 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): IntSchema
     {
-        return (new IntSchema())->preMiddleware(function ($input) {
+        return (new IntSchema())->preParse(function ($input) {
             /** @var \BackedEnum $input */
             $input = $this->parse($input);
 
@@ -103,7 +103,7 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
 
     public function toString(): StringSchema
     {
-        return (new StringSchema())->preMiddleware(function ($input) {
+        return (new StringSchema())->preParse(function ($input) {
             /** @var \BackedEnum $input */
             $input = $this->parse($input);
 

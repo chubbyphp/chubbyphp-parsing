@@ -60,7 +60,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public function parse(mixed $input): mixed
     {
         try {
-            $input = $this->dispatchPreMiddlewares($input);
+            $input = $this->dispatchPreParses($input);
 
             if (null === $input && $this->nullable) {
                 return null;
@@ -76,7 +76,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->dispatchPostMiddlewares($input);
+            return $this->dispatchPostParses($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -88,7 +88,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function length(int $length): static
     {
-        return $this->postMiddleware(static function (string $string) use ($length) {
+        return $this->postParse(static function (string $string) use ($length) {
             $stringLength = \strlen($string);
 
             if ($stringLength !== $length) {
@@ -107,7 +107,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function minLength(int $minLength): static
     {
-        return $this->postMiddleware(static function (string $string) use ($minLength) {
+        return $this->postParse(static function (string $string) use ($minLength) {
             $stringLength = \strlen($string);
 
             if ($stringLength < $minLength) {
@@ -126,7 +126,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function maxLength(int $maxLength): static
     {
-        return $this->postMiddleware(static function (string $string) use ($maxLength) {
+        return $this->postParse(static function (string $string) use ($maxLength) {
             $stringLength = \strlen($string);
 
             if ($stringLength > $maxLength) {
@@ -145,7 +145,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function includes(string $includes): static
     {
-        return $this->postMiddleware(static function (string $string) use ($includes) {
+        return $this->postParse(static function (string $string) use ($includes) {
             if (!str_contains($string, $includes)) {
                 throw new ParserErrorException(
                     new Error(
@@ -162,7 +162,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function startsWith(string $startsWith): static
     {
-        return $this->postMiddleware(static function (string $string) use ($startsWith) {
+        return $this->postParse(static function (string $string) use ($startsWith) {
             if (!str_starts_with($string, $startsWith)) {
                 throw new ParserErrorException(
                     new Error(
@@ -179,7 +179,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function endsWith(string $endsWith): static
     {
-        return $this->postMiddleware(static function (string $string) use ($endsWith) {
+        return $this->postParse(static function (string $string) use ($endsWith) {
             if (!str_ends_with($string, $endsWith)) {
                 throw new ParserErrorException(
                     new Error(
@@ -200,7 +200,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             throw new \InvalidArgumentException(sprintf('Invalid match "%s" given', $match));
         }
 
-        return $this->postMiddleware(static function (string $string) use ($match) {
+        return $this->postParse(static function (string $string) use ($match) {
             if (0 === preg_match($match, $string)) {
                 throw new ParserErrorException(
                     new Error(
@@ -217,7 +217,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function email(): static
     {
-        return $this->postMiddleware(static function (string $string) {
+        return $this->postParse(static function (string $string) {
             if (!filter_var($string, FILTER_VALIDATE_EMAIL)) {
                 throw new ParserErrorException(
                     new Error(
@@ -234,7 +234,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function ipV4(): static
     {
-        return $this->postMiddleware(static function (string $string) {
+        return $this->postParse(static function (string $string) {
             if (!filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 throw new ParserErrorException(
                     new Error(
@@ -251,7 +251,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function ipV6(): static
     {
-        return $this->postMiddleware(static function (string $string) {
+        return $this->postParse(static function (string $string) {
             if (!filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                 throw new ParserErrorException(
                     new Error(
@@ -268,7 +268,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function url(): static
     {
-        return $this->postMiddleware(static function (string $string) {
+        return $this->postParse(static function (string $string) {
             if (!filter_var($string, FILTER_VALIDATE_URL)) {
                 throw new ParserErrorException(
                     new Error(
@@ -285,7 +285,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function uuidV4(): static
     {
-        return $this->postMiddleware(static function (string $string) {
+        return $this->postParse(static function (string $string) {
             if (0 === preg_match(self::UUID_V4_PATTERN, $string)) {
                 throw new ParserErrorException(
                     new Error(
@@ -302,7 +302,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function uuidV5(): static
     {
-        return $this->postMiddleware(static function (string $string) {
+        return $this->postParse(static function (string $string) {
             if (0 === preg_match(self::UUID_V5_PATTERN, $string)) {
                 throw new ParserErrorException(
                     new Error(
@@ -319,32 +319,32 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function trim(): static
     {
-        return $this->postMiddleware(static fn (string $string) => trim($string));
+        return $this->postParse(static fn (string $string) => trim($string));
     }
 
     public function trimStart(): static
     {
-        return $this->postMiddleware(static fn (string $string) => ltrim($string));
+        return $this->postParse(static fn (string $string) => ltrim($string));
     }
 
     public function trimEnd(): static
     {
-        return $this->postMiddleware(static fn (string $string) => rtrim($string));
+        return $this->postParse(static fn (string $string) => rtrim($string));
     }
 
     public function toLowerCase(): static
     {
-        return $this->postMiddleware(static fn (string $string) => strtolower($string));
+        return $this->postParse(static fn (string $string) => strtolower($string));
     }
 
     public function toUpperCase(): static
     {
-        return $this->postMiddleware(static fn (string $string) => strtoupper($string));
+        return $this->postParse(static fn (string $string) => strtoupper($string));
     }
 
     public function toDateTime(): DateTimeSchema
     {
-        return (new DateTimeSchema())->preMiddleware(function ($input) {
+        return (new DateTimeSchema())->preParse(function ($input) {
             $input = $this->parse($input);
 
             try {
@@ -371,7 +371,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function toFloat(): FloatSchema
     {
-        return (new FloatSchema())->preMiddleware(function ($input) {
+        return (new FloatSchema())->preParse(function ($input) {
             $input = $this->parse($input);
 
             $floatInput = (float) $input;
@@ -392,7 +392,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): IntSchema
     {
-        return (new IntSchema())->preMiddleware(function ($input) {
+        return (new IntSchema())->preParse(function ($input) {
             $input = $this->parse($input);
 
             $intInput = (int) $input;

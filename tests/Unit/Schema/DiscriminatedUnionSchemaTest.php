@@ -30,8 +30,8 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default([]));
-        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
-        self::assertNotSame($schema, $schema->postMiddleware(static fn (\stdClass $output) => $output));
+        self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postParse(static fn (\stdClass $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
     }
 
@@ -238,26 +238,26 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithPreMiddleware(): void
+    public function testParseSuccessWithPreParse(): void
     {
         $input = ['field1' => 'type2', 'field2' => 'test'];
 
         $schema = (new DiscriminatedUnionSchema([
             new ObjectSchema(['field1' => new LiteralSchema('type1')]),
             new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
-        ], 'field1'))->preMiddleware(static fn () => $input);
+        ], 'field1'))->preParse(static fn () => $input);
 
         self::assertSame($input, (array) $schema->parse(null));
     }
 
-    public function testParseSuccessWithPostMiddleware(): void
+    public function testParseSuccessWithPostParse(): void
     {
         $input = ['field1' => 'type2', 'field2' => 'test'];
 
         $schema = (new DiscriminatedUnionSchema([
             new ObjectSchema(['field1' => new LiteralSchema('type1')]),
             new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
-        ], 'field1'))->postMiddleware(static function (\stdClass $output) {
+        ], 'field1'))->postParse(static function (\stdClass $output) {
             $output->field3 = 'test';
 
             return $output;

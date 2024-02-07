@@ -25,19 +25,19 @@ final class LazySchema implements SchemaInterface
     }
 
     /**
-     * @param \Closure(mixed $input): mixed $preMiddleware
+     * @param \Closure(mixed $input): mixed $preParse
      */
-    public function preMiddleware(\Closure $preMiddleware): static
+    public function preParse(\Closure $preParse): static
     {
-        throw new \BadMethodCallException('LazySchema does not support any modification, "preMiddleware" called.');
+        throw new \BadMethodCallException('LazySchema does not support any modification, "preParse" called.');
     }
 
     /**
-     * @param \Closure(mixed $input): mixed $postMiddleware
+     * @param \Closure(mixed $input): mixed $postParse
      */
-    public function postMiddleware(\Closure $postMiddleware): static
+    public function postParse(\Closure $postParse): static
     {
-        throw new \BadMethodCallException('LazySchema does not support any modification, "postMiddleware" called.');
+        throw new \BadMethodCallException('LazySchema does not support any modification, "postParse" called.');
     }
 
     /**

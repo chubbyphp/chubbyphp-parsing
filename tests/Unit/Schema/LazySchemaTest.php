@@ -91,7 +91,7 @@ final class LazySchemaTest extends AbstractTestCase
         }
     }
 
-    public function testPreMiddleware(): void
+    public function testPreParse(): void
     {
         $schema = new LazySchema(static function () use (&$schema) {
             return (new ObjectSchema([
@@ -101,15 +101,15 @@ final class LazySchemaTest extends AbstractTestCase
         });
 
         try {
-            $schema->preMiddleware(static function (): void {});
+            $schema->preParse(static function (): void {});
 
             throw new \Exception('code should not be reached');
         } catch (\BadMethodCallException $e) {
-            self::assertSame('LazySchema does not support any modification, "preMiddleware" called.', $e->getMessage());
+            self::assertSame('LazySchema does not support any modification, "preParse" called.', $e->getMessage());
         }
     }
 
-    public function testPostMiddleware(): void
+    public function testPostParse(): void
     {
         $schema = new LazySchema(static function () use (&$schema) {
             return (new ObjectSchema([
@@ -119,11 +119,11 @@ final class LazySchemaTest extends AbstractTestCase
         });
 
         try {
-            $schema->postMiddleware(static function (): void {});
+            $schema->postParse(static function (): void {});
 
             throw new \Exception('code should not be reached');
         } catch (\BadMethodCallException $e) {
-            self::assertSame('LazySchema does not support any modification, "postMiddleware" called.', $e->getMessage());
+            self::assertSame('LazySchema does not support any modification, "postParse" called.', $e->getMessage());
         }
     }
 

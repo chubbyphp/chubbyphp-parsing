@@ -27,7 +27,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     public function parse(mixed $input): mixed
     {
         try {
-            $input = $this->dispatchPreMiddlewares($input);
+            $input = $this->dispatchPreParses($input);
 
             if (null === $input && $this->nullable) {
                 return null;
@@ -43,7 +43,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->dispatchPostMiddlewares($input);
+            return $this->dispatchPostParses($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -55,7 +55,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function gt(int $gt): static
     {
-        return $this->postMiddleware(static function (int $int) use ($gt) {
+        return $this->postParse(static function (int $int) use ($gt) {
             if ($int <= $gt) {
                 throw new ParserErrorException(
                     new Error(
@@ -72,7 +72,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function gte(int $gte): static
     {
-        return $this->postMiddleware(static function (int $int) use ($gte) {
+        return $this->postParse(static function (int $int) use ($gte) {
             if ($int < $gte) {
                 throw new ParserErrorException(
                     new Error(
@@ -89,7 +89,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function lt(int $lt): static
     {
-        return $this->postMiddleware(static function (int $int) use ($lt) {
+        return $this->postParse(static function (int $int) use ($lt) {
             if ($int >= $lt) {
                 throw new ParserErrorException(
                     new Error(
@@ -106,7 +106,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function lte(int $lte): static
     {
-        return $this->postMiddleware(static function (int $int) use ($lte) {
+        return $this->postParse(static function (int $int) use ($lte) {
             if ($int > $lte) {
                 throw new ParserErrorException(
                     new Error(
@@ -143,7 +143,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function toFloat(): FloatSchema
     {
-        return (new FloatSchema())->preMiddleware(function ($input) {
+        return (new FloatSchema())->preParse(function ($input) {
             /** @var int $input */
             $input = $this->parse($input);
 
@@ -153,7 +153,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function toString(): StringSchema
     {
-        return (new StringSchema())->preMiddleware(function ($input) {
+        return (new StringSchema())->preParse(function ($input) {
             /** @var int $input */
             $input = $this->parse($input);
 
@@ -163,7 +163,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public function toDateTime(): DateTimeSchema
     {
-        return (new DateTimeSchema())->preMiddleware(function ($input) {
+        return (new DateTimeSchema())->preParse(function ($input) {
             /** @var int $input */
             $input = $this->parse($input);
 

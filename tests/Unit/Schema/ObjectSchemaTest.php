@@ -31,8 +31,8 @@ final class ObjectSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default([]));
-        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
-        self::assertNotSame($schema, $schema->postMiddleware(static fn (\stdClass $output) => $output));
+        self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postParse(static fn (\stdClass $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
 
         self::assertNotSame($schema, $schema->ignore([]));
@@ -240,20 +240,20 @@ final class ObjectSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithPreMiddleware(): void
+    public function testParseSuccessWithPreParse(): void
     {
         $input = ['field1' => 'test'];
 
-        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->preMiddleware(static fn () => $input);
+        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->preParse(static fn () => $input);
 
         self::assertSame($input, (array) $schema->parse(null));
     }
 
-    public function testParseSuccessWithPostMiddleware(): void
+    public function testParseSuccessWithPostParse(): void
     {
         $input = ['field1' => 'test'];
 
-        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->postMiddleware(static function (\stdClass $output) {
+        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->postParse(static function (\stdClass $output) {
             $output->field2 = 'test';
 
             return $output;
