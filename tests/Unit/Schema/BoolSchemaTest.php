@@ -22,7 +22,8 @@ final class BoolSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(true));
-        self::assertNotSame($schema, $schema->middleware(static fn (bool $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (bool $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (bool $output, ParserErrorException $e) => $output));
     }
 
@@ -37,11 +38,13 @@ final class BoolSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $input = true;
+        $input1 = true;
+        $input2 = false;
 
-        $schema = (new BoolSchema())->default($input);
+        $schema = (new BoolSchema())->default($input1);
 
-        self::assertSame($input, $schema->parse(null));
+        self::assertSame($input1, $schema->parse(null));
+        self::assertSame($input2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -72,11 +75,20 @@ final class BoolSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
     {
         $input = true;
 
-        $schema = (new BoolSchema())->middleware(static fn (bool $output) => (bool) $output);
+        $schema = (new BoolSchema())->preMiddleware(static fn () => $input);
+
+        self::assertSame($input, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
+    {
+        $input = true;
+
+        $schema = (new BoolSchema())->postMiddleware(static fn (bool $output) => (bool) $output);
 
         self::assertSame((bool) $input, $schema->parse($input));
     }
@@ -132,7 +144,7 @@ final class BoolSchemaTest extends AbstractTestCase
     {
         $input = true;
 
-        $schema = (new BoolSchema())->toFloat();
+        $schema = (new BoolSchema())->toFloat()->gte(1.0);
 
         self::assertSame((float) $input, $schema->parse($input));
     }
@@ -141,7 +153,7 @@ final class BoolSchemaTest extends AbstractTestCase
     {
         $input = true;
 
-        $schema = (new BoolSchema())->toInt();
+        $schema = (new BoolSchema())->toInt()->gte(1);
 
         self::assertSame((int) $input, $schema->parse($input));
     }
@@ -150,7 +162,7 @@ final class BoolSchemaTest extends AbstractTestCase
     {
         $input = true;
 
-        $schema = (new BoolSchema())->toString();
+        $schema = (new BoolSchema())->toString()->length(1);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

@@ -11,12 +11,15 @@ interface SchemaInterface
 {
     public function nullable(): static;
 
-    public function default(mixed $default): static;
+    /**
+     * @param \Closure(mixed $input): mixed $preMiddleware
+     */
+    public function preMiddleware(\Closure $preMiddleware): static;
 
     /**
-     * @param \Closure(mixed $input): mixed $middleware
+     * @param \Closure(mixed $input): mixed $postMiddleware
      */
-    public function middleware(\Closure $middleware): static;
+    public function postMiddleware(\Closure $postMiddleware): static;
 
     /**
      * @param \Closure(mixed $input, ParserErrorException $parserErrorException): mixed $catch

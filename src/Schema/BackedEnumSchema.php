@@ -15,9 +15,6 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_VALUE_CODE = 'backedEnum.value';
     public const ERROR_VALUE_TEMPLATE = 'Value should be one of {{cases}}, {{given}} given';
 
-    public const ERROR_INT_CODE = 'backedEnum.int';
-    public const ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
-
     private \BackedEnum $backedEnum;
 
     /**
@@ -52,13 +49,13 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
 
     public function parse(mixed $input): mixed
     {
-        $input ??= $this->default;
-
-        if (null === $input && $this->nullable) {
-            return null;
-        }
-
         try {
+            $input = $this->dispatchPreMiddlewares($input);
+
+            if (null === $input && $this->nullable) {
+                return null;
+            }
+
             if (!\is_int($input) && !\is_string($input)) {
                 throw new ParserErrorException(
                     new Error(
@@ -69,9 +66,9 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            $enum = ($this->backedEnum)::tryFrom($input);
+            $output = ($this->backedEnum)::tryFrom($input);
 
-            if (null === $enum) {
+            if (null === $output) {
                 throw new ParserErrorException(
                     new Error(
                         self::ERROR_VALUE_CODE,
@@ -84,7 +81,7 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->dispatchMiddlewares($enum);
+            return $this->dispatchPostMiddlewares($output);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -94,30 +91,24 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
         }
     }
 
-    public function toInt(): static
+    public function toInt(): IntSchema
     {
-        return $this->middleware(static function (\BackedEnum $enum) {
-            $value = $enum->value;
+        return (new IntSchema())->preMiddleware(function ($input) {
+            /** @var \BackedEnum $input */
+            $input = $this->parse($input);
 
-            $intValue = (int) $value;
-
-            if ((string) $intValue !== $value) {
-                throw new ParserErrorException(
-                    new Error(
-                        self::ERROR_INT_CODE,
-                        self::ERROR_INT_TEMPLATE,
-                        ['given' => $value]
-                    )
-                );
-            }
-
-            return $intValue;
+            return $input->value;
         });
     }
 
-    public function toString(): static
+    public function toString(): StringSchema
     {
-        return $this->middleware(static fn (\BackedEnum $enum) => (string) $enum->value);
+        return (new StringSchema())->preMiddleware(function ($input) {
+            /** @var \BackedEnum $input */
+            $input = $this->parse($input);
+
+            return $input->value;
+        });
     }
 
     /**

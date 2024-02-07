@@ -20,13 +20,13 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function parse(mixed $input): mixed
     {
-        $input ??= $this->default;
-
-        if (null === $input && $this->nullable) {
-            return null;
-        }
-
         try {
+            $input = $this->dispatchPreMiddlewares($input);
+
+            if (null === $input && $this->nullable) {
+                return null;
+            }
+
             if (!$input instanceof \DateTimeInterface) {
                 throw new ParserErrorException(
                     new Error(
@@ -37,7 +37,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->dispatchMiddlewares($input);
+            return $this->dispatchPostMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -49,7 +49,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function from(\DateTimeImmutable $from): static
     {
-        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($from) {
+        return $this->postMiddleware(static function (\DateTimeImmutable $datetime) use ($from) {
             if ($datetime < $from) {
                 throw new ParserErrorException(
                     new Error(
@@ -66,7 +66,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function to(\DateTimeImmutable $to): static
     {
-        return $this->middleware(static function (\DateTimeImmutable $datetime) use ($to) {
+        return $this->postMiddleware(static function (\DateTimeImmutable $datetime) use ($to) {
             if ($datetime > $to) {
                 throw new ParserErrorException(
                     new Error(
@@ -81,13 +81,23 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    public function toInt(): static
+    public function toInt(): IntSchema
     {
-        return $this->middleware(static fn (\DateTimeInterface $datetime) => $datetime->getTimestamp());
+        return (new IntSchema())->preMiddleware(function ($input) {
+            /** @var \DateTimeInterface */
+            $input = $this->parse($input);
+
+            return $input->getTimestamp();
+        });
     }
 
-    public function toString(): static
+    public function toString(): StringSchema
     {
-        return $this->middleware(static fn (\DateTimeInterface $datetime) => $datetime->format('c'));
+        return (new StringSchema())->preMiddleware(function ($input) {
+            /** @var \DateTimeInterface */
+            $input = $this->parse($input);
+
+            return $input->format('c');
+        });
     }
 }

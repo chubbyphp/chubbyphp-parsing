@@ -22,7 +22,8 @@ final class IntSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(42));
-        self::assertNotSame($schema, $schema->middleware(static fn (int $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (int $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (int $output, ParserErrorException $e) => $output));
     }
 
@@ -37,11 +38,13 @@ final class IntSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $input = 1;
+        $input1 = 1;
+        $input2 = 2;
 
-        $schema = (new IntSchema())->default($input);
+        $schema = (new IntSchema())->default($input1);
 
-        self::assertSame($input, $schema->parse(null));
+        self::assertSame($input1, $schema->parse(null));
+        self::assertSame($input2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -72,11 +75,20 @@ final class IntSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
     {
         $input = 1;
 
-        $schema = (new IntSchema())->middleware(static fn (int $output) => (string) $output);
+        $schema = (new IntSchema())->preMiddleware(static fn () => $input);
+
+        self::assertSame($input, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
+    {
+        $input = 1;
+
+        $schema = (new IntSchema())->postMiddleware(static fn (int $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }
@@ -453,7 +465,7 @@ final class IntSchemaTest extends AbstractTestCase
     {
         $input = 1705742100;
 
-        $schema = (new IntSchema())->toDateTime();
+        $schema = (new IntSchema())->toDateTime()->from(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
 
         self::assertEquals(new \DateTimeImmutable('@'.$input), $schema->parse($input));
     }
@@ -462,7 +474,7 @@ final class IntSchemaTest extends AbstractTestCase
     {
         $input = 42;
 
-        $schema = (new IntSchema())->toFloat();
+        $schema = (new IntSchema())->toFloat()->gte(42.0);
 
         self::assertSame((float) $input, $schema->parse($input));
     }
@@ -471,7 +483,7 @@ final class IntSchemaTest extends AbstractTestCase
     {
         $input = 42;
 
-        $schema = (new IntSchema())->toString();
+        $schema = (new IntSchema())->toString()->length(2);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

@@ -22,7 +22,8 @@ final class StringSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(42));
-        self::assertNotSame($schema, $schema->middleware(static fn (string $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (string $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (string $output, ParserErrorException $e) => $output));
     }
 
@@ -37,11 +38,13 @@ final class StringSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $input = 'test';
+        $input1 = 'test1';
+        $input2 = 'test2';
 
-        $schema = (new StringSchema())->default($input);
+        $schema = (new StringSchema())->default($input1);
 
-        self::assertSame($input, $schema->parse(null));
+        self::assertSame($input1, $schema->parse(null));
+        self::assertSame($input2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -72,11 +75,20 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
     {
         $input = '1';
 
-        $schema = (new StringSchema())->middleware(static fn (string $output) => (int) $output);
+        $schema = (new StringSchema())->preMiddleware(static fn () => $input);
+
+        self::assertSame($input, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
+    {
+        $input = '1';
+
+        $schema = (new StringSchema())->postMiddleware(static fn (string $output) => (int) $output);
 
         self::assertSame((int) $input, $schema->parse($input));
     }
@@ -614,7 +626,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '2024-01-20T09:15:00+00:00';
 
-        $schema = (new StringSchema())->toDateTime();
+        $schema = (new StringSchema())->toDateTime()->from(new \DateTimeImmutable('2024-01-20T09:00:00+00:00'));
 
         self::assertEquals(new \DateTimeImmutable($input), $schema->parse($input));
     }
@@ -715,12 +727,12 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '4.2';
 
-        $schema = (new StringSchema())->toFloat();
+        $schema = (new StringSchema())->toFloat()->gt(4.0);
 
         self::assertSame((float) $input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidtoFloat(): void
+    public function testParseWithInvalidToFloat(): void
     {
         $input = '4.2cars';
 
@@ -747,12 +759,12 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '42';
 
-        $schema = (new StringSchema())->toInt();
+        $schema = (new StringSchema())->toInt()->gt(40);
 
         self::assertSame((int) $input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidtoInt(): void
+    public function testParseWithInvalidToInt(): void
     {
         $input = '42cars';
 

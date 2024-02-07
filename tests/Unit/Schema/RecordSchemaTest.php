@@ -23,7 +23,8 @@ final class RecordSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default([]));
-        self::assertNotSame($schema, $schema->middleware(static fn (array $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (array $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
     }
 
@@ -64,13 +65,13 @@ final class RecordSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $input = ['field1' => 'value1', 'field2' => 'value2'];
+        $input1 = ['field1' => 'value1', 'field2' => 'value1'];
+        $input2 = ['field1' => 'value1', 'field2' => 'value2'];
 
-        $schema = (new RecordSchema(new StringSchema()))->default($input);
+        $schema = (new RecordSchema(new StringSchema()))->default($input1);
 
-        $output = $schema->parse(null);
-
-        self::assertSame($input, $output);
+        self::assertSame($input1, $schema->parse(null));
+        self::assertSame($input2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -126,17 +127,26 @@ final class RecordSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
     {
         $input = ['field1' => 'value1'];
 
-        $schema = (new RecordSchema(new StringSchema()))->middleware(static function (array $output) {
+        $schema = (new RecordSchema(new StringSchema()))->preMiddleware(static fn () => $input);
+
+        self::assertSame($input, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
+    {
+        $input = ['field1' => 'value1'];
+
+        $schema = (new RecordSchema(new StringSchema()))->postMiddleware(static function (array $output) {
             $output['field2'] = 'value2';
 
             return $output;
         });
 
-        self::assertSame([...$input, 'field2' => 'value2'], (array) $schema->parse($input));
+        self::assertSame([...$input, 'field2' => 'value2'], $schema->parse($input));
     }
 
     public function testParseFailedWithCatch(): void
@@ -167,7 +177,7 @@ final class RecordSchemaTest extends AbstractTestCase
 
         $schema = new RecordSchema(new StringSchema());
 
-        self::assertSame($input, (array) $schema->safeParse($input)->data);
+        self::assertSame($input, $schema->safeParse($input)->data);
     }
 
     public function testSafeParseFailed(): void

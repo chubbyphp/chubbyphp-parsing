@@ -23,7 +23,8 @@ final class TupleSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(['test']));
-        self::assertNotSame($schema, $schema->middleware(static fn (array $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (array $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
     }
 
@@ -52,11 +53,13 @@ final class TupleSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $input = ['test', 'test'];
+        $input1 = ['test1', 'test1'];
+        $input2 = ['test2', 'test2'];
 
-        $schema = (new TupleSchema([new StringSchema(), new StringSchema()]))->default($input);
+        $schema = (new TupleSchema([new StringSchema(), new StringSchema()]))->default($input1);
 
-        self::assertSame($input, $schema->parse(null));
+        self::assertSame($input1, $schema->parse(null));
+        self::assertSame($input2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -174,12 +177,21 @@ final class TupleSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
+    {
+        $input = ['test', 'test'];
+
+        $schema = (new TupleSchema([new StringSchema(), new StringSchema()]))->preMiddleware(static fn () => $input);
+
+        self::assertSame($input, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
     {
         $input = ['test', 'test'];
 
         $schema = (new TupleSchema([new StringSchema(), new StringSchema()]))
-            ->middleware(static fn (array $output) => array_merge($output, ['test2']))
+            ->postMiddleware(static fn (array $output) => array_merge($output, ['test2']))
         ;
 
         self::assertSame(array_merge($input, ['test2']), $schema->parse($input));

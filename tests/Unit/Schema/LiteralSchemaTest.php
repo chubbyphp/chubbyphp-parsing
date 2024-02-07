@@ -22,7 +22,8 @@ final class LiteralSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default('test'));
-        self::assertNotSame($schema, $schema->middleware(static fn (string $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (string $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (string $output, ParserErrorException $e) => $output));
     }
 
@@ -187,11 +188,20 @@ final class LiteralSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
     {
         $input = 'test1';
 
-        $schema = (new LiteralSchema($input))->middleware(static fn (string $output) => $output.'1');
+        $schema = (new LiteralSchema($input))->preMiddleware(static fn () => $input);
+
+        self::assertSame($input, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
+    {
+        $input = 'test1';
+
+        $schema = (new LiteralSchema($input))->postMiddleware(static fn (string $output) => $output.'1');
 
         self::assertSame('test11', $schema->parse($input));
     }

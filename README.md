@@ -47,8 +47,8 @@ use Chubbyphp\Parsing\Schema\SchemaInterface;
 $schema = ...;
 
 $schema->nullable();
-$schema->default('test');
-$schema->middleware(static fn (string $output) => $output);
+$schema->preMiddleware(static fn (string $output) => $output);
+$schema->postMiddleware(static fn (string $output) => $output);
 $schema->catch(static fn (string $output, ParserErrorException $e) => $output);
 $schema->parse('test');
 $schema->safeParse('test');

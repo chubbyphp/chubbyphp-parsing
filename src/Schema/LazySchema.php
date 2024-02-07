@@ -24,17 +24,20 @@ final class LazySchema implements SchemaInterface
         throw new \BadMethodCallException('LazySchema does not support any modification, "nullable" called.');
     }
 
-    public function default(mixed $default): static
+    /**
+     * @param \Closure(mixed $input): mixed $preMiddleware
+     */
+    public function preMiddleware(\Closure $preMiddleware): static
     {
-        throw new \BadMethodCallException('LazySchema does not support any modification, "default" called.');
+        throw new \BadMethodCallException('LazySchema does not support any modification, "preMiddleware" called.');
     }
 
     /**
-     * @param \Closure(mixed $input): mixed $middleware
+     * @param \Closure(mixed $input): mixed $postMiddleware
      */
-    public function middleware(\Closure $middleware): static
+    public function postMiddleware(\Closure $postMiddleware): static
     {
-        throw new \BadMethodCallException('LazySchema does not support any modification, "middleware" called.');
+        throw new \BadMethodCallException('LazySchema does not support any modification, "postMiddleware" called.');
     }
 
     /**

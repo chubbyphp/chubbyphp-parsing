@@ -22,7 +22,8 @@ final class FloatSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(4.2));
-        self::assertNotSame($schema, $schema->middleware(static fn (float $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (float $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (float $output, ParserErrorException $e) => $output));
     }
 
@@ -37,11 +38,13 @@ final class FloatSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $input = 1.5;
+        $input1 = 1.5;
+        $input2 = 2.5;
 
-        $schema = (new FloatSchema())->default($input);
+        $schema = (new FloatSchema())->default($input1);
 
-        self::assertSame($input, $schema->parse(null));
+        self::assertSame($input1, $schema->parse(null));
+        self::assertSame($input2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -72,11 +75,20 @@ final class FloatSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
     {
         $input = 1.5;
 
-        $schema = (new FloatSchema())->middleware(static fn (float $output) => (string) $output);
+        $schema = (new FloatSchema())->preMiddleware(static fn () => $input);
+
+        self::assertSame($input, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
+    {
+        $input = 1.5;
+
+        $schema = (new FloatSchema())->postMiddleware(static fn (float $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }
@@ -454,12 +466,12 @@ final class FloatSchemaTest extends AbstractTestCase
     {
         $input = 4.0;
 
-        $schema = (new FloatSchema())->toInt();
+        $schema = (new FloatSchema())->toInt()->gte(4);
 
         self::assertSame((int) $input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidtoInt(): void
+    public function testParseWithInvalidToInt(): void
     {
         $input = 4.2;
 
@@ -486,7 +498,7 @@ final class FloatSchemaTest extends AbstractTestCase
     {
         $input = 4.2;
 
-        $schema = (new FloatSchema())->toString();
+        $schema = (new FloatSchema())->toString()->length(3);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

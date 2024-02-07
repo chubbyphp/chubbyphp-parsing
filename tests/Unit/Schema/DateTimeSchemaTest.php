@@ -22,7 +22,8 @@ final class DateTimeSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(new \DateTimeImmutable('2024-01-20T09:15:00+00:00')));
-        self::assertNotSame($schema, $schema->middleware(static fn (\DateTimeInterface $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (\DateTimeInterface $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (\DateTimeInterface $output, ParserErrorException $e) => $output));
     }
 
@@ -37,11 +38,13 @@ final class DateTimeSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $input1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $input2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
 
-        $schema = (new DateTimeSchema())->default($input);
+        $schema = (new DateTimeSchema())->default($input1);
 
-        self::assertSame($input, $schema->parse(null));
+        self::assertSame($input1, $schema->parse(null));
+        self::assertSame($input2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -72,11 +75,20 @@ final class DateTimeSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
-        $schema = (new DateTimeSchema())->middleware(static fn (\DateTimeInterface $output) => $output->format('c'));
+        $schema = (new DateTimeSchema())->preMiddleware(static fn () => $input);
+
+        self::assertSame($input, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
+    {
+        $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+
+        $schema = (new DateTimeSchema())->postMiddleware(static fn (\DateTimeInterface $output) => $output->format('c'));
 
         self::assertSame($input->format('c'), $schema->parse($input));
     }
@@ -201,7 +213,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
-        $schema = (new DateTimeSchema())->toInt();
+        $schema = (new DateTimeSchema())->toInt()->positive();
 
         self::assertSame($input->getTimestamp(), $schema->parse($input));
     }
@@ -212,7 +224,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
 
         $input = new \DateTimeImmutable($inputString);
 
-        $schema = (new DateTimeSchema())->toString();
+        $schema = (new DateTimeSchema())->toString()->length(25);
 
         self::assertSame($inputString, $schema->parse($input));
     }

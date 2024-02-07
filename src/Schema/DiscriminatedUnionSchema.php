@@ -57,15 +57,15 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
 
     public function parse(mixed $input): mixed
     {
-        $input ??= $this->default;
-
-        if (null === $input && $this->nullable) {
-            return null;
+        if ($input instanceof \stdClass || $input instanceof \Traversable) {
+            $input = (array) $input;
         }
 
         try {
-            if ($input instanceof \stdClass || $input instanceof \Traversable) {
-                $input = (array) $input;
+            $input = $this->dispatchPreMiddlewares($input);
+
+            if (null === $input && $this->nullable) {
+                return null;
             }
 
             if (!\is_array($input)) {
@@ -88,9 +88,9 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
                 );
             }
 
-            $object = $this->parseObjectSchemas($input, $input[$this->discriminatorFieldName]);
+            $output = $this->parseObjectSchemas($input, $input[$this->discriminatorFieldName]);
 
-            return $this->dispatchMiddlewares($object);
+            return $this->dispatchPostMiddlewares($output);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);

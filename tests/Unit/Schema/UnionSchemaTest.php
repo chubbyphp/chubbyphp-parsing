@@ -24,7 +24,8 @@ final class UnionSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default('test'));
-        self::assertNotSame($schema, $schema->middleware(static fn (int|string $output) => $output));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (int|string $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (int|string $output, ParserErrorException $e) => $output));
     }
 
@@ -62,11 +63,13 @@ final class UnionSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithStringAndDefault(): void
     {
-        $input = 'test';
+        $input1 = 'test';
+        $input2 = 5;
 
-        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->default($input);
+        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->default($input1);
 
-        self::assertSame($input, $schema->parse(null));
+        self::assertSame($input1, $schema->parse(null));
+        self::assertSame($input2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithIntAndDefault(): void
@@ -117,7 +120,7 @@ final class UnionSchemaTest extends AbstractTestCase
     {
         $input = '1';
 
-        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->middleware(static fn (string $output) => (int) $output);
+        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->postMiddleware(static fn (string $output) => (int) $output);
 
         self::assertSame((int) $input, $schema->parse($input));
     }
@@ -126,7 +129,7 @@ final class UnionSchemaTest extends AbstractTestCase
     {
         $input = 1;
 
-        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->middleware(static fn (int $output) => (string) $output);
+        $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))->postMiddleware(static fn (int $output) => (string) $output);
 
         self::assertSame((string) $input, $schema->parse($input));
     }

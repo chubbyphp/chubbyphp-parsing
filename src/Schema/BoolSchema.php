@@ -14,13 +14,13 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
     public function parse(mixed $input): mixed
     {
-        $input ??= $this->default;
-
-        if (null === $input && $this->nullable) {
-            return null;
-        }
-
         try {
+            $input = $this->dispatchPreMiddlewares($input);
+
+            if (null === $input && $this->nullable) {
+                return null;
+            }
+
             if (!\is_bool($input)) {
                 throw new ParserErrorException(
                     new Error(
@@ -31,7 +31,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            return $this->dispatchMiddlewares($input);
+            return $this->dispatchPostMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
@@ -41,18 +41,33 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
         }
     }
 
-    public function toFloat(): static
+    public function toFloat(): FloatSchema
     {
-        return $this->middleware(static fn (bool $bool) => (float) $bool);
+        return (new FloatSchema())->preMiddleware(function ($input) {
+            /** @var bool $input */
+            $input = $this->parse($input);
+
+            return (float) $input;
+        });
     }
 
-    public function toInt(): static
+    public function toInt(): IntSchema
     {
-        return $this->middleware(static fn (bool $bool) => (int) $bool);
+        return (new IntSchema())->preMiddleware(function ($input) {
+            /** @var bool $input */
+            $input = $this->parse($input);
+
+            return (int) $input;
+        });
     }
 
-    public function toString(): static
+    public function toString(): StringSchema
     {
-        return $this->middleware(static fn (bool $bool) => (string) $bool);
+        return (new StringSchema())->preMiddleware(function ($input) {
+            /** @var bool $input */
+            $input = $this->parse($input);
+
+            return (string) $input;
+        });
     }
 }

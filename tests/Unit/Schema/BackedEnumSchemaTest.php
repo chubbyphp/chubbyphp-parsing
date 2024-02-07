@@ -24,14 +24,6 @@ enum BackedSuit: string
     case Spades = 'S';
 }
 
-enum BackedSuitIntString: string
-{
-    case Hearts = '1';
-    case Diamonds = '2';
-    case Clubs = '3';
-    case Spades = '4';
-}
-
 enum BackedSuitInt: int
 {
     case Hearts = 1;
@@ -56,7 +48,8 @@ final class BackedEnumSchemaTest extends AbstractTestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->default(true));
-        self::assertNotSame($schema, $schema->middleware(static fn (BackedSuit $output) => $output->value));
+        self::assertNotSame($schema, $schema->preMiddleware(static fn (mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postMiddleware(static fn (BackedSuit $output) => $output->value));
         self::assertNotSame($schema, $schema->catch(static fn (BackedSuit $output, ParserErrorException $e) => $output->value));
     }
 
@@ -114,12 +107,16 @@ final class BackedEnumSchemaTest extends AbstractTestCase
 
     public function testParseSuccessWithDefault(): void
     {
-        $enum = BackedSuit::Diamonds;
-        $input = $enum->value;
+        $enum1 = BackedSuit::Diamonds;
+        $input1 = $enum1->value;
 
-        $schema = (new BackedEnumSchema(BackedSuit::class))->default($input);
+        $enum2 = BackedSuit::Hearts;
+        $input2 = $enum2->value;
 
-        self::assertSame($enum, $schema->parse(null));
+        $schema = (new BackedEnumSchema(BackedSuit::class))->default($input1);
+
+        self::assertSame($enum1, $schema->parse(null));
+        self::assertSame($enum2, $schema->parse($input2));
     }
 
     public function testParseSuccessWithNullAndNullable(): void
@@ -172,12 +169,22 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         }
     }
 
-    public function testParseSuccessWithMiddleware(): void
+    public function testParseSuccessWithPreMiddleware(): void
     {
         $enum = BackedSuit::Diamonds;
         $input = $enum->value;
 
-        $schema = (new BackedEnumSchema(BackedSuit::class))->middleware(static fn (BackedSuit $output) => $output->value);
+        $schema = (new BackedEnumSchema(BackedSuit::class))->preMiddleware(static fn () => $input);
+
+        self::assertSame($enum, $schema->parse(null));
+    }
+
+    public function testParseSuccessWithPostMiddleware(): void
+    {
+        $enum = BackedSuit::Diamonds;
+        $input = $enum->value;
+
+        $schema = (new BackedEnumSchema(BackedSuit::class))->postMiddleware(static fn (BackedSuit $output) => $output->value);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -231,15 +238,15 @@ final class BackedEnumSchemaTest extends AbstractTestCase
 
     public function testParseWithValidtoInt(): void
     {
-        $enum = BackedSuitIntString::Diamonds;
+        $enum = BackedSuitInt::Diamonds;
         $input = $enum->value;
 
-        $schema = (new BackedEnumSchema(BackedSuitIntString::class))->toInt();
+        $schema = (new BackedEnumSchema(BackedSuitInt::class))->toInt();
 
         self::assertSame((int) $input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidtoInt(): void
+    public function testParseWithInvalidToInt(): void
     {
         $enum = BackedSuit::Diamonds;
         $input = $enum->value;
@@ -253,17 +260,17 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         } catch (ParserErrorException $parserErrorException) {
             self::assertSame([
                 [
-                    'code' => 'backedEnum.int',
-                    'template' => 'Cannot convert {{given}} to int',
+                    'code' => 'int.type',
+                    'template' => 'Type should be "int", "{{given}}" given',
                     'variables' => [
-                        'given' => $input,
+                        'given' => 'string',
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
         }
     }
 
-    public function testParseWithValidtoStringWithStringEnum(): void
+    public function testParseWithValidtoString(): void
     {
         $enum = BackedSuit::Diamonds;
         $input = $enum->value;
@@ -273,13 +280,27 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithValidtoStringWithIntEnum(): void
+    public function testParseWithInvalidToString(): void
     {
         $enum = BackedSuitInt::Diamonds;
         $input = $enum->value;
 
         $schema = (new BackedEnumSchema(BackedSuitInt::class))->toString();
 
-        self::assertSame((string) $input, $schema->parse($input));
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.type',
+                    'template' => 'Type should be "string", "{{given}}" given',
+                    'variables' => [
+                        'given' => 'integer',
+                    ],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
     }
 }

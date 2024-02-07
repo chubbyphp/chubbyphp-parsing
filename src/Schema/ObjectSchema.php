@@ -59,15 +59,15 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
     public function parse(mixed $input): mixed
     {
-        $input ??= $this->default;
-
-        if (null === $input && $this->nullable) {
-            return null;
+        if ($input instanceof \stdClass || $input instanceof \Traversable) {
+            $input = (array) $input;
         }
 
         try {
-            if ($input instanceof \stdClass || $input instanceof \Traversable) {
-                $input = (array) $input;
+            $input = $this->dispatchPreMiddlewares($input);
+
+            if (null === $input && $this->nullable) {
+                return null;
             }
 
             if (!\is_array($input)) {
@@ -92,7 +92,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 throw $childrenParserErrorException;
             }
 
-            return $this->dispatchMiddlewares($output);
+            return $this->dispatchPostMiddlewares($output);
         } catch (ParserErrorException $childrenParserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $childrenParserErrorException);

@@ -11,12 +11,15 @@ abstract class AbstractSchema implements SchemaInterface
 {
     protected bool $nullable = false;
 
-    protected mixed $default = null;
+    /**
+     * @var array<\Closure(mixed): mixed>
+     */
+    protected array $preMiddlewares = [];
 
     /**
      * @var array<\Closure(mixed): mixed>
      */
-    protected array $middlewares = [];
+    protected array $postMiddlewares = [];
 
     /**
      * @var \Closure(mixed, ParserErrorException): mixed
@@ -32,23 +35,26 @@ abstract class AbstractSchema implements SchemaInterface
         return $clone;
     }
 
-    final public function default(mixed $default): static
+    /**
+     * @param \Closure(mixed $input): mixed $preMiddleware
+     */
+    final public function preMiddleware(\Closure $preMiddleware): static
     {
         $clone = clone $this;
 
-        $clone->default = $default;
+        $clone->preMiddlewares[] = $preMiddleware;
 
         return $clone;
     }
 
     /**
-     * @param \Closure(mixed $input): mixed $middleware
+     * @param \Closure(mixed $input): mixed $postMiddleware
      */
-    final public function middleware(\Closure $middleware): static
+    final public function postMiddleware(\Closure $postMiddleware): static
     {
         $clone = clone $this;
 
-        $clone->middlewares[] = $middleware;
+        $clone->postMiddlewares[] = $postMiddleware;
 
         return $clone;
     }
@@ -74,10 +80,24 @@ abstract class AbstractSchema implements SchemaInterface
         }
     }
 
-    final protected function dispatchMiddlewares(mixed $data): mixed
+    final public function default(mixed $default): static
     {
-        foreach ($this->middlewares as $middleware) {
-            $data = $middleware($data);
+        return $this->preMiddleware(static fn (mixed $input) => $input ?? $default);
+    }
+
+    final protected function dispatchPreMiddlewares(mixed $data): mixed
+    {
+        foreach ($this->preMiddlewares as $preMiddleware) {
+            $data = $preMiddleware($data);
+        }
+
+        return $data;
+    }
+
+    final protected function dispatchPostMiddlewares(mixed $data): mixed
+    {
+        foreach ($this->postMiddlewares as $postMiddleware) {
+            $data = $postMiddleware($data);
         }
 
         return $data;

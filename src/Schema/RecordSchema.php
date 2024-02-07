@@ -16,15 +16,15 @@ final class RecordSchema extends AbstractSchema implements SchemaInterface
 
     public function parse(mixed $input): mixed
     {
-        $input ??= $this->default;
-
-        if (null === $input && $this->nullable) {
-            return null;
+        if ($input instanceof \stdClass || $input instanceof \Traversable) {
+            $input = (array) $input;
         }
 
         try {
-            if ($input instanceof \stdClass || $input instanceof \Traversable) {
-                $input = (array) $input;
+            $input = $this->dispatchPreMiddlewares($input);
+
+            if (null === $input && $this->nullable) {
+                return null;
             }
 
             if (!\is_array($input)) {
@@ -53,7 +53,7 @@ final class RecordSchema extends AbstractSchema implements SchemaInterface
                 throw $childrenParserErrorException;
             }
 
-            return $this->dispatchMiddlewares($output);
+            return $this->dispatchPostMiddlewares($output);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);

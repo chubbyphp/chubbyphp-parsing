@@ -19,13 +19,13 @@ final class LiteralSchema extends AbstractSchema
 
     public function parse(mixed $input): mixed
     {
-        $input ??= $this->default;
-
-        if (null === $input && $this->nullable) {
-            return null;
-        }
-
         try {
+            $input = $this->dispatchPreMiddlewares($input);
+
+            if (null === $input && $this->nullable) {
+                return null;
+            }
+
             if (!\is_bool($input) && !\is_float($input) && !\is_int($input) && !\is_string($input)) {
                 throw new ParserErrorException(
                     new Error(
@@ -46,7 +46,7 @@ final class LiteralSchema extends AbstractSchema
                 );
             }
 
-            return $this->dispatchMiddlewares($input);
+            return $this->dispatchPostMiddlewares($input);
         } catch (ParserErrorException $parserErrorException) {
             if ($this->catch) {
                 return ($this->catch)($input, $parserErrorException);
