@@ -84,20 +84,20 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
     public function toInt(): IntSchema
     {
         return (new IntSchema())->preParse(function ($input) {
-            /** @var \DateTimeInterface */
+            /** @var null|\DateTimeInterface $input */
             $input = $this->parse($input);
 
-            return $input->getTimestamp();
-        });
+            return null !== $input ? $input->getTimestamp() : null;
+        })->nullable($this->nullable);
     }
 
     public function toString(): StringSchema
     {
         return (new StringSchema())->preParse(function ($input) {
-            /** @var \DateTimeInterface */
+            /** @var null|\DateTimeInterface $input */
             $input = $this->parse($input);
 
-            return $input->format('c');
-        });
+            return null !== $input ? $input->format('c') : null;
+        })->nullable($this->nullable);
     }
 }

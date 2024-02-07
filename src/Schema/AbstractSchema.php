@@ -26,11 +26,11 @@ abstract class AbstractSchema implements SchemaInterface
      */
     protected null|\Closure $catch = null;
 
-    final public function nullable(): static
+    final public function nullable(bool $nullable = true): static
     {
         $clone = clone $this;
 
-        $clone->nullable = true;
+        $clone->nullable = $nullable;
 
         return $clone;
     }

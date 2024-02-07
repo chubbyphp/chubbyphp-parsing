@@ -21,6 +21,7 @@ final class LiteralSchemaTest extends AbstractTestCase
         $schema = new LiteralSchema('test');
 
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->nullable(false));
         self::assertNotSame($schema, $schema->default('test'));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (string $output) => $output));

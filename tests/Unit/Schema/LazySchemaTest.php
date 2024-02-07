@@ -73,7 +73,7 @@ final class LazySchemaTest extends AbstractTestCase
         self::assertSame($input, json_decode(json_encode($result->data), true));
     }
 
-    public function testNullable(): void
+    public function testNullableTrue(): void
     {
         $schema = new LazySchema(static function () use (&$schema) {
             return (new ObjectSchema([
@@ -87,7 +87,25 @@ final class LazySchemaTest extends AbstractTestCase
 
             throw new \Exception('code should not be reached');
         } catch (\BadMethodCallException $e) {
-            self::assertSame('LazySchema does not support any modification, "nullable" called.', $e->getMessage());
+            self::assertSame('LazySchema does not support any modification, "nullable" called with true.', $e->getMessage());
+        }
+    }
+
+    public function testNullableFalse(): void
+    {
+        $schema = new LazySchema(static function () use (&$schema) {
+            return (new ObjectSchema([
+                'name' => new StringSchema(),
+                'child' => $schema,
+            ]))->nullable();
+        });
+
+        try {
+            $schema->nullable(false);
+
+            throw new \Exception('code should not be reached');
+        } catch (\BadMethodCallException $e) {
+            self::assertSame('LazySchema does not support any modification, "nullable" called with false.', $e->getMessage());
         }
     }
 

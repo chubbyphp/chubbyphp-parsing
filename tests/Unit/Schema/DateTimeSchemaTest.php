@@ -21,6 +21,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
         $schema = new DateTimeSchema();
 
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->nullable(false));
         self::assertNotSame($schema, $schema->default(new \DateTimeImmutable('2024-01-20T09:15:00+00:00')));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (\DateTimeInterface $output) => $output));
@@ -218,6 +219,13 @@ final class DateTimeSchemaTest extends AbstractTestCase
         self::assertSame($input->getTimestamp(), $schema->parse($input));
     }
 
+    public function testParseWithToIntNullable(): void
+    {
+        $schema = (new DateTimeSchema())->nullable()->toInt();
+
+        self::assertNull($schema->parse(null));
+    }
+
     public function testParseWithToString(): void
     {
         $inputString = '2024-01-20T09:15:00+00:00';
@@ -227,5 +235,12 @@ final class DateTimeSchemaTest extends AbstractTestCase
         $schema = (new DateTimeSchema())->toString()->length(25);
 
         self::assertSame($inputString, $schema->parse($input));
+    }
+
+    public function testParseWithToStringNullable(): void
+    {
+        $schema = (new DateTimeSchema())->nullable()->toString();
+
+        self::assertNull($schema->parse(null));
     }
 }

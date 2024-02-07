@@ -94,21 +94,21 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
     public function toInt(): IntSchema
     {
         return (new IntSchema())->preParse(function ($input) {
-            /** @var \BackedEnum $input */
+            /** @var null|\BackedEnum $input */
             $input = $this->parse($input);
 
-            return $input->value;
-        });
+            return null !== $input ? $input->value : null;
+        })->nullable($this->nullable);
     }
 
     public function toString(): StringSchema
     {
         return (new StringSchema())->preParse(function ($input) {
-            /** @var \BackedEnum $input */
+            /** @var null|\BackedEnum $input */
             $input = $this->parse($input);
 
-            return $input->value;
-        });
+            return null !== $input ? $input->value : null;
+        })->nullable($this->nullable);
     }
 
     /**

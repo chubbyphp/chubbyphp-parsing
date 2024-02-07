@@ -23,6 +23,7 @@ final class UnionSchemaTest extends AbstractTestCase
         $schema = new UnionSchema([new StringSchema(), new IntSchema()]);
 
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->nullable(false));
         self::assertNotSame($schema, $schema->default('test'));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (int|string $output) => $output));

@@ -9,7 +9,7 @@ use Chubbyphp\Parsing\Result;
 
 interface SchemaInterface
 {
-    public function nullable(): static;
+    public function nullable(bool $nullable = true): static;
 
     /**
      * @param \Closure(mixed $input): mixed $preParse

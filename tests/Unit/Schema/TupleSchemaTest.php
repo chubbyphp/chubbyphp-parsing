@@ -22,6 +22,7 @@ final class TupleSchemaTest extends AbstractTestCase
         $schema = new TupleSchema([new StringSchema(), new StringSchema()]);
 
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->nullable(false));
         self::assertNotSame($schema, $schema->default(['test']));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (array $output) => $output));

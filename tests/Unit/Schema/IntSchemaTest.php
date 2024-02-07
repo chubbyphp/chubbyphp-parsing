@@ -21,6 +21,7 @@ final class IntSchemaTest extends AbstractTestCase
         $schema = new IntSchema();
 
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->nullable(false));
         self::assertNotSame($schema, $schema->default(42));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (int $output) => $output));
@@ -470,6 +471,13 @@ final class IntSchemaTest extends AbstractTestCase
         self::assertEquals(new \DateTimeImmutable('@'.$input), $schema->parse($input));
     }
 
+    public function testParseWithToDateTimeNullable(): void
+    {
+        $schema = (new IntSchema())->nullable()->toDateTime();
+
+        self::assertNull($schema->parse(null));
+    }
+
     public function testParseWithToFloat(): void
     {
         $input = 42;
@@ -479,6 +487,13 @@ final class IntSchemaTest extends AbstractTestCase
         self::assertSame((float) $input, $schema->parse($input));
     }
 
+    public function testParseWithToFloatNullable(): void
+    {
+        $schema = (new IntSchema())->nullable()->toFloat();
+
+        self::assertNull($schema->parse(null));
+    }
+
     public function testParseWithToString(): void
     {
         $input = 42;
@@ -486,5 +501,12 @@ final class IntSchemaTest extends AbstractTestCase
         $schema = (new IntSchema())->toString()->length(2);
 
         self::assertSame((string) $input, $schema->parse($input));
+    }
+
+    public function testParseWithToStringNullable(): void
+    {
+        $schema = (new IntSchema())->nullable()->toString();
+
+        self::assertNull($schema->parse(null));
     }
 }

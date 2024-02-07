@@ -345,7 +345,12 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public function toDateTime(): DateTimeSchema
     {
         return (new DateTimeSchema())->preParse(function ($input) {
+            /** @var null|string $input */
             $input = $this->parse($input);
+
+            if (null === $input) {
+                return null;
+            }
 
             try {
                 $dateTime = new \DateTimeImmutable($input);
@@ -366,13 +371,18 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                     ['given' => $input]
                 )
             );
-        });
+        })->nullable($this->nullable);
     }
 
     public function toFloat(): FloatSchema
     {
         return (new FloatSchema())->preParse(function ($input) {
+            /** @var null|string $input */
             $input = $this->parse($input);
+
+            if (null === $input) {
+                return null;
+            }
 
             $floatInput = (float) $input;
 
@@ -387,13 +397,18 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             }
 
             return $floatInput;
-        });
+        })->nullable($this->nullable);
     }
 
     public function toInt(): IntSchema
     {
         return (new IntSchema())->preParse(function ($input) {
+            /** @var null|string $input */
             $input = $this->parse($input);
+
+            if (null === $input) {
+                return null;
+            }
 
             $intInput = (int) $input;
 
@@ -408,6 +423,6 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             }
 
             return $intInput;
-        });
+        })->nullable($this->nullable);
     }
 }

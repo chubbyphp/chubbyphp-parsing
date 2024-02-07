@@ -29,6 +29,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         ], 'field1');
 
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->nullable(false));
         self::assertNotSame($schema, $schema->default([]));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (\stdClass $output) => $output));

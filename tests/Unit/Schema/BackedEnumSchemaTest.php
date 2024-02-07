@@ -47,6 +47,7 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         $schema = new BackedEnumSchema(BackedSuit::class);
 
         self::assertNotSame($schema, $schema->nullable());
+        self::assertNotSame($schema, $schema->nullable(false));
         self::assertNotSame($schema, $schema->default(true));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (BackedSuit $output) => $output->value));
@@ -246,6 +247,13 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         self::assertSame((int) $input, $schema->parse($input));
     }
 
+    public function testParseWithValidtoIntNullable(): void
+    {
+        $schema = (new BackedEnumSchema(BackedSuitInt::class))->nullable()->toInt();
+
+        self::assertNull($schema->parse(null));
+    }
+
     public function testParseWithInvalidToInt(): void
     {
         $enum = BackedSuit::Diamonds;
@@ -278,6 +286,13 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         $schema = (new BackedEnumSchema(BackedSuit::class))->toString();
 
         self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidtoStringNullable(): void
+    {
+        $schema = (new BackedEnumSchema(BackedSuit::class))->nullable()->toString();
+
+        self::assertNull($schema->parse(null));
     }
 
     public function testParseWithInvalidToString(): void

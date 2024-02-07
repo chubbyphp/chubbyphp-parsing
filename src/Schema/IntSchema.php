@@ -144,30 +144,30 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     public function toFloat(): FloatSchema
     {
         return (new FloatSchema())->preParse(function ($input) {
-            /** @var int $input */
+            /** @var null|int $input */
             $input = $this->parse($input);
 
-            return (float) $input;
-        });
+            return null !== $input ? (float) $input : null;
+        })->nullable($this->nullable);
     }
 
     public function toString(): StringSchema
     {
         return (new StringSchema())->preParse(function ($input) {
-            /** @var int $input */
+            /** @var null|int $input */
             $input = $this->parse($input);
 
-            return (string) $input;
-        });
+            return null !== $input ? (string) $input : null;
+        })->nullable($this->nullable);
     }
 
     public function toDateTime(): DateTimeSchema
     {
         return (new DateTimeSchema())->preParse(function ($input) {
-            /** @var int $input */
+            /** @var null|int $input */
             $input = $this->parse($input);
 
-            return new \DateTimeImmutable('@'.$input);
-        });
+            return null !== $input ? new \DateTimeImmutable('@'.$input) : null;
+        })->nullable($this->nullable);
     }
 }
