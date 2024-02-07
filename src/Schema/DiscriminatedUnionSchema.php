@@ -10,11 +10,11 @@ use Chubbyphp\Parsing\ParserErrorException;
 final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInterface
 {
     public const ERROR_TYPE_CODE = 'discriminatedUnion.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", "{{given}}" given';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", {{given}} given';
 
     public const ERROR_DISCRIMINATOR_FIELD_CODE = 'discriminatedUnion.discriminatorField';
     public const ERROR_DISCRIMINATOR_FIELD_TEMPLATE
-    = 'Input does not contain the discriminator field "{{discriminatorFieldName}}"';
+    = 'Input does not contain the discriminator field {{discriminatorFieldName}}';
 
     /**
      * @var array<ObjectSchemaInterface>

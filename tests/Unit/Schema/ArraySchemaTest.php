@@ -71,7 +71,7 @@ final class ArraySchemaTest extends AbstractTestCase
                 [
                     [
                         'code' => 'array.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -97,7 +97,7 @@ final class ArraySchemaTest extends AbstractTestCase
                 1 => [
                     [
                         'code' => 'string.type',
-                        'template' => 'Type should be "string", "{{given}}" given',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'integer',
                         ],
@@ -106,7 +106,7 @@ final class ArraySchemaTest extends AbstractTestCase
                 2 => [
                     [
                         'code' => 'string.type',
-                        'template' => 'Type should be "string", "{{given}}" given',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'boolean',
                         ],
@@ -146,7 +146,7 @@ final class ArraySchemaTest extends AbstractTestCase
                     [
                         [
                             'code' => 'array.type',
-                            'template' => 'Type should be "array", "{{given}}" given',
+                            'template' => 'Type should be "array", {{given}} given',
                             'variables' => [
                                 'given' => 'NULL',
                             ],
@@ -179,7 +179,7 @@ final class ArraySchemaTest extends AbstractTestCase
             [
                 [
                     'code' => 'array.type',
-                    'template' => 'Type should be "array", "{{given}}" given',
+                    'template' => 'Type should be "array", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -333,7 +333,7 @@ final class ArraySchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'array.includes',
-                    'template' => '"{{given}}" does not include "{{includes}}"',
+                    'template' => '{{given}} does not include {{includes}}',
                     'variables' => [
                         'includes' => json_decode(json_encode($dateTime2Equal), true),
                         'given' => json_decode(json_encode($input), true),
@@ -361,7 +361,7 @@ final class ArraySchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'array.includes',
-                    'template' => '"{{given}}" does not include "{{includes}}"',
+                    'template' => '{{given}} does not include {{includes}}',
                     'variables' => [
                         'includes' => json_decode(json_encode($dateTime3), true),
                         'given' => json_decode(json_encode($input), true),

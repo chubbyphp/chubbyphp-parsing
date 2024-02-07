@@ -101,14 +101,14 @@ final class UnionSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.type',
-                    'template' => 'Type should be "string", "{{given}}" given',
+                    'template' => 'Type should be "string", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
                 ],
                 [
                     'code' => 'int.type',
-                    'template' => 'Type should be "int", "{{given}}" given',
+                    'template' => 'Type should be "int", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -143,14 +143,14 @@ final class UnionSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'string.type',
-                        'template' => 'Type should be "string", "{{given}}" given',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
                     ],
                     [
                         'code' => 'int.type',
-                        'template' => 'Type should be "int", "{{given}}" given',
+                        'template' => 'Type should be "int", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -189,14 +189,14 @@ final class UnionSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'string.type',
-                'template' => 'Type should be "string", "{{given}}" given',
+                'template' => 'Type should be "string", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],
             ],
             [
                 'code' => 'int.type',
-                'template' => 'Type should be "int", "{{given}}" given',
+                'template' => 'Type should be "int", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

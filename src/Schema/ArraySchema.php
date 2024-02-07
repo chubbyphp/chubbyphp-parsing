@@ -10,7 +10,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 final class ArraySchema extends AbstractSchema implements SchemaInterface
 {
     public const ERROR_TYPE_CODE = 'array.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", "{{given}}" given';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", {{given}} given';
 
     public const ERROR_LENGTH_CODE = 'array.length';
     public const ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
@@ -22,7 +22,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
     public const ERROR_INCLUDES_CODE = 'array.includes';
-    public const ERROR_INCLUDES_TEMPLATE = '"{{given}}" does not include "{{includes}}"';
+    public const ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
 
     public function __construct(private SchemaInterface $itemSchema) {}
 

@@ -67,7 +67,7 @@ final class IntSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'int.type',
-                    'template' => 'Type should be "int", "{{given}}" given',
+                    'template' => 'Type should be "int", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -102,7 +102,7 @@ final class IntSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'int.type',
-                        'template' => 'Type should be "int", "{{given}}" given',
+                        'template' => 'Type should be "int", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -132,7 +132,7 @@ final class IntSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'int.type',
-                'template' => 'Type should be "int", "{{given}}" given',
+                'template' => 'Type should be "int", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

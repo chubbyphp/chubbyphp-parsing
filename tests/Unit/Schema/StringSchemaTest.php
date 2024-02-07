@@ -67,7 +67,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.type',
-                    'template' => 'Type should be "string", "{{given}}" given',
+                    'template' => 'Type should be "string", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -102,7 +102,7 @@ final class StringSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'string.type',
-                        'template' => 'Type should be "string", "{{given}}" given',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -132,7 +132,7 @@ final class StringSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'string.type',
-                'template' => 'Type should be "string", "{{given}}" given',
+                'template' => 'Type should be "string", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],
@@ -262,7 +262,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.includes',
-                    'template' => '"{{given}}" does not include "{{includes}}"',
+                    'template' => '{{given}} does not include {{includes}}',
                     'variables' => [
                         'includes' => 'lee',
                         'given' => $input,
@@ -295,7 +295,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.startsWith',
-                    'template' => '"{{given}}" does not starts with "{{startsWith}}"',
+                    'template' => '{{given}} does not starts with {{startsWith}}',
                     'variables' => [
                         'startsWith' => 'xam',
                         'given' => $input,
@@ -328,7 +328,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.endsWith',
-                    'template' => '"{{given}}" does not ends with "{{endsWith}}"',
+                    'template' => '{{given}} does not ends with {{endsWith}}',
                     'variables' => [
                         'endsWith' => 'mpl',
                         'given' => $input,
@@ -372,7 +372,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.match',
-                    'template' => '"{{given}}" does not match "{{match}}"',
+                    'template' => '{{given}} does not match {{match}}',
                     'variables' => [
                         'match' => '/^[a-z]+$/i',
                         'given' => $input,
@@ -405,7 +405,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.email',
-                    'template' => 'Invalid email "{{given}}"',
+                    'template' => 'Invalid email {{given}}',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -437,7 +437,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.ip',
-                    'template' => 'Invalid ip {{version}} "{{given}}"',
+                    'template' => 'Invalid ip {{version}} {{given}}',
                     'variables' => [
                         'version' => 'v4',
                         'given' => $input,
@@ -470,7 +470,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.ip',
-                    'template' => 'Invalid ip {{version}} "{{given}}"',
+                    'template' => 'Invalid ip {{version}} {{given}}',
                     'variables' => [
                         'version' => 'v6',
                         'given' => $input,
@@ -503,7 +503,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.url',
-                    'template' => 'Invalid url "{{given}}"',
+                    'template' => 'Invalid url {{given}}',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -535,7 +535,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.uuid',
-                    'template' => 'Invalid uuid {{version}} "{{given}}"',
+                    'template' => 'Invalid uuid {{version}} {{given}}',
                     'variables' => [
                         'version' => 'v4',
                         'given' => $input,
@@ -568,7 +568,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.uuid',
-                    'template' => 'Invalid uuid {{version}} "{{given}}"',
+                    'template' => 'Invalid uuid {{version}} {{given}}',
                     'variables' => [
                         'version' => 'v5',
                         'given' => $input,
@@ -646,7 +646,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.datetime',
-                    'template' => 'Cannot convert "{{given}}" to datetime',
+                    'template' => 'Cannot convert {{given}} to datetime',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -669,7 +669,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.datetime',
-                    'template' => 'Cannot convert "{{given}}" to datetime',
+                    'template' => 'Cannot convert {{given}} to datetime',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -692,7 +692,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.datetime',
-                    'template' => 'Cannot convert "{{given}}" to datetime',
+                    'template' => 'Cannot convert {{given}} to datetime',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -715,7 +715,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.datetime',
-                    'template' => 'Cannot convert "{{given}}" to datetime',
+                    'template' => 'Cannot convert {{given}} to datetime',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -754,7 +754,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.float',
-                    'template' => 'Cannot convert "{{given}}" to float',
+                    'template' => 'Cannot convert {{given}} to float',
                     'variables' => [
                         'given' => $input,
                     ],
@@ -793,7 +793,7 @@ final class StringSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.int',
-                    'template' => 'Cannot convert "{{given}}" to int',
+                    'template' => 'Cannot convert {{given}} to int',
                     'variables' => [
                         'given' => $input,
                     ],

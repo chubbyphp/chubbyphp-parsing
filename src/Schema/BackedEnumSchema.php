@@ -10,7 +10,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
 {
     public const ERROR_TYPE_CODE = 'backedEnum.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "int|string", "{{given}}" given';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "int|string", {{given}} given';
 
     public const ERROR_VALUE_CODE = 'backedEnum.value';
     public const ERROR_VALUE_TEMPLATE = 'Value should be one of {{cases}}, {{given}} given';

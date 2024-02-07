@@ -10,7 +10,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 final class FloatSchema extends AbstractSchema implements SchemaInterface
 {
     public const ERROR_TYPE_CODE = 'float.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "float", "{{given}}" given';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "float", {{given}} given';
 
     public const ERROR_GT_CODE = 'float.gt';
     public const ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';

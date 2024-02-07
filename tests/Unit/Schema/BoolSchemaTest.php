@@ -67,7 +67,7 @@ final class BoolSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'bool.type',
-                    'template' => 'Type should be "bool", "{{given}}" given',
+                    'template' => 'Type should be "bool", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -103,7 +103,7 @@ final class BoolSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'bool.type',
-                        'template' => 'Type should be "bool", "{{given}}" given',
+                        'template' => 'Type should be "bool", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -133,7 +133,7 @@ final class BoolSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'bool.type',
-                'template' => 'Type should be "bool", "{{given}}" given',
+                'template' => 'Type should be "bool", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

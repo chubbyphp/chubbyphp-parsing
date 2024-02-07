@@ -94,7 +94,7 @@ final class RecordSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'record.type',
-                    'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -118,7 +118,7 @@ final class RecordSchemaTest extends AbstractTestCase
                 'field2' => [
                     [
                         'code' => 'string.type',
-                        'template' => 'Type should be "string", "{{given}}" given',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'integer',
                         ],
@@ -158,7 +158,7 @@ final class RecordSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'record.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -188,7 +188,7 @@ final class RecordSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'record.type',
-                'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

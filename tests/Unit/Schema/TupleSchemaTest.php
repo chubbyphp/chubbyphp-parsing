@@ -83,7 +83,7 @@ final class TupleSchemaTest extends AbstractTestCase
                 [
                     [
                         'code' => 'tuple.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -109,7 +109,7 @@ final class TupleSchemaTest extends AbstractTestCase
                 1 => [
                     [
                         'code' => 'string.type',
-                        'template' => 'Type should be "string", "{{given}}" given',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'integer',
                         ],
@@ -208,7 +208,7 @@ final class TupleSchemaTest extends AbstractTestCase
                     [
                         [
                             'code' => 'tuple.type',
-                            'template' => 'Type should be "array", "{{given}}" given',
+                            'template' => 'Type should be "array", {{given}} given',
                             'variables' => [
                                 'given' => 'NULL',
                             ],
@@ -241,7 +241,7 @@ final class TupleSchemaTest extends AbstractTestCase
             [
                 [
                     'code' => 'tuple.type',
-                    'template' => 'Type should be "array", "{{given}}" given',
+                    'template' => 'Type should be "array", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],

@@ -10,7 +10,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 final class TupleSchema extends AbstractSchema implements SchemaInterface
 {
     public const ERROR_TYPE_CODE = 'tuple.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", "{{given}}" given';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", {{given}} given';
 
     public const ERROR_LENGTH_CODE = 'tuple.length';
     public const ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';

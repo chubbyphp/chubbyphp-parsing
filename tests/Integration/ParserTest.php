@@ -95,7 +95,7 @@ final class ParserTest extends TestCase
                 'array' => [
                     [
                         'code' => 'array.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -104,7 +104,7 @@ final class ParserTest extends TestCase
                 'backedEnum' => [
                     [
                         'code' => 'backedEnum.type',
-                        'template' => 'Type should be "int|string", "{{given}}" given',
+                        'template' => 'Type should be "int|string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -113,7 +113,7 @@ final class ParserTest extends TestCase
                 'bool' => [
                     [
                         'code' => 'bool.type',
-                        'template' => 'Type should be "bool", "{{given}}" given',
+                        'template' => 'Type should be "bool", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -122,7 +122,7 @@ final class ParserTest extends TestCase
                 'dateTime' => [
                     [
                         'code' => 'datetime.type',
-                        'template' => 'Type should be "\\DateTimeInterface", "{{given}}" given',
+                        'template' => 'Type should be "\\DateTimeInterface", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -131,7 +131,7 @@ final class ParserTest extends TestCase
                 'discriminatedUnion' => [
                     [
                         'code' => 'discriminatedUnion.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -140,7 +140,7 @@ final class ParserTest extends TestCase
                 'float' => [
                     [
                         'code' => 'float.type',
-                        'template' => 'Type should be "float", "{{given}}" given',
+                        'template' => 'Type should be "float", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -149,7 +149,7 @@ final class ParserTest extends TestCase
                 'int' => [
                     [
                         'code' => 'int.type',
-                        'template' => 'Type should be "int", "{{given}}" given',
+                        'template' => 'Type should be "int", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -158,7 +158,7 @@ final class ParserTest extends TestCase
                 'literal' => [
                     [
                         'code' => 'literal.type',
-                        'template' => 'Type should be "bool|float|int|string", "{{given}}" given',
+                        'template' => 'Type should be "bool|float|int|string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -167,7 +167,7 @@ final class ParserTest extends TestCase
                 'object' => [
                     [
                         'code' => 'object.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -176,7 +176,7 @@ final class ParserTest extends TestCase
                 'record' => [
                     [
                         'code' => 'record.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -185,7 +185,7 @@ final class ParserTest extends TestCase
                 'string' => [
                     [
                         'code' => 'string.type',
-                        'template' => 'Type should be "string", "{{given}}" given',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -194,7 +194,7 @@ final class ParserTest extends TestCase
                 'tuple' => [
                     [
                         'code' => 'tuple.type',
-                        'template' => 'Type should be "array", "{{given}}" given',
+                        'template' => 'Type should be "array", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -203,14 +203,14 @@ final class ParserTest extends TestCase
                 'union' => [
                     [
                         'code' => 'string.type',
-                        'template' => 'Type should be "string", "{{given}}" given',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
                     ],
                     [
                         'code' => 'int.type',
-                        'template' => 'Type should be "int", "{{given}}" given',
+                        'template' => 'Type should be "int", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],

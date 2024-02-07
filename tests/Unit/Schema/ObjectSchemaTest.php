@@ -164,7 +164,7 @@ final class ObjectSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'object.type',
-                    'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -188,7 +188,7 @@ final class ObjectSchemaTest extends AbstractTestCase
                 'field2' => [
                     [
                         'code' => 'object.unknownField',
-                        'template' => 'Unknown field "{{fieldName}}"',
+                        'template' => 'Unknown field {{fieldName}}',
                         'variables' => [
                             'fieldName' => 'field2',
                         ],
@@ -197,7 +197,7 @@ final class ObjectSchemaTest extends AbstractTestCase
                 'field3' => [
                     [
                         'code' => 'object.unknownField',
-                        'template' => 'Unknown field "{{fieldName}}"',
+                        'template' => 'Unknown field {{fieldName}}',
                         'variables' => [
                             'fieldName' => 'field3',
                         ],
@@ -222,7 +222,7 @@ final class ObjectSchemaTest extends AbstractTestCase
                 'field2' => [
                     [
                         'code' => 'float.type',
-                        'template' => 'Type should be "float", "{{given}}" given',
+                        'template' => 'Type should be "float", {{given}} given',
                         'variables' => [
                             'given' => 'string',
                         ],
@@ -231,7 +231,7 @@ final class ObjectSchemaTest extends AbstractTestCase
                 'field3' => [
                     [
                         'code' => 'int.type',
-                        'template' => 'Type should be "int", "{{given}}" given',
+                        'template' => 'Type should be "int", {{given}} given',
                         'variables' => [
                             'given' => 'string',
                         ],
@@ -271,7 +271,7 @@ final class ObjectSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'object.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -301,7 +301,7 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'object.type',
-                'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

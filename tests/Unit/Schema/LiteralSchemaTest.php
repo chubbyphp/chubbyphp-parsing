@@ -92,7 +92,7 @@ final class LiteralSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'literal.type',
-                    'template' => 'Type should be "bool|float|int|string", "{{given}}" given',
+                    'template' => 'Type should be "bool|float|int|string", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -215,7 +215,7 @@ final class LiteralSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'literal.type',
-                        'template' => 'Type should be "bool|float|int|string", "{{given}}" given',
+                        'template' => 'Type should be "bool|float|int|string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -245,7 +245,7 @@ final class LiteralSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'literal.type',
-                'template' => 'Type should be "bool|float|int|string", "{{given}}" given',
+                'template' => 'Type should be "bool|float|int|string", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

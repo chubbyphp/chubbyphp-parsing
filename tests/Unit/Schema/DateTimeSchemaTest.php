@@ -67,7 +67,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'datetime.type',
-                    'template' => 'Type should be "\DateTimeInterface", "{{given}}" given',
+                    'template' => 'Type should be "\DateTimeInterface", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -102,7 +102,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'datetime.type',
-                        'template' => 'Type should be "\DateTimeInterface", "{{given}}" given',
+                        'template' => 'Type should be "\DateTimeInterface", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -132,7 +132,7 @@ final class DateTimeSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'datetime.type',
-                'template' => 'Type should be "\DateTimeInterface", "{{given}}" given',
+                'template' => 'Type should be "\DateTimeInterface", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

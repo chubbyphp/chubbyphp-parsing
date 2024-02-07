@@ -169,7 +169,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'discriminatedUnion.type',
-                    'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -195,7 +195,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'discriminatedUnion.discriminatorField',
-                    'template' => 'Input does not contain the discriminator field "{{discriminatorFieldName}}"',
+                    'template' => 'Input does not contain the discriminator field {{discriminatorFieldName}}',
                     'variables' => [
                         'discriminatorFieldName' => 'field1',
                     ],
@@ -278,7 +278,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'discriminatedUnion.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -314,7 +314,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'discriminatedUnion.type',
-                'template' => 'Type should be "array|\stdClass|\Traversable", "{{given}}" given',
+                'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

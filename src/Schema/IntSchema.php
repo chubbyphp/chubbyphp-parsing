@@ -10,7 +10,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 final class IntSchema extends AbstractSchema implements SchemaInterface
 {
     public const ERROR_TYPE_CODE = 'int.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "int", "{{given}}" given';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "int", {{given}} given';
 
     public const ERROR_GT_CODE = 'int.gt';
     public const ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';

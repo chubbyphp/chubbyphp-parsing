@@ -67,7 +67,7 @@ final class FloatSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'float.type',
-                    'template' => 'Type should be "float", "{{given}}" given',
+                    'template' => 'Type should be "float", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -103,7 +103,7 @@ final class FloatSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'float.type',
-                        'template' => 'Type should be "float", "{{given}}" given',
+                        'template' => 'Type should be "float", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -133,7 +133,7 @@ final class FloatSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'float.type',
-                'template' => 'Type should be "float", "{{given}}" given',
+                'template' => 'Type should be "float", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],

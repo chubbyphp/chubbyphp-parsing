@@ -139,7 +139,7 @@ final class BackedEnumSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'backedEnum.type',
-                    'template' => 'Type should be "int|string", "{{given}}" given',
+                    'template' => 'Type should be "int|string", {{given}} given',
                     'variables' => [
                         'given' => 'NULL',
                     ],
@@ -198,7 +198,7 @@ final class BackedEnumSchemaTest extends AbstractTestCase
                 self::assertSame([
                     [
                         'code' => 'backedEnum.type',
-                        'template' => 'Type should be "int|string", "{{given}}" given',
+                        'template' => 'Type should be "int|string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
@@ -229,7 +229,7 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         self::assertSame([
             [
                 'code' => 'backedEnum.type',
-                'template' => 'Type should be "int|string", "{{given}}" given',
+                'template' => 'Type should be "int|string", {{given}} given',
                 'variables' => [
                     'given' => 'NULL',
                 ],
@@ -269,7 +269,7 @@ final class BackedEnumSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'int.type',
-                    'template' => 'Type should be "int", "{{given}}" given',
+                    'template' => 'Type should be "int", {{given}} given',
                     'variables' => [
                         'given' => 'string',
                     ],
@@ -310,7 +310,7 @@ final class BackedEnumSchemaTest extends AbstractTestCase
             self::assertSame([
                 [
                     'code' => 'string.type',
-                    'template' => 'Type should be "string", "{{given}}" given',
+                    'template' => 'Type should be "string", {{given}} given',
                     'variables' => [
                         'given' => 'integer',
                     ],

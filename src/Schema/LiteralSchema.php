@@ -10,7 +10,7 @@ use Chubbyphp\Parsing\ParserErrorException;
 final class LiteralSchema extends AbstractSchema
 {
     public const ERROR_TYPE_CODE = 'literal.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "bool|float|int|string", "{{given}}" given';
+    public const ERROR_TYPE_TEMPLATE = 'Type should be "bool|float|int|string", {{given}} given';
 
     public const ERROR_EQUALS_CODE = 'literal.equals';
     public const ERROR_EQUALS_TEMPLATE = 'Input should be {{expected}}, {{given}} given';
