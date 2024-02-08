@@ -272,6 +272,13 @@ $data = $schema->parse(['name' => 'example']);
 
 // SampleClass object
 $data = $schema->parse(['name' => 'example'], SampleNamespace\SampleClass::class);
+
+// validations
+$schema->strict();
+
+// transformations
+
+// conversions
 ```
 
 ### record

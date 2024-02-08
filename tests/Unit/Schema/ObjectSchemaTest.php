@@ -36,7 +36,7 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->postParse(static fn (\stdClass $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
 
-        self::assertNotSame($schema, $schema->ignore([]));
+        self::assertNotSame($schema, $schema->strict());
     }
 
     public function testConstructWithoutFieldName(): void
@@ -73,7 +73,7 @@ final class ObjectSchemaTest extends AbstractTestCase
 
         $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
 
-        $output = $schema->parse($input);
+        $output = $schema->parse([...$input, 'field3' => 1.5]);
 
         self::assertInstanceOf(\stdClass::class, $output);
 
@@ -121,11 +121,11 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertSame((array) $input, (array) $output);
     }
 
-    public function testParseSuccessWithIgnore(): void
+    public function testParseSuccessWithStrictIgnore(): void
     {
         $input = ['field1' => 'test', 'field2' => 1];
 
-        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->ignore(['field2']);
+        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->strict(['field2']);
 
         $output = $schema->parse($input);
 
@@ -177,7 +177,7 @@ final class ObjectSchemaTest extends AbstractTestCase
     {
         $input = ['field1' => 'test', 'field2' => 1, 'field3' => 1.5];
 
-        $schema = new ObjectSchema(['field1' => new StringSchema()]);
+        $schema = (new ObjectSchema(['field1' => new StringSchema()]))->strict();
 
         try {
             $schema->parse($input);

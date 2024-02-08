@@ -9,7 +9,7 @@ interface ObjectSchemaInterface extends SchemaInterface
     public function getFieldSchema(string $fieldName): null|SchemaInterface;
 
     /**
-     * @param array<string> $ignore
+     * @param array<string> $strict
      */
-    public function ignore(array $ignore): static;
+    public function strict(array $strict = []): static;
 }
