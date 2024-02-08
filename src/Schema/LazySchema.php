@@ -21,7 +21,12 @@ final class LazySchema implements SchemaInterface
 
     public function nullable(bool $nullable = true): static
     {
-        throw new \BadMethodCallException(sprintf('LazySchema does not support any modification, "nullable" called with %s.', $nullable ? 'true' : 'false'));
+        throw new \BadMethodCallException(
+            sprintf(
+                'LazySchema does not support any modification, "nullable" called with %s.',
+                $nullable ? 'true' : 'false'
+            )
+        );
     }
 
     /**
