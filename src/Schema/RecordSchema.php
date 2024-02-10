@@ -20,6 +20,10 @@ final class RecordSchema extends AbstractSchema implements SchemaInterface
             $input = (array) $input;
         }
 
+        if ($input instanceof \JsonSerializable) {
+            $input = $input->jsonSerialize();
+        }
+
         try {
             $input = $this->dispatchPreParses($input);
 

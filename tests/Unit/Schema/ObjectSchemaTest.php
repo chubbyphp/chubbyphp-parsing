@@ -11,10 +11,18 @@ use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
-final class ObjectDemo
+final class ObjectDemo implements \JsonSerializable
 {
     public string $field1;
     public int $field2;
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'field1' => $this->field1,
+            'field2' => $this->field2,
+        ];
+    }
 }
 
 /**
@@ -93,7 +101,7 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertSame($input, (array) $output);
     }
 
-    public function testParseSuccessWithStdClass(): void
+    public function testParseSuccessWithStdClassInput(): void
     {
         $input = new \stdClass();
         $input->field1 = 'test';
@@ -108,9 +116,24 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertSame((array) $input, (array) $output);
     }
 
-    public function testParseSuccessWithIterator(): void
+    public function testParseSuccessWithIteratorInput(): void
     {
         $input = new \ArrayIterator(['field1' => 'test', 'field2' => 1]);
+
+        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame((array) $input, (array) $output);
+    }
+
+    public function testParseSuccessWithJsonSerialzableObject(): void
+    {
+        $input = new ObjectDemo();
+        $input->field1 = 'test';
+        $input->field2 = 1;
 
         $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
 

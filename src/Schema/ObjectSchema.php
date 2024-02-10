@@ -63,6 +63,10 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             $input = (array) $input;
         }
 
+        if ($input instanceof \JsonSerializable) {
+            $input = $input->jsonSerialize();
+        }
+
         try {
             $input = $this->dispatchPreParses($input);
 

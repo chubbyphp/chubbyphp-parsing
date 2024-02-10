@@ -13,6 +13,20 @@ use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
+final class DiscriminatedUnionDemo implements \JsonSerializable
+{
+    public string $field1;
+    public string $field2;
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'field1' => $this->field1,
+            'field2' => $this->field2,
+        ];
+    }
+}
+
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema
@@ -80,7 +94,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         self::assertSame($input, (array) $output);
     }
 
-    public function testParseSuccessWithStdClass(): void
+    public function testParseSuccessWithStdClassInput(): void
     {
         $input = new \stdClass();
         $input->field1 = 'type2';
@@ -98,9 +112,27 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         self::assertSame((array) $input, (array) $output);
     }
 
-    public function testParseSuccessWithIterator(): void
+    public function testParseSuccessWithIteratorInput(): void
     {
         $input = new \ArrayIterator(['field1' => 'type2', 'field2' => 'test']);
+
+        $schema = new DiscriminatedUnionSchema([
+            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
+            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+        ], 'field1');
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame((array) $input, (array) $output);
+    }
+
+    public function testParseSuccessWithJsonSerialzableObject(): void
+    {
+        $input = new DiscriminatedUnionDemo();
+        $input->field1 = 'type2';
+        $input->field2 = 'test';
 
         $schema = new DiscriminatedUnionSchema([
             new ObjectSchema(['field1' => new LiteralSchema('type1')]),

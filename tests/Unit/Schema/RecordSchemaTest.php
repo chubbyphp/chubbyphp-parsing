@@ -9,6 +9,20 @@ use Chubbyphp\Parsing\Schema\RecordSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
+final class RecordDemo implements \JsonSerializable
+{
+    public string $field1;
+    public string $field2;
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'field1' => $this->field1,
+            'field2' => $this->field2,
+        ];
+    }
+}
+
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\RecordSchema
@@ -40,7 +54,7 @@ final class RecordSchemaTest extends AbstractTestCase
         self::assertSame($input, $output);
     }
 
-    public function testParseSuccessWithStdClass(): void
+    public function testParseSuccessWithStdClassInput(): void
     {
         $input = new \stdClass();
         $input->field1 = 'value1';
@@ -53,9 +67,22 @@ final class RecordSchemaTest extends AbstractTestCase
         self::assertSame((array) $input, $output);
     }
 
-    public function testParseSuccessWithIterator(): void
+    public function testParseSuccessWithIteratorInput(): void
     {
         $input = new \ArrayIterator(['field1' => 'value1', 'field2' => 'value2']);
+
+        $schema = new RecordSchema(new StringSchema());
+
+        $output = $schema->parse($input);
+
+        self::assertSame((array) $input, $output);
+    }
+
+    public function testParseSuccessWithJsonSerialzableObject(): void
+    {
+        $input = new RecordDemo();
+        $input->field1 = 'value1';
+        $input->field2 = 'value2';
 
         $schema = new RecordSchema(new StringSchema());
 

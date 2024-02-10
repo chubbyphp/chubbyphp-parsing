@@ -61,6 +61,10 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
             $input = (array) $input;
         }
 
+        if ($input instanceof \JsonSerializable) {
+            $input = $input->jsonSerialize();
+        }
+
         try {
             $input = $this->dispatchPreParses($input);
 
