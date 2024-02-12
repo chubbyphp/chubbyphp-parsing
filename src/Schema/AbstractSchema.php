@@ -87,20 +87,20 @@ abstract class AbstractSchema implements SchemaInterface
 
     final protected function dispatchPreParses(mixed $data): mixed
     {
-        foreach ($this->preParses as $preParse) {
-            $data = $preParse($data);
-        }
-
-        return $data;
+        return array_reduce(
+            $this->preParses,
+            static fn (mixed $currentData, \Closure $preParse) => $preParse($currentData),
+            $data
+        );
     }
 
     final protected function dispatchPostParses(mixed $data): mixed
     {
-        foreach ($this->postParses as $postParse) {
-            $data = $postParse($data);
-        }
-
-        return $data;
+        return array_reduce(
+            $this->postParses,
+            static fn (mixed $currentData, \Closure $postParse) => $postParse($currentData),
+            $data
+        );
     }
 
     final protected function getDataType(mixed $input): string
