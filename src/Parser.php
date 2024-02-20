@@ -16,10 +16,12 @@ use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
 use Chubbyphp\Parsing\Schema\RecordSchema;
+use Chubbyphp\Parsing\Schema\RespectValidationSchema;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
+use Respect\Validation\Validatable;
 
 final class Parser implements ParserInterface
 {
@@ -110,5 +112,10 @@ final class Parser implements ParserInterface
     public function union(array $schemas): UnionSchema
     {
         return new UnionSchema($schemas);
+    }
+
+    public function respectValidation(Validatable $validatable): RespectValidationSchema
+    {
+        return new RespectValidationSchema($validatable);
     }
 }

@@ -16,10 +16,12 @@ use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\RecordSchema;
+use Chubbyphp\Parsing\Schema\RespectValidationSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
 use PHPUnit\Framework\TestCase;
+use Respect\Validation\Validator as v;
 
 enum BackedSuit: string
 {
@@ -170,5 +172,14 @@ final class ParserTest extends TestCase
         $unionSchema = $p->union([$p->string(), $p->int()]);
 
         self::assertInstanceOf(UnionSchema::class, $unionSchema);
+    }
+
+    public function testRespectValidation(): void
+    {
+        $p = new Parser();
+
+        $respectValidationSchema = $p->respectValidation(v::numericVal()->positive()->between(1, 255));
+
+        self::assertInstanceOf(RespectValidationSchema::class, $respectValidationSchema);
     }
 }

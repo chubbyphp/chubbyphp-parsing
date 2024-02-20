@@ -35,7 +35,7 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-parsing "^1.0"
+composer require chubbyphp/chubbyphp-parsing "^1.1"
 ```
 
 ## Usage
@@ -294,6 +294,23 @@ $data = $schema->parse([
     'key1' => 'value1',
     'key2' => 'value2'
 ]);
+```
+
+### respectValidation
+
+```sh
+composer require respect/validation "^2.3"
+```
+
+```php
+use Chubbyphp\Parsing\Parser;
+use Respect\Validation\Validator as v;
+
+$p = new Parser();
+
+$schema = $p->respectValidation(v::numericVal()->positive()->between(1, 255));
+
+$data = $schema->parse(5);
 ```
 
 ### string
