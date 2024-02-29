@@ -8,7 +8,7 @@ final class ParserErrorException extends \RuntimeException
 {
     private array $errors = [];
 
-    public function __construct(null|Error $error = null, null|int|string $key = null)
+    public function __construct(?Error $error = null, null|int|string $key = null)
     {
         if (null === $error) {
             return;

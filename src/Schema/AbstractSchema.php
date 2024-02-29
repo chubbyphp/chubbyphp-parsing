@@ -24,7 +24,7 @@ abstract class AbstractSchema implements SchemaInterface
     /**
      * @var \Closure(mixed, ParserErrorException): mixed
      */
-    protected null|\Closure $catch = null;
+    protected ?\Closure $catch = null;
 
     final public function nullable(bool $nullable = true): static
     {

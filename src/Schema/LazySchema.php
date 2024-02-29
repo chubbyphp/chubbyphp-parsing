@@ -12,7 +12,7 @@ use Chubbyphp\Parsing\Result;
  */
 final class LazySchema implements SchemaInterface
 {
-    private null|SchemaInterface $schema = null;
+    private ?SchemaInterface $schema = null;
 
     /**
      * @param \Closure(): SchemaInterface $lazy

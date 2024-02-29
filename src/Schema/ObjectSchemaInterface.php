@@ -6,7 +6,7 @@ namespace Chubbyphp\Parsing\Schema;
 
 interface ObjectSchemaInterface extends SchemaInterface
 {
-    public function getFieldSchema(string $fieldName): null|SchemaInterface;
+    public function getFieldSchema(string $fieldName): ?SchemaInterface;
 
     /**
      * @param array<string> $strict

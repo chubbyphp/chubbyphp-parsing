@@ -23,7 +23,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     /**
      * @var null|array<string>
      */
-    private null|array $strict = null;
+    private ?array $strict = null;
 
     /**
      * @param array<string, SchemaInterface> $fieldNameToSchema
@@ -106,7 +106,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
         }
     }
 
-    public function getFieldSchema(string $fieldName): null|SchemaInterface
+    public function getFieldSchema(string $fieldName): ?SchemaInterface
     {
         return $this->fieldNameToSchema[$fieldName] ?? null;
     }
