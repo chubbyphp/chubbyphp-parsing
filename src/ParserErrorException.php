@@ -25,12 +25,12 @@ final class ParserErrorException extends \RuntimeException
     public function addParserErrorException(self $parserErrorException, null|int|string $key = null): self
     {
         if (null !== $key) {
-            $this->errors[$key] = array_merge_recursive($this->errors[$key] ?? [], $parserErrorException->getErrors());
+            $this->errors = $this->mergeErrors([$key => $parserErrorException->getErrors()], $this->errors);
 
             return $this;
         }
 
-        $this->errors = array_merge_recursive($this->errors, $parserErrorException->getErrors());
+        $this->errors = $this->mergeErrors($parserErrorException->getErrors(), $this->errors);
 
         return $this;
     }
@@ -38,12 +38,12 @@ final class ParserErrorException extends \RuntimeException
     public function addError(Error $error, null|int|string $key = null): self
     {
         if (null !== $key) {
-            $this->errors[$key] = array_merge($this->errors[$key] ?? [], [$error]);
+            $this->errors = $this->mergeErrors([$key => [$error]], $this->errors);
 
             return $this;
         }
 
-        $this->errors = array_merge($this->errors, [$error]);
+        $this->errors = $this->mergeErrors([$error], $this->errors);
 
         return $this;
     }
@@ -61,6 +61,19 @@ final class ParserErrorException extends \RuntimeException
     public function getApiProblemErrorMessages(): array
     {
         return $this->flatErrorsToApiProblemMessages($this->errors);
+    }
+
+    private function mergeErrors(array $errors, array $mergedErrors): array
+    {
+        foreach ($errors as $key => $error) {
+            if ($error instanceof Error) {
+                $mergedErrors[] = $error;
+            } else {
+                $mergedErrors[$key] = $this->mergeErrors($error, $mergedErrors[$key] ?? []);
+            }
+        }
+
+        return $mergedErrors;
     }
 
     private function flatErrorsToApiProblemMessages(array $errors, string $path = ''): array

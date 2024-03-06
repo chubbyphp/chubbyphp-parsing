@@ -96,236 +96,158 @@ final class ParserErrorExceptionTest extends AbstractTestCase
         $exception = $this->getNestedParserErrorException();
 
         self::assertSame([
-            'field1' => [
+            'offset' => [
                 [
-                    'code' => 'error: 1',
-                    'template' => 'value: {{value}}',
+                    'code' => 'int.type',
+                    'template' => 'Type should be "int", {{given}} given',
                     'variables' => [
-                        'value' => 1,
+                        'given' => 'float',
                     ],
                 ],
                 [
-                    'code' => 'error: 12',
-                    'template' => 'value: {{value}}',
+                    'code' => 'string.type',
+                    'template' => 'Type should be "string", {{given}} given',
                     'variables' => [
-                        'value' => 12,
-                    ],
-                ],
-            ],
-            'field2' => [
-                [
-                    'code' => 'error: 2',
-                    'template' => 'value: {{value}}',
-                    'variables' => [
-                        'value' => 2,
+                        'given' => 'float',
                     ],
                 ],
             ],
-            'field3' => [
+            'limit' => [
                 [
-                    'code' => 'error: 3',
-                    'template' => 'value: {{value}}',
+                    'code' => 'int.type',
+                    'template' => 'Type should be "int", {{given}} given',
                     'variables' => [
-                        'value' => 3,
+                        'given' => 'float',
+                    ],
+                ],
+                [
+                    'code' => 'string.type',
+                    'template' => 'Type should be "string", {{given}} given',
+                    'variables' => [
+                        'given' => 'float',
                     ],
                 ],
             ],
-            'field4' => [
-                'field1' => [
+            'filters' => [
+                'name' => [
                     [
-                        'code' => 'error: 4',
-                        'template' => 'value: {{value}}',
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
-                            'value' => 4,
-                        ],
-                    ],
-                    [
-                        'code' => 'error: 8',
-                        'template' => 'value: {{value}}',
-                        'variables' => [
-                            'value' => 8,
+                            'given' => 'float',
                         ],
                     ],
                 ],
-                'field2' => [
+            ],
+            'sort' => [
+                'name' => [
                     [
-                        'code' => 'error: 5',
-                        'template' => 'value: {{value}}',
+                        'code' => 'literal.type',
+                        'template' => 'Type should be "bool|float|int|string", {{given}} given',
                         'variables' => [
-                            'value' => 5,
+                            'given' => 'float',
                         ],
                     ],
                     [
-                        'code' => 'error: 9',
-                        'template' => 'value: {{value}}',
+                        'code' => 'literal.type',
+                        'template' => 'Type should be "bool|float|int|string", {{given}} given',
                         'variables' => [
-                            'value' => 9,
-                        ],
-                    ],
-                ],
-                'field3' => [
-                    'field1' => [
-                        [
-                            'code' => 'error: 6',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 6,
-                            ],
-                        ],
-                        [
-                            'code' => 'error: 10',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 10,
-                            ],
-                        ],
-                    ],
-                    'field2' => [
-                        [
-                            'code' => 'error: 7',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 7,
-                            ],
-                        ],
-                        [
-                            'code' => 'error: 11',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 11,
-                            ],
+                            'given' => 'float',
                         ],
                     ],
                 ],
             ],
-            'field5' => [
+            'items' => [
                 [
-                    'code' => 'error: 13',
-                    'template' => 'value: {{value}}',
-                    'variables' => [
-                        'value' => 13,
-                    ],
-                ],
-                [
-                    'code' => 'error: 14',
-                    'template' => 'value: {{value}}',
-                    'variables' => [
-                        'value' => 14,
-                    ],
-                ],
-                [
-                    'code' => 'error: 15',
-                    'template' => 'value: {{value}}',
-                    'variables' => [
-                        'value' => 15,
-                    ],
-                ],
-            ],
-            'field6' => [
-                [
-                    'field1' => [
+                    'id' => [
                         [
-                            'code' => 'error: 16',
-                            'template' => 'value: {{value}}',
+                            'code' => 'string.type',
+                            'template' => 'Type should be "string", {{given}} given',
                             'variables' => [
-                                'value' => 16,
-                            ],
-                        ],
-                        [
-                            'code' => 'error: 17',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 17,
+                                'given' => 'float',
                             ],
                         ],
                     ],
-                    'field2' => [
+                    'createdAt' => [
                         [
-                            'code' => 'error: 18',
-                            'template' => 'value: {{value}}',
+                            'code' => 'datetime.type',
+                            'template' => 'Type should be "\DateTimeInterface", {{given}} given',
                             'variables' => [
-                                'value' => 18,
+                                'given' => 'float',
                             ],
                         ],
                     ],
-                    'field3' => [
+                    'updatedAt' => [
                         [
-                            'code' => 'error: 19',
-                            'template' => 'value: {{value}}',
+                            'code' => 'datetime.type',
+                            'template' => 'Type should be "\DateTimeInterface", {{given}} given',
                             'variables' => [
-                                'value' => 19,
+                                'given' => 'float',
                             ],
                         ],
                     ],
-                ],
-                [
-                    'field1' => [
+                    'name' => [
                         [
-                            'code' => 'error: 20',
-                            'template' => 'value: {{value}}',
+                            'code' => 'string.type',
+                            'template' => 'Type should be "string", {{given}} given',
                             'variables' => [
-                                'value' => 20,
-                            ],
-                        ],
-                        [
-                            'code' => 'error: 21',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 21,
+                                'given' => 'float',
                             ],
                         ],
                     ],
-                    'field2' => [
+                    'tag' => [
                         [
-                            'code' => 'error: 22',
-                            'template' => 'value: {{value}}',
+                            'code' => 'string.type',
+                            'template' => 'Type should be "string", {{given}} given',
                             'variables' => [
-                                'value' => 22,
+                                'given' => 'float',
                             ],
                         ],
                     ],
-                    'field3' => [
-                        [
-                            'code' => 'error: 23',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 23,
+                    'vaccinations' => [
+                        0 => [
+                            'name' => [
+                                [
+                                    'code' => 'string.type',
+                                    'template' => 'Type should be "string", {{given}} given',
+                                    'variables' => [
+                                        'given' => 'float',
+                                    ],
+                                ],
+                                [
+                                    'code' => 'string.type',
+                                    'template' => 'Type should be "string", {{given}} given',
+                                    'variables' => [
+                                        'given' => 'float',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        3 => [
+                            'name' => [
+                                [
+                                    'code' => 'string.type',
+                                    'template' => 'Type should be "string", {{given}} given',
+                                    'variables' => [
+                                        'given' => 'float',
+                                    ],
+                                ],
+                                [
+                                    'code' => 'string.type',
+                                    'template' => 'Type should be "string", {{given}} given',
+                                    'variables' => [
+                                        'given' => 'float',
+                                    ],
+                                ],
                             ],
                         ],
                     ],
-                ],
-                [
-                    'field1' => [
+                    '_type' => [
                         [
-                            'code' => 'error: 24',
-                            'template' => 'value: {{value}}',
+                            'code' => 'literal.type',
+                            'template' => 'Type should be "bool|float|int|string", {{given}} given',
                             'variables' => [
-                                'value' => 24,
-                            ],
-                        ],
-                        [
-                            'code' => 'error: 25',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 25,
-                            ],
-                        ],
-                    ],
-                    'field2' => [
-                        [
-                            'code' => 'error: 26',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 26,
-                            ],
-                        ],
-                    ],
-                    'field3' => [
-                        [
-                            'code' => 'error: 27',
-                            'template' => 'value: {{value}}',
-                            'variables' => [
-                                'value' => 27,
+                                'given' => 'float',
                             ],
                         ],
                     ],
@@ -342,219 +264,139 @@ final class ParserErrorExceptionTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'name' => 'field1',
-                'reason' => 'value: 1',
+                'name' => 'offset',
+                'reason' => 'Type should be "int", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 1,
+                    '_template' => 'Type should be "int", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field1',
-                'reason' => 'value: 12',
+                'name' => 'offset',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 12,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field2',
-                'reason' => 'value: 2',
+                'name' => 'limit',
+                'reason' => 'Type should be "int", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 2,
+                    '_template' => 'Type should be "int", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field3',
-                'reason' => 'value: 3',
+                'name' => 'limit',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 3,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field4[field1]',
-                'reason' => 'value: 4',
+                'name' => 'filters[name]',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 4,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field4[field1]',
-                'reason' => 'value: 8',
+                'name' => 'sort[name]',
+                'reason' => 'Type should be "bool|float|int|string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 8,
+                    '_template' => 'Type should be "bool|float|int|string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field4[field2]',
-                'reason' => 'value: 5',
+                'name' => 'sort[name]',
+                'reason' => 'Type should be "bool|float|int|string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 5,
+                    '_template' => 'Type should be "bool|float|int|string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field4[field2]',
-                'reason' => 'value: 9',
+                'name' => 'items[0][id]',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 9,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field4[field3][field1]',
-                'reason' => 'value: 6',
+                'name' => 'items[0][createdAt]',
+                'reason' => 'Type should be "\DateTimeInterface", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 6,
+                    '_template' => 'Type should be "\DateTimeInterface", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field4[field3][field1]',
-                'reason' => 'value: 10',
+                'name' => 'items[0][updatedAt]',
+                'reason' => 'Type should be "\DateTimeInterface", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 10,
+                    '_template' => 'Type should be "\DateTimeInterface", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field4[field3][field2]',
-                'reason' => 'value: 7',
+                'name' => 'items[0][name]',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 7,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field4[field3][field2]',
-                'reason' => 'value: 11',
+                'name' => 'items[0][tag]',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 11,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field5',
-                'reason' => 'value: 13',
+                'name' => 'items[0][vaccinations][0][name]',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 13,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field5',
-                'reason' => 'value: 14',
+                'name' => 'items[0][vaccinations][0][name]',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 14,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field5',
-                'reason' => 'value: 15',
+                'name' => 'items[0][vaccinations][3][name]',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 15,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field6[0][field1]',
-                'reason' => 'value: 16',
+                'name' => 'items[0][vaccinations][3][name]',
+                'reason' => 'Type should be "string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 16,
+                    '_template' => 'Type should be "string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
             [
-                'name' => 'field6[0][field1]',
-                'reason' => 'value: 17',
+                'name' => 'items[0][_type]',
+                'reason' => 'Type should be "bool|float|int|string", "float" given',
                 'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 17,
-                ],
-            ],
-            [
-                'name' => 'field6[0][field2]',
-                'reason' => 'value: 18',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 18,
-                ],
-            ],
-            [
-                'name' => 'field6[0][field3]',
-                'reason' => 'value: 19',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 19,
-                ],
-            ],
-            [
-                'name' => 'field6[1][field1]',
-                'reason' => 'value: 20',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 20,
-                ],
-            ],
-            [
-                'name' => 'field6[1][field1]',
-                'reason' => 'value: 21',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 21,
-                ],
-            ],
-            [
-                'name' => 'field6[1][field2]',
-                'reason' => 'value: 22',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 22,
-                ],
-            ],
-            [
-                'name' => 'field6[1][field3]',
-                'reason' => 'value: 23',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 23,
-                ],
-            ],
-            [
-                'name' => 'field6[2][field1]',
-                'reason' => 'value: 24',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 24,
-                ],
-            ],
-            [
-                'name' => 'field6[2][field1]',
-                'reason' => 'value: 25',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 25,
-                ],
-            ],
-            [
-                'name' => 'field6[2][field2]',
-                'reason' => 'value: 26',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 26,
-                ],
-            ],
-            [
-                'name' => 'field6[2][field3]',
-                'reason' => 'value: 27',
-                'details' => [
-                    '_template' => 'value: {{value}}',
-                    'value' => 27,
+                    '_template' => 'Type should be "bool|float|int|string", {{given}} given',
+                    'given' => 'float',
                 ],
             ],
         ], $this->errorsToSimpleArray($exception->getApiProblemErrorMessages()));
@@ -564,46 +406,39 @@ final class ParserErrorExceptionTest extends AbstractTestCase
 
     private function getNestedParserErrorException(): ParserErrorException
     {
-        $i = 0;
-
         return (new ParserErrorException())
-            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
-            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field3')
             ->addParserErrorException(
                 (new ParserErrorException())
-                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
                     ->addParserErrorException(
                         (new ParserErrorException())
-                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2'),
-                        'field3'
+                            ->addError(new Error('int.type', 'Type should be "int", {{given}} given', ['given' => 'float']))
+                    )
+                    ->addParserErrorException(
+                        (new ParserErrorException())
+                            ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float']))
                     ),
-                'field4'
+                'offset'
             )
             ->addParserErrorException(
                 (new ParserErrorException())
-                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
                     ->addParserErrorException(
                         (new ParserErrorException())
-                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2'),
-                        'field3'
+                            ->addError(new Error('int.type', 'Type should be "int", {{given}} given', ['given' => 'float']))
+                    )
+                    ->addParserErrorException(
+                        (new ParserErrorException())
+                            ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float']))
                     ),
-                'field4'
+                'limit'
             )
-            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
             ->addParserErrorException(
                 (new ParserErrorException())
-                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]))
-                    ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]))
                     ->addParserErrorException(
                         (new ParserErrorException())
-                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]))
+                            ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float'])),
+                        'name'
                     ),
-                'field5'
+                'filters'
             )
             ->addParserErrorException(
                 (new ParserErrorException())
@@ -611,39 +446,95 @@ final class ParserErrorExceptionTest extends AbstractTestCase
                         (new ParserErrorException())
                             ->addParserErrorException(
                                 (new ParserErrorException())
-                                    ->addParserErrorException(
-                                        (new ParserErrorException())
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field3'),
-                                    ),
-                                0
+                                    ->addError(new Error('literal.type', 'Type should be "bool|float|int|string", {{given}} given', ['given' => 'float']))
                             )
                             ->addParserErrorException(
                                 (new ParserErrorException())
-                                    ->addParserErrorException(
-                                        (new ParserErrorException())
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field3'),
-                                    ),
-                                1
-                            )
-                            ->addParserErrorException(
-                                (new ParserErrorException())
-                                    ->addParserErrorException(
-                                        (new ParserErrorException())
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field1')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field2')
-                                            ->addError(new Error('error: '.++$i, 'value: {{value}}', ['value' => $i]), 'field3'),
-                                    ),
-                                2
-                            )
+                                    ->addError(new Error('literal.type', 'Type should be "bool|float|int|string", {{given}} given', ['given' => 'float']))
+                            ),
+                        'name'
                     ),
-                'field6'
+                'sort'
+            )
+            ->addParserErrorException(
+                (new ParserErrorException())
+                    ->addParserErrorException(
+                        (new ParserErrorException())
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float'])),
+                                'id'
+                            )
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addError(new Error('datetime.type', 'Type should be "\DateTimeInterface", {{given}} given', ['given' => 'float'])),
+                                'createdAt'
+                            )
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addError(new Error('datetime.type', 'Type should be "\DateTimeInterface", {{given}} given', ['given' => 'float'])),
+                                'updatedAt'
+                            )
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float'])),
+                                'name'
+                            )
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float'])),
+                                'tag'
+                            )
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addParserErrorException(
+                                        (new ParserErrorException())
+                                            ->addParserErrorException(
+                                                (new ParserErrorException())
+                                                    ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float'])),
+                                                'name'
+                                            ),
+                                        0
+                                    )
+                                    // does make sense, but to make sure the nesting works as expected
+                                    ->addParserErrorException(
+                                        (new ParserErrorException())
+                                            ->addParserErrorException(
+                                                (new ParserErrorException())
+                                                    ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float'])),
+                                                'name'
+                                            ),
+                                        0
+                                    )
+                                    ->addParserErrorException(
+                                        (new ParserErrorException())
+                                            ->addParserErrorException(
+                                                (new ParserErrorException())
+                                                    ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float'])),
+                                                'name'
+                                            ),
+                                        3
+                                    )
+                                    // does make sense, but to make sure the nesting works as expected
+                                    ->addParserErrorException(
+                                        (new ParserErrorException())
+                                            ->addParserErrorException(
+                                                (new ParserErrorException())
+                                                    ->addError(new Error('string.type', 'Type should be "string", {{given}} given', ['given' => 'float'])),
+                                                'name'
+                                            ),
+                                        3
+                                    ),
+                                'vaccinations'
+                            )
+                            ->addParserErrorException(
+                                (new ParserErrorException())
+                                    ->addError(new Error('literal.type', 'Type should be "bool|float|int|string", {{given}} given', ['given' => 'float'])),
+                                '_type'
+                            ),
+                        0
+                    ),
+                'items'
             )
         ;
     }
