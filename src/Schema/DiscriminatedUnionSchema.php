@@ -14,7 +14,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
 
     public const ERROR_DISCRIMINATOR_FIELD_CODE = 'discriminatedUnion.discriminatorField';
     public const ERROR_DISCRIMINATOR_FIELD_TEMPLATE
-    = 'Input does not contain the discriminator field {{discriminatorFieldName}}';
+        = 'Input does not contain the discriminator field {{discriminatorFieldName}}';
 
     /**
      * @var array<ObjectSchemaInterface>
