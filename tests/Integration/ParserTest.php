@@ -122,7 +122,7 @@ final class ParserTest extends TestCase
                 'dateTime' => [
                     [
                         'code' => 'datetime.type',
-                        'template' => 'Type should be "\\DateTimeInterface", {{given}} given',
+                        'template' => 'Type should be "\DateTimeInterface", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
