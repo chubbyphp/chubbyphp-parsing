@@ -29,7 +29,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
         foreach ($objectSchemas as $i => $objectSchema) {
             if (!$objectSchema instanceof ObjectSchemaInterface) {
                 throw new \InvalidArgumentException(
-                    sprintf(
+                    \sprintf(
                         'Argument #1 value of #%s ($objectSchemas) must be of type %s, %s given',
                         $i,
                         ObjectSchemaInterface::class,
@@ -42,7 +42,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
 
             if (null === $discriminatorFieldSchema) {
                 throw new \InvalidArgumentException(
-                    sprintf(
+                    \sprintf(
                         'Argument #1 value of #%s #%s ($objectSchemas) must contain %s',
                         $i,
                         $discriminatorFieldName,

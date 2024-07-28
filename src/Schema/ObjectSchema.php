@@ -34,7 +34,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
         foreach ($fieldNameToSchema as $fieldName => $fieldSchema) {
             if (!\is_string($fieldName)) {
                 throw new \InvalidArgumentException(
-                    sprintf(
+                    \sprintf(
                         'Argument #1 name #%s ($fieldNameToSchema) must be of type string, %s given',
                         $fieldName,
                         $this->getDataType($fieldName)
@@ -44,7 +44,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
             if (!$fieldSchema instanceof SchemaInterface) {
                 throw new \InvalidArgumentException(
-                    sprintf(
+                    \sprintf(
                         'Argument #1 value of #%s ($fieldNameToSchema) must be of type %s, %s given',
                         $fieldName,
                         SchemaInterface::class,

@@ -24,7 +24,7 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
     {
         if (!enum_exists($backedEnumClass)) {
             throw new \InvalidArgumentException(
-                sprintf(
+                \sprintf(
                     'Argument #1 ($backedEnum) must be of type \BackedEnum::class, %s given',
                     $this->getDataType($backedEnumClass)
                 )
@@ -37,7 +37,7 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
 
         if (!$backedEnum instanceof \BackedEnum) {
             throw new \InvalidArgumentException(
-                sprintf(
+                \sprintf(
                     'Argument #1 ($backedEnum) must be of type \BackedEnum::class, %s given',
                     $this->getDataType($backedEnumClass)
                 )

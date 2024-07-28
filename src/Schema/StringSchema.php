@@ -197,7 +197,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public function match(string $match): static
     {
         if (false === @preg_match($match, '')) {
-            throw new \InvalidArgumentException(sprintf('Invalid match "%s" given', $match));
+            throw new \InvalidArgumentException(\sprintf('Invalid match "%s" given', $match));
         }
 
         return $this->postParse(static function (string $string) use ($match) {
