@@ -222,13 +222,13 @@ final class ParserTest extends TestCase
 
     protected function getSchema(): SchemaInterface
     {
-        $discriminatedUnion = new class() {
+        $discriminatedUnion = new class {
             public bool|float|int|string $literal;
             public string $string;
             public string $default = 'defaultOnClass';
         };
 
-        $object = new class() {
+        $object = new class {
             public array $array;
             public BackedSuit $backedEnum;
             public bool $bool;
