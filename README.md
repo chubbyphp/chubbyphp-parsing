@@ -3,8 +3,8 @@
 [![CI](https://github.com/chubbyphp/chubbyphp-parsing/actions/workflows/ci.yml/badge.svg)](https://github.com/chubbyphp/chubbyphp-parsing/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/chubbyphp/chubbyphp-parsing/badge.svg?branch=master)](https://coveralls.io/github/chubbyphp/chubbyphp-parsing?branch=master)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fchubbyphp%2Fchubbyphp-parsing%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/chubbyphp/chubbyphp-parsing/master)
-[![Latest Stable Version](https://poser.pugx.org/chubbyphp/chubbyphp-parsing/v/stable.png)](https://packagist.org/packages/chubbyphp/chubbyphp-parsing)
-[![Total Downloads](https://poser.pugx.org/chubbyphp/chubbyphp-parsing/downloads.png)](https://packagist.org/packages/chubbyphp/chubbyphp-parsing)
+[![Latest Stable Version](https://poser.pugx.org/chubbyphp/chubbyphp-parsing/v)](https://packagist.org/packages/chubbyphp/chubbyphp-parsing)
+[![Total Downloads](https://poser.pugx.org/chubbyphp/chubbyphp-parsing/downloads)](https://packagist.org/packages/chubbyphp/chubbyphp-parsing)
 [![Monthly Downloads](https://poser.pugx.org/chubbyphp/chubbyphp-parsing/d/monthly)](https://packagist.org/packages/chubbyphp/chubbyphp-parsing)
 
 [![bugs](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-parsing&metric=bugs)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-parsing)
