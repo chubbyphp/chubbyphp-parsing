@@ -17,7 +17,8 @@
         }
     ],
     "require": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "symfony/yaml": "^7.1"
     },
     "require-dev": {
         "chubbyphp/chubbyphp-dev-helper": "dev-master",
