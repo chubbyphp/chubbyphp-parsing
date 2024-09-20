@@ -404,6 +404,39 @@ final class ParserErrorExceptionTest extends AbstractTestCase
         self::assertTrue($exception->hasError());
     }
 
+    public function testGetMessage(): void
+    {
+        $exception = $this->getNestedParserErrorException();
+
+        $message = <<<'EOD'
+            offset: Type should be "int", "float" given
+            offset: Type should be "string", "float" given
+            limit: Type should be "int", "float" given
+            limit: Type should be "string", "float" given
+            filters[name]: Type should be "string", "float" given
+            sort[name]: Type should be "bool|float|int|string", "float" given
+            sort[name]: Type should be "bool|float|int|string", "float" given
+            items[0][id]: Type should be "string", "float" given
+            items[0][createdAt]: Type should be "\DateTimeInterface", "float" given
+            items[0][updatedAt]: Type should be "\DateTimeInterface", "float" given
+            items[0][name]: Type should be "string", "float" given
+            items[0][tag]: Type should be "string", "float" given
+            items[0][vaccinations][0][name]: Type should be "string", "float" given
+            items[0][vaccinations][0][name]: Type should be "string", "float" given
+            items[0][vaccinations][3][name]: Type should be "string", "float" given
+            items[0][vaccinations][3][name]: Type should be "string", "float" given
+            items[0][_type]: Type should be "bool|float|int|string", "float" given
+            EOD;
+
+        self::assertSame($message, $exception->getMessage());
+
+        $exception->addError(new Error('random', 'Make sure this error gets added as well', []), 'anotherField');
+
+        $messageWithOneErrorMore = $message .= PHP_EOL.'anotherField: Make sure this error gets added as well';
+
+        self::assertSame($messageWithOneErrorMore, $exception->getMessage());
+    }
+
     private function getNestedParserErrorException(): ParserErrorException
     {
         return (new ParserErrorException())
