@@ -93,7 +93,7 @@ final class ParserErrorExceptionTest extends AbstractTestCase
 
     public function testNestedGetErrors(): void
     {
-        $exception = $this->getNestedParserErrorException();
+        $exception = self::getNestedParserErrorException();
 
         self::assertSame([
             'offset' => [
@@ -260,7 +260,7 @@ final class ParserErrorExceptionTest extends AbstractTestCase
 
     public function testNestedGetApiProblemErrorMessages(): void
     {
-        $exception = $this->getNestedParserErrorException();
+        $exception = self::getNestedParserErrorException();
 
         self::assertSame([
             [
@@ -406,7 +406,7 @@ final class ParserErrorExceptionTest extends AbstractTestCase
 
     public function testGetMessage(): void
     {
-        $exception = $this->getNestedParserErrorException();
+        $exception = self::getNestedParserErrorException();
 
         $message = <<<'EOD'
             offset: Type should be "int", "float" given
@@ -437,7 +437,7 @@ final class ParserErrorExceptionTest extends AbstractTestCase
         self::assertSame($messageWithOneErrorMore, $exception->getMessage());
     }
 
-    private function getNestedParserErrorException(): ParserErrorException
+    public static function getNestedParserErrorException(): ParserErrorException
     {
         return (new ParserErrorException())
             ->addParserErrorException(

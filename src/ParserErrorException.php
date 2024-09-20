@@ -13,7 +13,7 @@ final class ParserErrorException extends \RuntimeException
 
     public function __construct(?Error $error = null, null|int|string $key = null)
     {
-        $this->message = $this->messageStringable();
+        $this->message = new ParserErrorExceptionToString($this);
 
         if ($error) {
             $this->addError($error, $key);
@@ -67,25 +67,6 @@ final class ParserErrorException extends \RuntimeException
     public function getApiProblemErrorMessages(): array
     {
         return $this->flatErrorsToApiProblemMessages($this->errors);
-    }
-
-    private function messageStringable(): \Stringable
-    {
-        return new class($this) implements \Stringable {
-            public function __construct(private ParserErrorException $e) {}
-
-            public function __toString(): string
-            {
-                /** @var array<string> */
-                $lines = [];
-
-                foreach ($this->e->getApiProblemErrorMessages() as $apiProblemErrorMessage) {
-                    $lines[] = "{$apiProblemErrorMessage['name']}: {$apiProblemErrorMessage['reason']}";
-                }
-
-                return implode(PHP_EOL, $lines);
-            }
-        };
     }
 
     private function mergeErrors(array $errors, array $mergedErrors): array
