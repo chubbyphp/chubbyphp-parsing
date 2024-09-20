@@ -76,7 +76,9 @@ final class ParserErrorException extends \RuntimeException
 
             public function __toString(): string
             {
+                /** @var array<string> */
                 $lines = [];
+
                 foreach ($this->e->getApiProblemErrorMessages() as $apiProblemErrorMessage) {
                     $lines[] = "{$apiProblemErrorMessage['name']}: {$apiProblemErrorMessage['reason']}";
                 }
