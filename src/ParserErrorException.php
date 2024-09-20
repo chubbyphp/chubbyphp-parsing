@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing;
 
+/**
+ * @phpstan-type ApiProblem array{name: string, reason: string, details: non-empty-array<string, mixed>}
+ */
 final class ParserErrorException extends \RuntimeException
 {
     private array $errors = [];
@@ -58,6 +61,9 @@ final class ParserErrorException extends \RuntimeException
         return 0 !== \count($this->errors);
     }
 
+    /**
+     * @return array<ApiProblem>
+     */
     public function getApiProblemErrorMessages(): array
     {
         return $this->flatErrorsToApiProblemMessages($this->errors);
@@ -93,8 +99,12 @@ final class ParserErrorException extends \RuntimeException
         return $mergedErrors;
     }
 
+    /**
+     * @return array<ApiProblem>
+     */
     private function flatErrorsToApiProblemMessages(array $errors, string $path = ''): array
     {
+        /** @var array<ApiProblem> */
         $errorsToApiProblemMessages = [];
 
         foreach ($errors as $key => $error) {
