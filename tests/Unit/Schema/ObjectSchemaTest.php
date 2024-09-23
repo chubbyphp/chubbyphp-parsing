@@ -45,6 +45,7 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
 
         self::assertNotSame($schema, $schema->strict());
+        self::assertNotSame($schema, $schema->optional([]));
     }
 
     public function testConstructWithoutFieldName(): void
@@ -136,6 +137,23 @@ final class ObjectSchemaTest extends AbstractTestCase
         $input->field2 = 1;
 
         $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(\stdClass::class, $output);
+
+        self::assertSame((array) $input, (array) $output);
+    }
+
+    public function testParseSuccessWithOptional(): void
+    {
+        $input = ['field2' => 'test', 'field3' => null];
+
+        $schema = (new ObjectSchema([
+            'field1' => new StringSchema(),
+            'field2' => new StringSchema(),
+            'field3' => (new StringSchema())->nullable(),
+        ]))->optional(['field1', 'field3']);
 
         $output = $schema->parse($input);
 
@@ -261,6 +279,26 @@ final class ObjectSchemaTest extends AbstractTestCase
                     ],
                 ],
             ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseFailedWithOptionalButStillNotProvidedEnoughFields(): void
+    {
+        try {
+            $schema = (new ObjectSchema([
+                'field1' => new StringSchema(),
+                'field2' => new StringSchema(),
+                'field3' => new StringSchema(),
+            ]))->optional(['field1']);
+
+            $schema->parse(['field2' => 'test']);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame(
+                'field3: Type should be "string", "NULL" given',
+                $parserErrorException->getMessage()
+            );
         }
     }
 

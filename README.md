@@ -273,6 +273,9 @@ $data = $schema->parse(['name' => 'example']);
 // SampleClass object
 $data = $schema->parse(['name' => 'example'], SampleNamespace\SampleClass::class);
 
+// if the key 'name' does not exist on input, if won't exists on the output
+$schema->optional(['name']);
+
 // validations
 $schema->strict();
 
