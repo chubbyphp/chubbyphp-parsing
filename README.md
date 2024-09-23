@@ -275,6 +275,7 @@ $data = $schema->parse(['name' => 'example'], SampleNamespace\SampleClass::class
 
 // validations
 $schema->strict();
+$schema->strict(['_id']); // strip _id if given, but complain about any other additional field
 
 // transformations
 
