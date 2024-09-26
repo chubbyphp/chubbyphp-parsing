@@ -26,6 +26,11 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     private ?array $strict = null;
 
     /**
+     * @var null|array<string>
+     */
+    private ?array $optional = null;
+
+    /**
      * @param array<string, SchemaInterface> $fieldNameToSchema
      * @param class-string                   $classname
      */
@@ -112,6 +117,18 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     }
 
     /**
+     * @param array<string> $optional
+     */
+    public function optional(array $optional = []): static
+    {
+        $clone = clone $this;
+
+        $clone->optional = $optional;
+
+        return $clone;
+    }
+
+    /**
      * @param array<string> $strict
      */
     public function strict(array $strict = []): static
@@ -150,6 +167,14 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     {
         foreach ($this->fieldNameToSchema as $fieldName => $fieldSchema) {
             try {
+                if (
+                    !\array_key_exists($fieldName, $input)
+                    && \is_array($this->optional)
+                    && \in_array($fieldName, $this->optional, true)
+                ) {
+                    continue;
+                }
+
                 $object->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
             } catch (ParserErrorException $childParserErrorException) {
                 $childrenParserErrorException->addParserErrorException($childParserErrorException, $fieldName);

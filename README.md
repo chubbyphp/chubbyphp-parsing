@@ -35,7 +35,7 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-parsing "^1.1"
+composer require chubbyphp/chubbyphp-parsing "^1.2"
 ```
 
 ## Usage
@@ -272,6 +272,9 @@ $data = $schema->parse(['name' => 'example']);
 
 // SampleClass object
 $data = $schema->parse(['name' => 'example'], SampleNamespace\SampleClass::class);
+
+// if the key 'name' does not exist on input, it won't exists on the output
+$schema->optional(['name']);
 
 // validations
 $schema->strict();
