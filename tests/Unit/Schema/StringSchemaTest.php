@@ -8,6 +8,9 @@ use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\StringSchema
@@ -23,9 +26,9 @@ final class StringSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->nullable(false));
         self::assertNotSame($schema, $schema->default(42));
-        self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
-        self::assertNotSame($schema, $schema->postParse(static fn (string $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (string $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->preParse(static fn(mixed $input) => $input));
+        self::assertNotSame($schema, $schema->postParse(static fn(string $output) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn(string $output, ParserErrorException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -80,7 +83,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '1';
 
-        $schema = (new StringSchema())->preParse(static fn () => $input);
+        $schema = (new StringSchema())->preParse(static fn() => $input);
 
         self::assertSame($input, $schema->parse(null));
     }
@@ -89,7 +92,7 @@ final class StringSchemaTest extends AbstractTestCase
     {
         $input = '1';
 
-        $schema = (new StringSchema())->postParse(static fn (string $output) => (int) $output);
+        $schema = (new StringSchema())->postParse(static fn(string $output) => (int) $output);
 
         self::assertSame((int) $input, $schema->parse($input));
     }
@@ -110,8 +113,7 @@ final class StringSchemaTest extends AbstractTestCase
                 ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
 
                 return 'catched';
-            })
-        ;
+            });
 
         self::assertSame('catched', $schema->parse(null));
     }
@@ -578,6 +580,64 @@ final class StringSchemaTest extends AbstractTestCase
         }
     }
 
+    public function testParseWithValidNotBlank(): void
+    {
+        $input = 'test';
+
+        $schema = (new StringSchema())->notBlank();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    #[DataProvider('invalidNotBlankProvider')]
+    public function testParseWithInvalidNotBlamk(string $invalidInput): void
+    {
+        $schema = (new StringSchema())->notBlank();
+
+        try {
+            $schema->parse($invalidInput);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.notBlank',
+                    'template' => 'string cannot be blank',
+                    'variables' => [],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
+    public function testParseWithValidNotEmpty(): void
+    {
+        $input = 'test';
+
+        $schema = (new StringSchema())->notEmpty();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidNotEmpty(): void
+    {
+        $input = '';
+        $schema = (new StringSchema())->notEmpty();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ParserErrorException $parserErrorException) {
+            self::assertSame([
+                [
+                    'code' => 'string.notEmpty',
+                    'template' => 'string cannot be empty',
+                    'variables' => [],
+                ],
+            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+        }
+    }
+
     public function testParseWithTrim(): void
     {
         $input = '   test ';
@@ -807,5 +867,20 @@ final class StringSchemaTest extends AbstractTestCase
         $schema = (new StringSchema())->nullable()->toInt();
 
         self::assertNull($schema->parse(null));
+    }
+
+    public static function invalidNotBlankProvider(): array
+    {
+        return [
+            [''],
+            [' '],
+            ['  '],
+            ["\n"],
+            ["\r"],
+            ["\t"],
+            ["\x0B"],
+            ["\x0C"],
+            [" \t\n \x0C"]
+        ];
     }
 }
