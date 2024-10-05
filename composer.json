@@ -31,9 +31,6 @@
     "Suggests": {
         "respect/validation": "^2.3"
     },
-    "conflict": {
-        "respect/validation": "<2.3|| >=3.0"
-    },
     "autoload": {
         "psr-4": {
             "Chubbyphp\\Parsing\\": "src/"
