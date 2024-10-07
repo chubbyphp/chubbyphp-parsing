@@ -29,8 +29,8 @@
         "phpunit/phpunit": "^10.4.2",
         "respect/validation": "^2.3"
     },
-    "conflict": {
-        "respect/validation": "<2.3|| >=3.0"
+    "suggest": {
+        "respect/validation": "If your interested in using the respect/validation, please install it with ^2.3"
     },
     "autoload": {
         "psr-4": {
