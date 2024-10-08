@@ -54,8 +54,16 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const ERROR_DATETIME_CODE = 'string.datetime';
     public const ERROR_DATETIME_TEMPLATE = 'Cannot convert {{given}} to datetime';
 
+    public const ERROR_NOT_BLANK_CODE = 'string.notBlank';
+    public const ERROR_NOT_BLANK_TEMPLATE = 'string cannot be blank';
+
+    public const ERROR_NOT_EMPTY_CODE = 'string.notEmpty';
+    public const ERROR_NOT_EMPTY_TEMPLATE = 'string cannot be empty';
+
     private const UUID_V4_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
     private const UUID_V5_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
+
+    private const NOT_BLANK_PATTERN = '/^[\\s]*$/';
 
     public function parse(mixed $input): mixed
     {
@@ -317,29 +325,61 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
+    public function notBlank(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::NOT_BLANK_PATTERN, $string)) {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_NOT_BLANK_CODE,
+                        self::ERROR_NOT_BLANK_TEMPLATE,
+                        []
+                    )
+                );
+            }
+            return $string;
+        });
+    }
+
+    public function notEmpty(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if ($string === "") {
+                throw new ParserErrorException(
+                    new Error(
+                        self::ERROR_NOT_EMPTY_CODE,
+                        self::ERROR_NOT_EMPTY_TEMPLATE,
+                        []
+                    )
+                );
+            }
+            return $string;
+        });
+    }
+
     public function trim(): static
     {
-        return $this->postParse(static fn (string $string) => trim($string));
+        return $this->postParse(static fn(string $string) => trim($string));
     }
 
     public function trimStart(): static
     {
-        return $this->postParse(static fn (string $string) => ltrim($string));
+        return $this->postParse(static fn(string $string) => ltrim($string));
     }
 
     public function trimEnd(): static
     {
-        return $this->postParse(static fn (string $string) => rtrim($string));
+        return $this->postParse(static fn(string $string) => rtrim($string));
     }
 
     public function toLowerCase(): static
     {
-        return $this->postParse(static fn (string $string) => strtolower($string));
+        return $this->postParse(static fn(string $string) => strtolower($string));
     }
 
     public function toUpperCase(): static
     {
-        return $this->postParse(static fn (string $string) => strtoupper($string));
+        return $this->postParse(static fn(string $string) => strtoupper($string));
     }
 
     public function toDateTime(): DateTimeSchema

@@ -336,6 +336,8 @@ $schema->includes('amp');
 $schema->startsWith('exa');
 $schema->endsWith('mpl');
 $schema->match('/^[a-z]+$/i');
+$schema->notBlank(); // string cannot be "" or composed only of white space characters
+$schema->notEmpty(); // string cannot be ""
 $schema->email();
 $schema->ipV4();
 $schema->ipV6();
