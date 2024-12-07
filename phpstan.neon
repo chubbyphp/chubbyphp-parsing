@@ -3,3 +3,18 @@ parameters:
         -
             message: '/type specified in iterable type array/'
             path: %currentWorkingDirectory%/src/ParserErrorException.php
+        -
+            message: '/Instanceof between Chubbyphp\\Parsing\\Schema\\ObjectSchemaInterface and Chubbyphp\\Parsing\\Schema\\ObjectSchemaInterface will always evaluate to true./'
+            path: %currentWorkingDirectory%/src/Schema/DiscriminatedUnionSchema.php
+        -
+            message: '/Call to function is_string\(\) with string will always evaluate to true./'
+            path: %currentWorkingDirectory%/src/Schema/ObjectSchema.php
+        -
+            message: '/Instanceof between Chubbyphp\\Parsing\\Schema\\SchemaInterface and Chubbyphp\\Parsing\\Schema\\SchemaInterface will always evaluate to true./'
+            path: %currentWorkingDirectory%/src/Schema/ObjectSchema.php
+        -
+            message: '/Instanceof between Chubbyphp\\Parsing\\Schema\\SchemaInterface and Chubbyphp\\Parsing\\Schema\\SchemaInterface will always evaluate to true./'
+            path: %currentWorkingDirectory%/src/Schema/TupleSchema.php
+        -
+            message: '/Instanceof between Chubbyphp\\Parsing\\Schema\\SchemaInterface and Chubbyphp\\Parsing\\Schema\\SchemaInterface will always evaluate to true./'
+            path: %currentWorkingDirectory%/src/Schema/UnionSchema.php
