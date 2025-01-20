@@ -354,6 +354,9 @@ $schema->toUpperCase();
 $schema->toDateTime();
 $schema->toFloat();
 $schema->toInt();
+
+// examples
+$notBlankSchema = $schema->trim()->minSize(1);
 ```
 
 ### tuple
