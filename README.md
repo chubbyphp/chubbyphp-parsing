@@ -303,7 +303,7 @@ $data = $schema->parse([
 ### respectValidation
 
 ```sh
-composer require respect/validation "^2.3"
+composer require respect/validation "^2.4"
 ```
 
 ```php
