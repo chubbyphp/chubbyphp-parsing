@@ -265,16 +265,21 @@ use Chubbyphp\Parsing\Parser;
 
 $p = new Parser();
 
+// stdClass example
 $schema = $p->object(['name' => $p->string()]);
+$object = $schema->parse(['name' => 'example']);
 
-// create a new schema based on a existing once
-$schema2 = $p->object([...$schema->getFieldToSchema(), 'value' => $p->string()]);
+// SampleNamespace\SampleClass example
+$schema = $p->object(['name' => $p->string()], SampleNamespace\SampleClass::class);
+$object = $schema->parse(['name' => 'example']);
 
-// stdClass object
-$data = $schema->parse(['name' => 'example']);
+// getFieldToSchema
+$schema = $p->object(['name' => $p->string()]);
+$extendedSchema = $p->object([...$schema->getFieldToSchema(), 'value' => $p->string()]);
 
-// SampleClass object
-$data = $schema->parse(['name' => 'example'], SampleNamespace\SampleClass::class);
+// getFieldSchema
+$schema = $p->object(['name' => $p->string()]);
+$nameSchema = $schema->getFieldSchema('name');
 
 // if the key 'name' does not exist on input, it won't exists on the output
 $schema->optional(['name']);
