@@ -35,7 +35,7 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-parsing "^1.3"
+composer require chubbyphp/chubbyphp-parsing "^1.4"
 ```
 
 ## Usage
@@ -266,6 +266,9 @@ use Chubbyphp\Parsing\Parser;
 $p = new Parser();
 
 $schema = $p->object(['name' => $p->string()]);
+
+// create a new schema based on a existing once
+$schema2 = $p->object([...$schema->getFieldToSchema(), 'value' => $p->string()]);
 
 // stdClass object
 $data = $schema->parse(['name' => 'example']);

@@ -18,7 +18,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     /**
      * @var array<string, SchemaInterface>
      */
-    private array $fieldNameToSchema;
+    private array $fieldToSchema;
 
     /**
      * @var null|array<string>
@@ -31,16 +31,16 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     private ?array $optional = null;
 
     /**
-     * @param array<string, SchemaInterface> $fieldNameToSchema
+     * @param array<string, SchemaInterface> $fieldToSchema
      * @param class-string                   $classname
      */
-    public function __construct(array $fieldNameToSchema, private string $classname = \stdClass::class)
+    public function __construct(array $fieldToSchema, private string $classname = \stdClass::class)
     {
-        foreach ($fieldNameToSchema as $fieldName => $fieldSchema) {
+        foreach ($fieldToSchema as $fieldName => $fieldSchema) {
             if (!\is_string($fieldName)) {
                 throw new \InvalidArgumentException(
                     \sprintf(
-                        'Argument #1 name #%s ($fieldNameToSchema) must be of type string, %s given',
+                        'Argument #1 name #%s ($fieldToSchema) must be of type string, %s given',
                         $fieldName,
                         $this->getDataType($fieldName)
                     )
@@ -50,7 +50,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             if (!$fieldSchema instanceof SchemaInterface) {
                 throw new \InvalidArgumentException(
                     \sprintf(
-                        'Argument #1 value of #%s ($fieldNameToSchema) must be of type %s, %s given',
+                        'Argument #1 value of #%s ($fieldToSchema) must be of type %s, %s given',
                         $fieldName,
                         SchemaInterface::class,
                         $this->getDataType($fieldSchema)
@@ -59,7 +59,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             }
         }
 
-        $this->fieldNameToSchema = $fieldNameToSchema;
+        $this->fieldToSchema = $fieldToSchema;
     }
 
     public function parse(mixed $input): mixed
@@ -111,9 +111,17 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
         }
     }
 
-    public function getFieldSchema(string $fieldName): ?SchemaInterface
+    /**
+     * @return array<string, SchemaInterface>
+     */
+    public function getFieldToSchema(): array
     {
-        return $this->fieldNameToSchema[$fieldName] ?? null;
+        return $this->fieldToSchema;
+    }
+
+    public function getFieldSchema(string $field): ?SchemaInterface
+    {
+        return $this->fieldToSchema[$field] ?? null;
     }
 
     /**
@@ -150,7 +158,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
         }
 
         foreach (array_keys($input) as $fieldName) {
-            if (!\in_array($fieldName, $this->strict, true) && !isset($this->fieldNameToSchema[$fieldName])) {
+            if (!\in_array($fieldName, $this->strict, true) && !isset($this->fieldToSchema[$fieldName])) {
                 $childrenParserErrorException->addError(new Error(
                     self::ERROR_UNKNOWN_FIELD_CODE,
                     self::ERROR_UNKNOWN_FIELD_TEMPLATE,
@@ -165,7 +173,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
      */
     private function parseFields(array $input, object $object, ParserErrorException $childrenParserErrorException): void
     {
-        foreach ($this->fieldNameToSchema as $fieldName => $fieldSchema) {
+        foreach ($this->fieldToSchema as $fieldName => $fieldSchema) {
             try {
                 if (
                     !\array_key_exists($fieldName, $input)
