@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
@@ -56,7 +57,7 @@ final class ObjectSchemaTest extends AbstractTestCase
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
             self::assertSame(
-                'Argument #1 name #0 ($fieldNameToSchema) must be of type string, integer given',
+                'Argument #1 name #0 ($fieldToSchema) must be of type string, integer given',
                 $invalidArgumentException->getMessage()
             );
         }
@@ -70,7 +71,7 @@ final class ObjectSchemaTest extends AbstractTestCase
             throw new \Exception('code should not be reached');
         } catch (\InvalidArgumentException $invalidArgumentException) {
             self::assertSame(
-                'Argument #1 value of #field2 ($fieldNameToSchema) must be of type Chubbyphp\Parsing\Schema\SchemaInterface, string given',
+                'Argument #1 value of #field2 ($fieldToSchema) must be of type Chubbyphp\Parsing\Schema\SchemaInterface, string given',
                 $invalidArgumentException->getMessage()
             );
         }
@@ -368,6 +369,21 @@ final class ObjectSchemaTest extends AbstractTestCase
                 ],
             ],
         ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+    }
+
+    public function testGetFieldToSchema(): void
+    {
+        $fieldToSchema = ['field1' => new StringSchema(), 'field2' => new IntSchema()];
+
+        $schema = new ObjectSchema($fieldToSchema);
+
+        self::assertSame($fieldToSchema, $schema->getFieldToSchema());
+
+        $fieldToSchema2 = [...$schema->getFieldToSchema(), 'field3' => new BoolSchema()];
+
+        $schema2 = new ObjectSchema($fieldToSchema2);
+
+        self::assertSame($fieldToSchema2, $schema2->getFieldToSchema());
     }
 
     public function testGetFieldSchemaSuccess(): void
