@@ -11,7 +11,7 @@ final class ParserErrorException extends \RuntimeException
 {
     private array $errors = [];
 
-    public function __construct(?Error $error = null, null|int|string $key = null)
+    public function __construct(?Error $error = null, int|string|null $key = null)
     {
         $this->message = new ParserErrorExceptionToString($this);
 
@@ -25,7 +25,7 @@ final class ParserErrorException extends \RuntimeException
         return self::class;
     }
 
-    public function addParserErrorException(self $parserErrorException, null|int|string $key = null): self
+    public function addParserErrorException(self $parserErrorException, int|string|null $key = null): self
     {
         if (null !== $key) {
             $this->errors = $this->mergeErrors([$key => $parserErrorException->getErrors()], $this->errors);
@@ -38,7 +38,7 @@ final class ParserErrorException extends \RuntimeException
         return $this;
     }
 
-    public function addError(Error $error, null|int|string $key = null): self
+    public function addError(Error $error, int|string|null $key = null): self
     {
         if (null !== $key) {
             $this->errors = $this->mergeErrors([$key => [$error]], $this->errors);
