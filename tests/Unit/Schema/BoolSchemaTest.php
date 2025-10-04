@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\BoolSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -14,7 +14,7 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  *
  * @internal
  */
-final class BoolSchemaTest extends AbstractTestCase
+final class BoolSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -25,7 +25,7 @@ final class BoolSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default(true));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (bool $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (bool $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (bool $output, ErrorsException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -63,16 +63,19 @@ final class BoolSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'bool.type',
-                    'template' => 'Type should be "bool", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'bool.type',
+                        'template' => 'Type should be "bool", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -98,17 +101,20 @@ final class BoolSchemaTest extends AbstractTestCase
     {
         $schema = (new BoolSchema())
 
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
                 self::assertSame([
                     [
-                        'code' => 'bool.type',
-                        'template' => 'Type should be "bool", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'bool.type',
+                            'template' => 'Type should be "bool", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -132,13 +138,16 @@ final class BoolSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'bool.type',
-                'template' => 'Type should be "bool", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'bool.type',
+                    'template' => 'Type should be "bool", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 
     public function testParseWithToFloat(): void

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class FloatSchema extends AbstractSchema implements SchemaInterface
 {
@@ -37,7 +37,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
             }
 
             if (!\is_float($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -47,12 +47,12 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
             }
 
             return $this->dispatchPostParses($input);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 
@@ -60,7 +60,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (float $float) use ($gt) {
             if ($float <= $gt) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_GT_CODE,
                         self::ERROR_GT_TEMPLATE,
@@ -77,7 +77,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (float $float) use ($gte) {
             if ($float < $gte) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_GTE_CODE,
                         self::ERROR_GTE_TEMPLATE,
@@ -94,7 +94,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (float $float) use ($lt) {
             if ($float >= $lt) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_LT_CODE,
                         self::ERROR_LT_TEMPLATE,
@@ -111,7 +111,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (float $float) use ($lte) {
             if ($float > $lte) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_LTE_CODE,
                         self::ERROR_LTE_TEMPLATE,
@@ -157,7 +157,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
             $intInput = (int) $input;
 
             if ((float) $intInput !== $input) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_INT_CODE,
                         self::ERROR_INT_TEMPLATE,

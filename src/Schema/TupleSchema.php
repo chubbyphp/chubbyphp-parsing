@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Errors;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class TupleSchema extends AbstractSchema implements SchemaInterface
 {
@@ -57,7 +58,7 @@ final class TupleSchema extends AbstractSchema implements SchemaInterface
             }
 
             if (!\is_array($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -66,25 +67,25 @@ final class TupleSchema extends AbstractSchema implements SchemaInterface
                 );
             }
 
-            $childrenParserErrorException = new ParserErrorException();
+            $childrenErrors = new Errors();
 
             $output = [];
 
             foreach ($this->schemas as $i => $schema) {
                 if (!isset($input[$i])) {
-                    $childrenParserErrorException->addError(new Error(
+                    $childrenErrors->add(new Error(
                         self::ERROR_MISSING_INDEX_CODE,
                         self::ERROR_MISSING_INDEX_TEMPLATE,
                         ['index' => $i]
-                    ), $i);
+                    ), (string) $i);
 
                     continue;
                 }
 
                 try {
                     $output[$i] = $schema->parse($input[$i]);
-                } catch (ParserErrorException $childParserErrorException) {
-                    $childrenParserErrorException->addParserErrorException($childParserErrorException, $i);
+                } catch (ErrorsException $e) {
+                    $childrenErrors->add($e->errors, (string) $i);
                 }
             }
 
@@ -92,24 +93,24 @@ final class TupleSchema extends AbstractSchema implements SchemaInterface
             $schemaCount = \count($this->schemas);
 
             for ($i = $schemaCount; $i < $inputCount; ++$i) {
-                $childrenParserErrorException->addError(new Error(
+                $childrenErrors->add(new Error(
                     self::ERROR_ADDITIONAL_INDEX_CODE,
                     self::ERROR_ADDITIONAL_INDEX_TEMPLATE,
                     ['index' => $i]
-                ), $i);
+                ), (string) $i);
             }
 
-            if ($childrenParserErrorException->hasError()) {
-                throw $childrenParserErrorException;
+            if ($childrenErrors->has()) {
+                throw new ErrorsException($childrenErrors);
             }
 
             return $this->dispatchPostParses($output);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 }

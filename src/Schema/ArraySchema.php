@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Errors;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class ArraySchema extends AbstractSchema implements SchemaInterface
 {
@@ -36,7 +37,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
             }
 
             if (!\is_array($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -47,27 +48,27 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
 
             $array = [];
 
-            $childrenParserErrorException = new ParserErrorException();
+            $childrenErrors = new Errors();
 
             foreach ($input as $i => $item) {
                 try {
                     $array[$i] = $this->itemSchema->parse($item);
-                } catch (ParserErrorException $childParserErrorException) {
-                    $childrenParserErrorException->addParserErrorException($childParserErrorException, $i);
+                } catch (ErrorsException $e) {
+                    $childrenErrors->add($e->errors, (string) $i);
                 }
             }
 
-            if ($childrenParserErrorException->hasError()) {
-                throw $childrenParserErrorException;
+            if ($childrenErrors->has()) {
+                throw new ErrorsException($childrenErrors);
             }
 
             return $this->dispatchPostParses($array);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 
@@ -77,7 +78,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
             $arrayLength = \count($array);
 
             if ($arrayLength !== $length) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_LENGTH_CODE,
                         self::ERROR_LENGTH_TEMPLATE,
@@ -96,7 +97,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
             $arrayLength = \count($array);
 
             if ($arrayLength < $minLength) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_MIN_LENGTH_CODE,
                         self::ERROR_MIN_LENGTH_TEMPLATE,
@@ -115,7 +116,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
             $arrayLength = \count($array);
 
             if ($arrayLength > $maxLength) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_MAX_LENGTH_CODE,
                         self::ERROR_MAX_LENGTH_TEMPLATE,
@@ -132,7 +133,7 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (array $array) use ($includes, $strict) {
             if (!\in_array($includes, $array, $strict)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_INCLUDES_CODE,
                         self::ERROR_INCLUDES_TEMPLATE,

@@ -35,12 +35,13 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-parsing "^1.4"
+composer require chubbyphp/chubbyphp-parsing "^2.0"
 ```
 
 ## Usage
 
 ```php
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
 
 /** @var SchemaInterface $schema */
@@ -51,7 +52,13 @@ $schema->preParse(static fn ($input) => $input);
 $schema->postParse(static fn (string $output) => $output);
 $schema->parse('test');
 $schema->safeParse('test');
-$schema->catch(static fn (string $output, ParserErrorException $e) => $output);
+$schema->catch(static fn (string $output, ErrorsException $e) => $output);
+
+try {
+    $schema->parse('test');
+} catch (ErrorsException $e)  {
+    var_dump($e->errors->toApiProblems());
+}
 ```
 
 ### array
@@ -391,8 +398,15 @@ $schema = $p->union([$p->string(), $p->int()]);
 $data = $schema->parse('42');
 ```
 
+## Migration
+
+ * [1.x to 2.x][10]
+
 ## Copyright
 
 2025 Dominik Zogg
 
 [1]: https://packagist.org/packages/chubbyphp/chubbyphp-parsing
+
+
+[10]: doc/Migration/1.x-2.x.md

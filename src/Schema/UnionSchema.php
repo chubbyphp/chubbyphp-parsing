@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Errors;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class UnionSchema extends AbstractSchema implements SchemaInterface
 {
@@ -46,27 +47,27 @@ final class UnionSchema extends AbstractSchema implements SchemaInterface
             $output = $this->parseSchemas($input);
 
             return $this->dispatchPostParses($output);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 
     private function parseSchemas(mixed $input): mixed
     {
-        $parserErrorException = new ParserErrorException();
+        $errors = new Errors();
 
         foreach ($this->schemas as $schema) {
             try {
                 return $schema->parse($input);
-            } catch (ParserErrorException $childParserErrorException) {
-                $parserErrorException->addParserErrorException($childParserErrorException);
+            } catch (ErrorsException $e) {
+                $errors->add($e->errors);
             }
         }
 
-        throw $parserErrorException;
+        throw new ErrorsException($errors);
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class IntSchema extends AbstractSchema implements SchemaInterface
 {
@@ -34,7 +34,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
             }
 
             if (!\is_int($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -44,12 +44,12 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
             }
 
             return $this->dispatchPostParses($input);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 
@@ -57,7 +57,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (int $int) use ($gt) {
             if ($int <= $gt) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_GT_CODE,
                         self::ERROR_GT_TEMPLATE,
@@ -74,7 +74,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (int $int) use ($gte) {
             if ($int < $gte) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_GTE_CODE,
                         self::ERROR_GTE_TEMPLATE,
@@ -91,7 +91,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (int $int) use ($lt) {
             if ($int >= $lt) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_LT_CODE,
                         self::ERROR_LT_TEMPLATE,
@@ -108,7 +108,7 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (int $int) use ($lte) {
             if ($int > $lte) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_LTE_CODE,
                         self::ERROR_LTE_TEMPLATE,

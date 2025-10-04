@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 final class DiscriminatedUnionDemo implements \JsonSerializable
 {
@@ -33,7 +33,7 @@ final class DiscriminatedUnionDemo implements \JsonSerializable
  *
  * @internal
  */
-final class DiscriminatedUnionSchemaTest extends AbstractTestCase
+final class DiscriminatedUnionSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -47,7 +47,7 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default([]));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (\stdClass $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ErrorsException $e) => $output));
     }
 
     public function testConstructWithoutObjectSchema(): void
@@ -197,16 +197,19 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'discriminatedUnion.type',
-                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'discriminatedUnion.type',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -223,16 +226,19 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'discriminatedUnion.discriminatorField',
-                    'template' => 'Input does not contain the discriminator field {{discriminatorFieldName}}',
-                    'variables' => [
-                        'discriminatorFieldName' => 'field1',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'discriminatedUnion.discriminatorField',
+                        'template' => 'Input does not contain the discriminator field {{discriminatorFieldName}}',
+                        'variables' => [
+                            'discriminatorFieldName' => 'field1',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -249,25 +255,31 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'literal.equals',
-                    'template' => 'Input should be {{expected}}, {{given}} given',
-                    'variables' => [
-                        'expected' => 'type1',
-                        'given' => 'type3',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'literal.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => 'type1',
+                            'given' => 'type3',
+                        ],
                     ],
                 ],
-                1 => [
-                    'code' => 'literal.equals',
-                    'template' => 'Input should be {{expected}}, {{given}} given',
-                    'variables' => [
-                        'expected' => 'type2',
-                        'given' => 'type3',
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'literal.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => 'type2',
+                            'given' => 'type3',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -305,17 +317,20 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
             new ObjectSchema(['field1' => new LiteralSchema('type1')]),
             new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1'))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
                 self::assertSame([
                     [
-                        'code' => 'discriminatedUnion.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'discriminatedUnion.type',
+                            'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -345,12 +360,15 @@ final class DiscriminatedUnionSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'discriminatedUnion.type',
-                'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'discriminatedUnion.type',
+                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 }

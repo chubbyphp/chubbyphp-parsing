@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Error;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Result;
 use PHPUnit\Framework\TestCase;
 
@@ -28,7 +29,7 @@ final class ResultTest extends TestCase
 
     public function testException(): void
     {
-        $exception = new ParserErrorException();
+        $exception = new ErrorsException(new Error('code', 'template', ['key' => 'value']));
 
         $result = new Result(null, $exception);
 
