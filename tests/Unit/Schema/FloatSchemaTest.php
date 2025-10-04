@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\FloatSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -14,7 +14,7 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  *
  * @internal
  */
-final class FloatSchemaTest extends AbstractTestCase
+final class FloatSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -25,7 +25,7 @@ final class FloatSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default(4.2));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (float $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (float $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (float $output, ErrorsException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -63,16 +63,19 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.type',
-                    'template' => 'Type should be "float", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.type',
+                        'template' => 'Type should be "float", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -98,17 +101,20 @@ final class FloatSchemaTest extends AbstractTestCase
     {
         $schema = (new FloatSchema())
 
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
                 self::assertSame([
                     [
-                        'code' => 'float.type',
-                        'template' => 'Type should be "float", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'float.type',
+                            'template' => 'Type should be "float", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -132,13 +138,16 @@ final class FloatSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'float.type',
-                'template' => 'Type should be "float", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'float.type',
+                    'template' => 'Type should be "float", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 
     public function testParseWithValidGt(): void
@@ -162,17 +171,23 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
                 [
-                    'code' => 'float.gt',
-                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
-                    'variables' => [
-                        'gt' => $gt,
-                        'given' => $input,
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'float.gt',
+                            'template' => 'Value should be greater than {{gt}}, {{given}} given',
+                            'variables' => [
+                                'gt' => $gt,
+                                'given' => $input,
+                            ],
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                $errorsException->errors->jsonSerialize()
+            );
         }
     }
 
@@ -187,17 +202,23 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
                 [
-                    'code' => 'float.gt',
-                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
-                    'variables' => [
-                        'gt' => $gt,
-                        'given' => $input,
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'float.gt',
+                            'template' => 'Value should be greater than {{gt}}, {{given}} given',
+                            'variables' => [
+                                'gt' => $gt,
+                                'given' => $input,
+                            ],
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                $errorsException->errors->jsonSerialize()
+            );
         }
     }
 
@@ -222,17 +243,20 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.gte',
-                    'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
-                    'variables' => [
-                        'gte' => $gte,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.gte',
+                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                        'variables' => [
+                            'gte' => $gte,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -257,17 +281,20 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.lt',
-                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
-                    'variables' => [
-                        'lt' => $lt,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.lt',
+                        'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                        'variables' => [
+                            'lt' => $lt,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -282,17 +309,20 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.lt',
-                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
-                    'variables' => [
-                        'lt' => $lt,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.lt',
+                        'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                        'variables' => [
+                            'lt' => $lt,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -317,17 +347,20 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.lte',
-                    'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
-                    'variables' => [
-                        'lte' => $lte,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.lte',
+                        'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
+                        'variables' => [
+                            'lte' => $lte,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -350,17 +383,20 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.gt',
-                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
-                    'variables' => [
-                        'gt' => 0,
-                        'given' => 0,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.gt',
+                        'template' => 'Value should be greater than {{gt}}, {{given}} given',
+                        'variables' => [
+                            'gt' => 0,
+                            'given' => 0,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -383,17 +419,20 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.gte',
-                    'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
-                    'variables' => [
-                        'gte' => 0,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.gte',
+                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                        'variables' => [
+                            'gte' => 0,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -416,17 +455,20 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.lt',
-                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
-                    'variables' => [
-                        'lt' => 0,
-                        'given' => 0,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.lt',
+                        'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                        'variables' => [
+                            'lt' => 0,
+                            'given' => 0,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -449,17 +491,20 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.lte',
-                    'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
-                    'variables' => [
-                        'lte' => 0,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.lte',
+                        'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
+                        'variables' => [
+                            'lte' => 0,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -489,16 +534,19 @@ final class FloatSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'float.int',
-                    'template' => 'Cannot convert {{given}} to int',
-                    'variables' => [
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.int',
+                        'template' => 'Cannot convert {{given}} to int',
+                        'variables' => [
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 

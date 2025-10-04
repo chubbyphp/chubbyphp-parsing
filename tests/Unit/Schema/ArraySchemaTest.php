@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -17,7 +17,7 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  *
  * @internal
  */
-final class ArraySchemaTest extends AbstractTestCase
+final class ArraySchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -28,7 +28,7 @@ final class ArraySchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default(['test']));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (array $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (array $output, ErrorsException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -66,18 +66,21 @@ final class ArraySchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame(
                 [
                     [
-                        'code' => 'array.type',
-                        'template' => 'Type should be "array", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.type',
+                            'template' => 'Type should be "array", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
                 ],
-                $this->errorsToSimpleArray($parserErrorException->getErrors())
+                $errorsException->errors->jsonSerialize()
             );
         }
     }
@@ -92,10 +95,11 @@ final class ArraySchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
-                1 => [
-                    [
+                [
+                    'path' => '1',
+                    'error' => [
                         'code' => 'string.type',
                         'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
@@ -103,8 +107,10 @@ final class ArraySchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-                2 => [
-                    [
+
+                [
+                    'path' => '2',
+                    'error' => [
                         'code' => 'string.type',
                         'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
@@ -112,7 +118,7 @@ final class ArraySchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -139,20 +145,23 @@ final class ArraySchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new ArraySchema(new StringSchema()))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
 
                 self::assertSame(
                     [
                         [
-                            'code' => 'array.type',
-                            'template' => 'Type should be "array", {{given}} given',
-                            'variables' => [
-                                'given' => 'NULL',
+                            'path' => '',
+                            'error' => [
+                                'code' => 'array.type',
+                                'template' => 'Type should be "array", {{given}} given',
+                                'variables' => [
+                                    'given' => 'NULL',
+                                ],
                             ],
                         ],
                     ],
-                    $this->errorsToSimpleArray($parserErrorException->getErrors())
+                    $errorsException->errors->jsonSerialize()
                 );
 
                 return 'catched';
@@ -178,14 +187,17 @@ final class ArraySchemaTest extends AbstractTestCase
         self::assertSame(
             [
                 [
-                    'code' => 'array.type',
-                    'template' => 'Type should be "array", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.type',
+                        'template' => 'Type should be "array", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
             ],
-            $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors())
+            $schema->safeParse(null)->exception->errors->jsonSerialize()
         );
     }
 
@@ -208,17 +220,20 @@ final class ArraySchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'array.length',
-                    'template' => 'Length {{length}}, {{given}} given',
-                    'variables' => [
-                        'length' => 5,
-                        'given' => \count($input),
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.length',
+                        'template' => 'Length {{length}}, {{given}} given',
+                        'variables' => [
+                            'length' => 5,
+                            'given' => \count($input),
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -241,17 +256,20 @@ final class ArraySchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'array.minLength',
-                    'template' => 'Min length {{min}}, {{given}} given',
-                    'variables' => [
-                        'minLength' => 5,
-                        'given' => \count($input),
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.minLength',
+                        'template' => 'Min length {{min}}, {{given}} given',
+                        'variables' => [
+                            'minLength' => 5,
+                            'given' => \count($input),
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -274,17 +292,20 @@ final class ArraySchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'array.maxLength',
-                    'template' => 'Max length {{max}}, {{given}} given',
-                    'variables' => [
-                        'maxLength' => 3,
-                        'given' => \count($input),
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.maxLength',
+                        'template' => 'Max length {{max}}, {{given}} given',
+                        'variables' => [
+                            'maxLength' => 3,
+                            'given' => \count($input),
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -329,17 +350,23 @@ final class ArraySchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
                 [
-                    'code' => 'array.includes',
-                    'template' => '{{given}} does not include {{includes}}',
-                    'variables' => [
-                        'includes' => json_decode(json_encode($dateTime2Equal), true),
-                        'given' => json_decode(json_encode($input), true),
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.includes',
+                            'template' => '{{given}} does not include {{includes}}',
+                            'variables' => [
+                                'includes' => json_decode(json_encode($dateTime2Equal), true),
+                                'given' => json_decode(json_encode($input), true),
+                            ],
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                $errorsException->errors->jsonSerialize()
+            );
         }
     }
 
@@ -357,17 +384,23 @@ final class ArraySchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
-            self::assertSame([
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
                 [
-                    'code' => 'array.includes',
-                    'template' => '{{given}} does not include {{includes}}',
-                    'variables' => [
-                        'includes' => json_decode(json_encode($dateTime3), true),
-                        'given' => json_decode(json_encode($input), true),
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.includes',
+                            'template' => '{{given}} does not include {{includes}}',
+                            'variables' => [
+                                'includes' => json_decode(json_encode($dateTime3), true),
+                                'given' => json_decode(json_encode($input), true),
+                            ],
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                $errorsException->errors->jsonSerialize()
+            );
         }
     }
 

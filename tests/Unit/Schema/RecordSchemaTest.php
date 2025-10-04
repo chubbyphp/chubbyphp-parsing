@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\RecordSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 final class RecordDemo implements \JsonSerializable
 {
@@ -29,7 +29,7 @@ final class RecordDemo implements \JsonSerializable
  *
  * @internal
  */
-final class RecordSchemaTest extends AbstractTestCase
+final class RecordSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -40,7 +40,7 @@ final class RecordSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default([]));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (array $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (array $output, ErrorsException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -117,16 +117,19 @@ final class RecordSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'record.type',
-                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'record.type',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -140,10 +143,11 @@ final class RecordSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
-                'field2' => [
-                    [
+                [
+                    'path' => 'field2',
+                    'error' => [
                         'code' => 'string.type',
                         'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
@@ -151,7 +155,7 @@ final class RecordSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -180,17 +184,21 @@ final class RecordSchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new RecordSchema(new StringSchema()))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
+
                 self::assertSame([
                     [
-                        'code' => 'record.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'record.type',
+                            'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -214,12 +222,15 @@ final class RecordSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'record.type',
-                'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'record.type',
+                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 }

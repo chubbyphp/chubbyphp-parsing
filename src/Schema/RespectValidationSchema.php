@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Errors;
+use Chubbyphp\Parsing\ErrorsException;
 use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Exceptions\ValidationException;
 use Respect\Validation\Validatable;
@@ -30,31 +31,31 @@ final class RespectValidationSchema extends AbstractSchema implements SchemaInte
             } catch (ValidationException $e) {
                 throw $this->convertException($e);
             }
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 
-    private function convertException(NestedValidationException|ValidationException $validationException): ParserErrorException
+    private function convertException(NestedValidationException|ValidationException $e): ErrorsException
     {
-        if ($validationException instanceof NestedValidationException) {
-            $parserErrorException = new ParserErrorException();
-            foreach ($validationException->getChildren() as $childValidationException) {
-                $parserErrorException->addParserErrorException($this->convertException($childValidationException));
+        if ($e instanceof NestedValidationException) {
+            $errors = new Errors();
+            foreach ($e->getChildren() as $child) {
+                $errors->add($this->convertException($child)->errors);
             }
 
-            return $parserErrorException;
+            return new ErrorsException($errors);
         }
 
-        return new ParserErrorException(
+        return new ErrorsException(
             new Error(
-                $validationException->getId(),
-                $validationException->getMessage(),
-                $validationException->getParams(),
+                $e->getId(),
+                $e->getMessage(),
+                $e->getParams(),
             )
         );
     }

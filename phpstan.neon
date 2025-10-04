@@ -1,9 +1,6 @@
 parameters:
     ignoreErrors:
         -
-            message: '/type specified in iterable type array/'
-            path: %currentWorkingDirectory%/src/ParserErrorException.php
-        -
             message: '/Instanceof between Chubbyphp\\Parsing\\Schema\\ObjectSchemaInterface and Chubbyphp\\Parsing\\Schema\\ObjectSchemaInterface will always evaluate to true./'
             path: %currentWorkingDirectory%/src/Schema/DiscriminatedUnionSchema.php
         -

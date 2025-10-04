@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class StringSchema extends AbstractSchema implements SchemaInterface
 {
@@ -67,7 +67,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             }
 
             if (!\is_string($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -77,12 +77,12 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             }
 
             return $this->dispatchPostParses($input);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 
@@ -92,7 +92,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             $stringLength = \strlen($string);
 
             if ($stringLength !== $length) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_LENGTH_CODE,
                         self::ERROR_LENGTH_TEMPLATE,
@@ -111,7 +111,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             $stringLength = \strlen($string);
 
             if ($stringLength < $minLength) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_MIN_LENGTH_CODE,
                         self::ERROR_MIN_LENGTH_TEMPLATE,
@@ -130,7 +130,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             $stringLength = \strlen($string);
 
             if ($stringLength > $maxLength) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_MAX_LENGTH_CODE,
                         self::ERROR_MAX_LENGTH_TEMPLATE,
@@ -147,7 +147,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) use ($includes) {
             if (!str_contains($string, $includes)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_INCLUDES_CODE,
                         self::ERROR_INCLUDES_TEMPLATE,
@@ -164,7 +164,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) use ($startsWith) {
             if (!str_starts_with($string, $startsWith)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_STARTSWITH_CODE,
                         self::ERROR_STARTSWITH_TEMPLATE,
@@ -181,7 +181,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) use ($endsWith) {
             if (!str_ends_with($string, $endsWith)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_ENDSWITH_CODE,
                         self::ERROR_ENDSWITH_TEMPLATE,
@@ -202,7 +202,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
         return $this->postParse(static function (string $string) use ($match) {
             if (0 === preg_match($match, $string)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_MATCH_CODE,
                         self::ERROR_MATCH_TEMPLATE,
@@ -219,7 +219,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) {
             if (!filter_var($string, FILTER_VALIDATE_EMAIL)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_EMAIL_CODE,
                         self::ERROR_EMAIL_TEMPLATE,
@@ -236,7 +236,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) {
             if (!filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_IP_CODE,
                         self::ERROR_IP_TEMPLATE,
@@ -253,7 +253,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) {
             if (!filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_IP_CODE,
                         self::ERROR_IP_TEMPLATE,
@@ -270,7 +270,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) {
             if (!filter_var($string, FILTER_VALIDATE_URL)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_URL_CODE,
                         self::ERROR_URL_TEMPLATE,
@@ -287,7 +287,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) {
             if (0 === preg_match(self::UUID_V4_PATTERN, $string)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_UUID_CODE,
                         self::ERROR_UUID_TEMPLATE,
@@ -304,7 +304,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (string $string) {
             if (0 === preg_match(self::UUID_V5_PATTERN, $string)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_UUID_CODE,
                         self::ERROR_UUID_TEMPLATE,
@@ -364,7 +364,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             } catch (\Exception) { // NOSONAR: supress the exception to throw a more specific one
             }
 
-            throw new ParserErrorException(
+            throw new ErrorsException(
                 new Error(
                     self::ERROR_DATETIME_CODE,
                     self::ERROR_DATETIME_TEMPLATE,
@@ -387,7 +387,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             $floatInput = (float) $input;
 
             if ((string) $floatInput !== $input) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_FLOAT_CODE,
                         self::ERROR_FLOAT_TEMPLATE,
@@ -413,7 +413,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
             $intInput = (int) $input;
 
             if ((string) $intInput !== $input) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_INT_CODE,
                         self::ERROR_INT_TEMPLATE,
