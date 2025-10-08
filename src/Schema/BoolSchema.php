@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class BoolSchema extends AbstractSchema implements SchemaInterface
 {
@@ -22,7 +22,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
             }
 
             if (!\is_bool($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -32,12 +32,12 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
             }
 
             return $this->dispatchPostParses($input);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 

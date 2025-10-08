@@ -14,16 +14,17 @@ use PHPUnit\Framework\TestCase;
  */
 final class ErrorTest extends TestCase
 {
-    public function testToString(): void
+    public function testToStringAndJsonSerialize(): void
     {
         $code = 'some.error';
-        $template = '{{bool}},{{int}},{{float}},{{string}},{{array}}';
+        $template = '{{bool}},{{int}},{{float}},{{string}},{{array}},{{date}}';
         $variables = [
             'bool' => true,
             'int' => 1337,
             'float' => 4.2,
             'string' => 'test',
             'array' => ['bool' => true, 'int' => 1337, 'float' => 4.2, 'string' => 'test'],
+            'date' => new \DateTimeImmutable('2025-10-07T00:00:00Z'),
         ];
 
         $error = new Error($code, $template, $variables);
@@ -32,7 +33,16 @@ final class ErrorTest extends TestCase
         self::assertSame($template, $error->template);
         self::assertSame($variables, $error->variables);
 
-        self::assertSame('true,1337,4.2,"test",{"bool":true,"int":1337,"float":4.2,"string":"test"}', (string) $error);
+        self::assertSame(
+            'true,1337,4.2,"test",{"bool":true,"int":1337,"float":4.2,"string":"test"},{"date":"2025-10-07 00:00:00.000000","timezone_type":2,"timezone":"Z"}',
+            (string) $error
+        );
+
+        self::assertSame([
+            'code' => 'some.error',
+            'template' => '{{bool}},{{int}},{{float}},{{string}},{{array}},{{date}}',
+            'variables' => json_decode(json_encode($variables), true),
+        ], $error->jsonSerialize());
     }
 
     public function testToStringWithError(): void

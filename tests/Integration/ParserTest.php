@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Integration;
 
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Parser;
-use Chubbyphp\Parsing\ParserErrorException;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -90,10 +90,11 @@ final class ParserTest extends TestCase
             $schema->parse([]);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
-                'array' => [
-                    [
+                [
+                    'path' => 'array',
+                    'error' => [
                         'code' => 'array.type',
                         'template' => 'Type should be "array", {{given}} given',
                         'variables' => [
@@ -101,8 +102,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'backedEnum' => [
-                    [
+                [
+                    'path' => 'backedEnum',
+                    'error' => [
                         'code' => 'backedEnum.type',
                         'template' => 'Type should be "int|string", {{given}} given',
                         'variables' => [
@@ -110,8 +112,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'bool' => [
-                    [
+                [
+                    'path' => 'bool',
+                    'error' => [
                         'code' => 'bool.type',
                         'template' => 'Type should be "bool", {{given}} given',
                         'variables' => [
@@ -119,8 +122,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'dateTime' => [
-                    [
+                [
+                    'path' => 'dateTime',
+                    'error' => [
                         'code' => 'datetime.type',
                         'template' => 'Type should be "\DateTimeInterface", {{given}} given',
                         'variables' => [
@@ -128,8 +132,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'discriminatedUnion' => [
-                    [
+                [
+                    'path' => 'discriminatedUnion',
+                    'error' => [
                         'code' => 'discriminatedUnion.type',
                         'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
@@ -137,8 +142,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'float' => [
-                    [
+                [
+                    'path' => 'float',
+                    'error' => [
                         'code' => 'float.type',
                         'template' => 'Type should be "float", {{given}} given',
                         'variables' => [
@@ -146,8 +152,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'int' => [
-                    [
+                [
+                    'path' => 'int',
+                    'error' => [
                         'code' => 'int.type',
                         'template' => 'Type should be "int", {{given}} given',
                         'variables' => [
@@ -155,8 +162,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'literal' => [
-                    [
+                [
+                    'path' => 'literal',
+                    'error' => [
                         'code' => 'literal.type',
                         'template' => 'Type should be "bool|float|int|string", {{given}} given',
                         'variables' => [
@@ -164,8 +172,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'object' => [
-                    [
+                [
+                    'path' => 'object',
+                    'error' => [
                         'code' => 'object.type',
                         'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
@@ -173,8 +182,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'record' => [
-                    [
+                [
+                    'path' => 'record',
+                    'error' => [
                         'code' => 'record.type',
                         'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
                         'variables' => [
@@ -182,8 +192,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'string' => [
-                    [
+                [
+                    'path' => 'string',
+                    'error' => [
                         'code' => 'string.type',
                         'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
@@ -191,8 +202,9 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'tuple' => [
-                    [
+                [
+                    'path' => 'tuple',
+                    'error' => [
                         'code' => 'tuple.type',
                         'template' => 'Type should be "array", {{given}} given',
                         'variables' => [
@@ -200,15 +212,19 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-                'union' => [
-                    [
+                [
+                    'path' => 'union',
+                    'error' => [
                         'code' => 'string.type',
                         'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
                         ],
                     ],
-                    [
+                ],
+                [
+                    'path' => 'union',
+                    'error' => [
                         'code' => 'int.type',
                         'template' => 'Type should be "int", {{given}} given',
                         'variables' => [
@@ -216,7 +232,7 @@ final class ParserTest extends TestCase
                         ],
                     ],
                 ],
-            ], json_decode(json_encode($parserErrorException->getErrors()), true));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 

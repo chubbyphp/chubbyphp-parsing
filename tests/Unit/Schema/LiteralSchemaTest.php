@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -14,7 +14,7 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  *
  * @internal
  */
-final class LiteralSchemaTest extends AbstractTestCase
+final class LiteralSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -25,7 +25,7 @@ final class LiteralSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default('test'));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (string $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (string $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (string $output, ErrorsException $e) => $output));
     }
 
     public function testParseSuccessWithBool(): void
@@ -88,16 +88,19 @@ final class LiteralSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'literal.type',
-                    'template' => 'Type should be "bool|float|int|string", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'literal.type',
+                        'template' => 'Type should be "bool|float|int|string", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -109,17 +112,20 @@ final class LiteralSchemaTest extends AbstractTestCase
             $schema->parse('test2');
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'literal.equals',
-                    'template' => 'Input should be {{expected}}, {{given}} given',
-                    'variables' => [
-                        'expected' => 'test1',
-                        'given' => 'test2',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'literal.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => 'test1',
+                            'given' => 'test2',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -131,17 +137,20 @@ final class LiteralSchemaTest extends AbstractTestCase
             $schema->parse(4.1);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'literal.equals',
-                    'template' => 'Input should be {{expected}}, {{given}} given',
-                    'variables' => [
-                        'expected' => 4.2,
-                        'given' => 4.1,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'literal.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => 4.2,
+                            'given' => 4.1,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -153,17 +162,20 @@ final class LiteralSchemaTest extends AbstractTestCase
             $schema->parse(1336);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'literal.equals',
-                    'template' => 'Input should be {{expected}}, {{given}} given',
-                    'variables' => [
-                        'expected' => 1337,
-                        'given' => 1336,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'literal.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => 1337,
+                            'given' => 1336,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -175,17 +187,20 @@ final class LiteralSchemaTest extends AbstractTestCase
             $schema->parse(false);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'literal.equals',
-                    'template' => 'Input should be {{expected}}, {{given}} given',
-                    'variables' => [
-                        'expected' => true,
-                        'given' => false,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'literal.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => true,
+                            'given' => false,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -210,17 +225,20 @@ final class LiteralSchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new LiteralSchema('test'))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
                 self::assertSame([
                     [
-                        'code' => 'literal.type',
-                        'template' => 'Type should be "bool|float|int|string", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'literal.type',
+                            'template' => 'Type should be "bool|float|int|string", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -244,12 +262,15 @@ final class LiteralSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'literal.type',
-                'template' => 'Type should be "bool|float|int|string", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'literal.type',
+                    'template' => 'Type should be "bool|float|int|string", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 }

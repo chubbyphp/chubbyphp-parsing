@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 {
@@ -28,7 +28,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
             }
 
             if (!$input instanceof \DateTimeInterface) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -38,12 +38,12 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
             }
 
             return $this->dispatchPostParses($input);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 
@@ -51,7 +51,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (\DateTimeImmutable $datetime) use ($from) {
             if ($datetime < $from) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_FROM_CODE,
                         self::ERROR_FROM_TEMPLATE,
@@ -68,7 +68,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
     {
         return $this->postParse(static function (\DateTimeImmutable $datetime) use ($to) {
             if ($datetime > $to) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TO_CODE,
                         self::ERROR_TO_TEMPLATE,

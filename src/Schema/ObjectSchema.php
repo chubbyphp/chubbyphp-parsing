@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Errors;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 {
@@ -80,7 +81,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             }
 
             if (!\is_array($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -91,23 +92,23 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
             $output = new $this->classname();
 
-            $childrenParserErrorException = new ParserErrorException();
+            $childrenErrors = new Errors();
 
-            $this->unknownFields($input, $childrenParserErrorException);
+            $this->unknownFields($input, $childrenErrors);
 
-            $this->parseFields($input, $output, $childrenParserErrorException);
+            $this->parseFields($input, $output, $childrenErrors);
 
-            if ($childrenParserErrorException->hasError()) {
-                throw $childrenParserErrorException;
+            if ($childrenErrors->has()) {
+                throw new ErrorsException($childrenErrors);
             }
 
             return $this->dispatchPostParses($output);
-        } catch (ParserErrorException $childrenParserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $childrenParserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $childrenParserErrorException;
+            throw $e;
         }
     }
 
@@ -151,7 +152,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     /**
      * @param array<string, mixed> $input
      */
-    private function unknownFields(array $input, ParserErrorException $childrenParserErrorException): void
+    private function unknownFields(array $input, Errors $childrenErrors): void
     {
         if (null === $this->strict) {
             return;
@@ -159,7 +160,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 
         foreach (array_keys($input) as $fieldName) {
             if (!\in_array($fieldName, $this->strict, true) && !isset($this->fieldToSchema[$fieldName])) {
-                $childrenParserErrorException->addError(new Error(
+                $childrenErrors->add(new Error(
                     self::ERROR_UNKNOWN_FIELD_CODE,
                     self::ERROR_UNKNOWN_FIELD_TEMPLATE,
                     ['fieldName' => $fieldName]
@@ -171,7 +172,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     /**
      * @param array<string, mixed> $input
      */
-    private function parseFields(array $input, object $object, ParserErrorException $childrenParserErrorException): void
+    private function parseFields(array $input, object $object, Errors $childrenErrors): void
     {
         foreach ($this->fieldToSchema as $fieldName => $fieldSchema) {
             try {
@@ -184,8 +185,8 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 }
 
                 $object->{$fieldName} = $fieldSchema->parse($input[$fieldName] ?? null);
-            } catch (ParserErrorException $childParserErrorException) {
-                $childrenParserErrorException->addParserErrorException($childParserErrorException, $fieldName);
+            } catch (ErrorsException $e) {
+                $childrenErrors->add($e->errors, $fieldName);
             }
         }
     }

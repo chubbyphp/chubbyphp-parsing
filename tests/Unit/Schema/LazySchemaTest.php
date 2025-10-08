@@ -7,7 +7,7 @@ namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -15,7 +15,7 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  *
  * @internal
  */
-final class LazySchemaTest extends AbstractTestCase
+final class LazySchemaTest extends TestCase
 {
     public function testParseSuccess(): void
     {

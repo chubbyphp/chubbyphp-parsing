@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\IntSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -14,7 +14,7 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  *
  * @internal
  */
-final class IntSchemaTest extends AbstractTestCase
+final class IntSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -25,7 +25,7 @@ final class IntSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default(42));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (int $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (int $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (int $output, ErrorsException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -63,16 +63,19 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.type',
-                    'template' => 'Type should be "int", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -97,17 +100,20 @@ final class IntSchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new IntSchema())
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
                 self::assertSame([
                     [
-                        'code' => 'int.type',
-                        'template' => 'Type should be "int", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'int.type',
+                            'template' => 'Type should be "int", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -131,13 +137,16 @@ final class IntSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'int.type',
-                'template' => 'Type should be "int", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'int.type',
+                    'template' => 'Type should be "int", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 
     public function testParseWithValidGt(): void
@@ -161,17 +170,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.gt',
-                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
-                    'variables' => [
-                        'gt' => $gt,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.gt',
+                        'template' => 'Value should be greater than {{gt}}, {{given}} given',
+                        'variables' => [
+                            'gt' => $gt,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -186,17 +198,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.gt',
-                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
-                    'variables' => [
-                        'gt' => $gt,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.gt',
+                        'template' => 'Value should be greater than {{gt}}, {{given}} given',
+                        'variables' => [
+                            'gt' => $gt,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -221,17 +236,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.gte',
-                    'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
-                    'variables' => [
-                        'gte' => $gte,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.gte',
+                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                        'variables' => [
+                            'gte' => $gte,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -256,17 +274,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.lt',
-                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
-                    'variables' => [
-                        'lt' => $lt,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.lt',
+                        'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                        'variables' => [
+                            'lt' => $lt,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -281,17 +302,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.lt',
-                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
-                    'variables' => [
-                        'lt' => $lt,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.lt',
+                        'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                        'variables' => [
+                            'lt' => $lt,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -316,17 +340,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.lte',
-                    'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
-                    'variables' => [
-                        'lte' => $lte,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.lte',
+                        'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
+                        'variables' => [
+                            'lte' => $lte,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -349,17 +376,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.gt',
-                    'template' => 'Value should be greater than {{gt}}, {{given}} given',
-                    'variables' => [
-                        'gt' => 0,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.gt',
+                        'template' => 'Value should be greater than {{gt}}, {{given}} given',
+                        'variables' => [
+                            'gt' => 0,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -382,17 +412,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.gte',
-                    'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
-                    'variables' => [
-                        'gte' => 0,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.gte',
+                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                        'variables' => [
+                            'gte' => 0,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -415,17 +448,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.lt',
-                    'template' => 'Value should be lesser than {{lt}}, {{given}} given',
-                    'variables' => [
-                        'lt' => 0,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.lt',
+                        'template' => 'Value should be lesser than {{lt}}, {{given}} given',
+                        'variables' => [
+                            'lt' => 0,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -448,17 +484,20 @@ final class IntSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.lte',
-                    'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
-                    'variables' => [
-                        'lte' => 0,
-                        'given' => $input,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.lte',
+                        'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
+                        'variables' => [
+                            'lte' => 0,
+                            'given' => $input,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 

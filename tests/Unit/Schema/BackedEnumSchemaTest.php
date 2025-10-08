@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 enum Suit
 {
@@ -40,7 +40,7 @@ enum BackedEmpty: string {}
  *
  * @internal
  */
-final class BackedEnumSchemaTest extends AbstractTestCase
+final class BackedEnumSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -51,7 +51,7 @@ final class BackedEnumSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default(true));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (BackedSuit $output) => $output->value));
-        self::assertNotSame($schema, $schema->catch(static fn (BackedSuit $output, ParserErrorException $e) => $output->value));
+        self::assertNotSame($schema, $schema->catch(static fn (BackedSuit $output, ErrorsException $e) => $output->value));
     }
 
     public function testConstructWithoutEnumClass(): void
@@ -135,16 +135,19 @@ final class BackedEnumSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'backedEnum.type',
-                    'template' => 'Type should be "int|string", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'backedEnum.type',
+                        'template' => 'Type should be "int|string", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -156,17 +159,20 @@ final class BackedEnumSchemaTest extends AbstractTestCase
             $schema->parse('Z');
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'backedEnum.value',
-                    'template' => 'Value should be one of {{cases}}, {{given}} given',
-                    'variables' => [
-                        'cases' => ['H', 'D', 'C', 'S'],
-                        'given' => 'Z',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'backedEnum.value',
+                        'template' => 'Value should be one of {{cases}}, {{given}} given',
+                        'variables' => [
+                            'cases' => ['H', 'D', 'C', 'S'],
+                            'given' => 'Z',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -193,17 +199,20 @@ final class BackedEnumSchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new BackedEnumSchema(BackedSuit::class))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
                 self::assertSame([
                     [
-                        'code' => 'backedEnum.type',
-                        'template' => 'Type should be "int|string", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'backedEnum.type',
+                            'template' => 'Type should be "int|string", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -228,13 +237,16 @@ final class BackedEnumSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'backedEnum.type',
-                'template' => 'Type should be "int|string", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'backedEnum.type',
+                    'template' => 'Type should be "int|string", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 
     public function testParseWithValidtoInt(): void
@@ -265,16 +277,19 @@ final class BackedEnumSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'int.type',
-                    'template' => 'Type should be "int", {{given}} given',
-                    'variables' => [
-                        'given' => 'string',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", {{given}} given',
+                        'variables' => [
+                            'given' => 'string',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -306,16 +321,19 @@ final class BackedEnumSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'string.type',
-                    'template' => 'Type should be "string", {{given}} given',
-                    'variables' => [
-                        'given' => 'integer',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", {{given}} given',
+                        'variables' => [
+                            'given' => 'integer',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 }

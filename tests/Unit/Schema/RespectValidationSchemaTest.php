@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\RespectValidationSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 use Respect\Validation\Validator as v;
 
 /**
@@ -15,7 +15,7 @@ use Respect\Validation\Validator as v;
  *
  * @internal
  */
-final class RespectValidationSchemaTest extends AbstractTestCase
+final class RespectValidationSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -26,7 +26,7 @@ final class RespectValidationSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default(42));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (float|int $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (float|int $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (float|int $output, ErrorsException $e) => $output));
     }
 
     public function testParseSuccess(): void
@@ -66,23 +66,29 @@ final class RespectValidationSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'numericVal',
-                    'template' => '`NULL` must be numeric',
-                    'variables' => [
-                        'input' => null,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'numericVal',
+                        'template' => '`NULL` must be numeric',
+                        'variables' => [
+                            'input' => null,
+                        ],
                     ],
                 ],
                 [
-                    'code' => 'positive',
-                    'template' => '`NULL` must be positive',
-                    'variables' => [
-                        'input' => null,
+                    'path' => '',
+                    'error' => [
+                        'code' => 'positive',
+                        'template' => '`NULL` must be positive',
+                        'variables' => [
+                            'input' => null,
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -111,24 +117,30 @@ final class RespectValidationSchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new RespectValidationSchema(v::numericVal()->positive()->between(1, 255)))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
                 self::assertSame([
                     [
-                        'code' => 'numericVal',
-                        'template' => '`NULL` must be numeric',
-                        'variables' => [
-                            'input' => null,
+                        'path' => '',
+                        'error' => [
+                            'code' => 'numericVal',
+                            'template' => '`NULL` must be numeric',
+                            'variables' => [
+                                'input' => null,
+                            ],
                         ],
                     ],
                     [
-                        'code' => 'positive',
-                        'template' => '`NULL` must be positive',
-                        'variables' => [
-                            'input' => null,
+                        'path' => '',
+                        'error' => [
+                            'code' => 'positive',
+                            'template' => '`NULL` must be positive',
+                            'variables' => [
+                                'input' => null,
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -154,19 +166,25 @@ final class RespectValidationSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'numericVal',
-                'template' => '`NULL` must be numeric',
-                'variables' => [
-                    'input' => null,
+                'path' => '',
+                'error' => [
+                    'code' => 'numericVal',
+                    'template' => '`NULL` must be numeric',
+                    'variables' => [
+                        'input' => null,
+                    ],
                 ],
             ],
             [
-                'code' => 'positive',
-                'template' => '`NULL` must be positive',
-                'variables' => [
-                    'input' => null,
+                'path' => '',
+                'error' => [
+                    'code' => 'positive',
+                    'template' => '`NULL` must be positive',
+                    'variables' => [
+                        'input' => null,
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse($input)->exception->getErrors()));
+        ], $schema->safeParse($input)->exception->errors->jsonSerialize());
     }
 }

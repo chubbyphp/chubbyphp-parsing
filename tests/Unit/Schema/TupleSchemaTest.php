@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\TupleSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -15,7 +15,7 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  *
  * @internal
  */
-final class TupleSchemaTest extends AbstractTestCase
+final class TupleSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -26,7 +26,7 @@ final class TupleSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default(['test']));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (array $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (array $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (array $output, ErrorsException $e) => $output));
     }
 
     public function testConstructWithoutSchema(): void
@@ -78,18 +78,21 @@ final class TupleSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame(
                 [
                     [
-                        'code' => 'tuple.type',
-                        'template' => 'Type should be "array", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'tuple.type',
+                            'template' => 'Type should be "array", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
                 ],
-                $this->errorsToSimpleArray($parserErrorException->getErrors())
+                $errorsException->errors->jsonSerialize()
             );
         }
     }
@@ -104,10 +107,11 @@ final class TupleSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
-                1 => [
-                    [
+                [
+                    'path' => '1',
+                    'error' => [
                         'code' => 'string.type',
                         'template' => 'Type should be "string", {{given}} given',
                         'variables' => [
@@ -115,7 +119,7 @@ final class TupleSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -129,10 +133,11 @@ final class TupleSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
-                1 => [
-                    [
+                [
+                    'path' => '1',
+                    'error' => [
                         'code' => 'tuple.missingIndex',
                         'template' => 'Missing input at index {{index}}',
                         'variables' => [
@@ -140,8 +145,9 @@ final class TupleSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-                2 => [
-                    [
+                [
+                    'path' => '2',
+                    'error' => [
                         'code' => 'tuple.missingIndex',
                         'template' => 'Missing input at index {{index}}',
                         'variables' => [
@@ -149,7 +155,7 @@ final class TupleSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -163,10 +169,11 @@ final class TupleSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
-                2 => [
-                    [
+                [
+                    'path' => '2',
+                    'error' => [
                         'code' => 'tuple.additionalIndex',
                         'template' => 'Additional input at index {{index}}',
                         'variables' => [
@@ -174,7 +181,7 @@ final class TupleSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -201,20 +208,23 @@ final class TupleSchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new TupleSchema([new StringSchema(), new StringSchema()]))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
 
                 self::assertSame(
                     [
                         [
-                            'code' => 'tuple.type',
-                            'template' => 'Type should be "array", {{given}} given',
-                            'variables' => [
-                                'given' => 'NULL',
+                            'path' => '',
+                            'error' => [
+                                'code' => 'tuple.type',
+                                'template' => 'Type should be "array", {{given}} given',
+                                'variables' => [
+                                    'given' => 'NULL',
+                                ],
                             ],
                         ],
                     ],
-                    $this->errorsToSimpleArray($parserErrorException->getErrors())
+                    $errorsException->errors->jsonSerialize()
                 );
 
                 return 'catched';
@@ -240,14 +250,17 @@ final class TupleSchemaTest extends AbstractTestCase
         self::assertSame(
             [
                 [
-                    'code' => 'tuple.type',
-                    'template' => 'Type should be "array", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'tuple.type',
+                        'template' => 'Type should be "array", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
             ],
-            $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors())
+            $schema->safeParse(null)->exception->errors->jsonSerialize()
         );
     }
 }
