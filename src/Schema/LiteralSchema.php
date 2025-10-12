@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class LiteralSchema extends AbstractSchema
 {
@@ -27,7 +27,7 @@ final class LiteralSchema extends AbstractSchema
             }
 
             if (!\is_bool($input) && !\is_float($input) && !\is_int($input) && !\is_string($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -37,7 +37,7 @@ final class LiteralSchema extends AbstractSchema
             }
 
             if ($input !== $this->literal) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_EQUALS_CODE,
                         self::ERROR_EQUALS_TEMPLATE,
@@ -47,12 +47,12 @@ final class LiteralSchema extends AbstractSchema
             }
 
             return $this->dispatchPostParses($input);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 }

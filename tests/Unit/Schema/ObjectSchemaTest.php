@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 final class ObjectDemo implements \JsonSerializable
 {
@@ -32,7 +32,7 @@ final class ObjectDemo implements \JsonSerializable
  *
  * @internal
  */
-final class ObjectSchemaTest extends AbstractTestCase
+final class ObjectSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -43,7 +43,7 @@ final class ObjectSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default([]));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (\stdClass $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (\stdClass $output, ErrorsException $e) => $output));
 
         self::assertNotSame($schema, $schema->strict());
         self::assertNotSame($schema, $schema->optional([]));
@@ -202,16 +202,19 @@ final class ObjectSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'object.type',
-                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'object.type',
+                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -225,10 +228,11 @@ final class ObjectSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
-                'field2' => [
-                    [
+                [
+                    'path' => 'field2',
+                    'error' => [
                         'code' => 'object.unknownField',
                         'template' => 'Unknown field {{fieldName}}',
                         'variables' => [
@@ -236,8 +240,9 @@ final class ObjectSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-                'field3' => [
-                    [
+                [
+                    'path' => 'field3',
+                    'error' => [
                         'code' => 'object.unknownField',
                         'template' => 'Unknown field {{fieldName}}',
                         'variables' => [
@@ -245,7 +250,7 @@ final class ObjectSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -259,10 +264,11 @@ final class ObjectSchemaTest extends AbstractTestCase
             $schema->parse($input);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
-                'field2' => [
-                    [
+                [
+                    'path' => 'field2',
+                    'error' => [
                         'code' => 'float.type',
                         'template' => 'Type should be "float", {{given}} given',
                         'variables' => [
@@ -270,8 +276,9 @@ final class ObjectSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-                'field3' => [
-                    [
+                [
+                    'path' => 'field3',
+                    'error' => [
                         'code' => 'int.type',
                         'template' => 'Type should be "int", {{given}} given',
                         'variables' => [
@@ -279,7 +286,7 @@ final class ObjectSchemaTest extends AbstractTestCase
                         ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -295,10 +302,10 @@ final class ObjectSchemaTest extends AbstractTestCase
             $schema->parse(['field2' => 'test']);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame(
                 'field3: Type should be "string", "NULL" given',
-                $parserErrorException->getMessage()
+                $errorsException->getMessage()
             );
         }
     }
@@ -328,17 +335,20 @@ final class ObjectSchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new ObjectSchema(['field1' => new StringSchema()]))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
                 self::assertSame([
                     [
-                        'code' => 'object.type',
-                        'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'object.type',
+                            'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -362,13 +372,16 @@ final class ObjectSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'object.type',
-                'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'object.type',
+                    'template' => 'Type should be "array|\stdClass|\Traversable", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 
     public function testGetFieldToSchema(): void

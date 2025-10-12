@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
-use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
@@ -16,7 +16,7 @@ use Chubbyphp\Tests\Parsing\Unit\AbstractTestCase;
  *
  * @internal
  */
-final class UnionSchemaTest extends AbstractTestCase
+final class UnionSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
@@ -27,7 +27,7 @@ final class UnionSchemaTest extends AbstractTestCase
         self::assertNotSame($schema, $schema->default('test'));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (int|string $output) => $output));
-        self::assertNotSame($schema, $schema->catch(static fn (int|string $output, ParserErrorException $e) => $output));
+        self::assertNotSame($schema, $schema->catch(static fn (int|string $output, ErrorsException $e) => $output));
     }
 
     public function testConstructWithWrongArgument(): void
@@ -97,23 +97,30 @@ final class UnionSchemaTest extends AbstractTestCase
             $schema->parse(null);
 
             throw new \Exception('code should not be reached');
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
-                    'code' => 'string.type',
-                    'template' => 'Type should be "string", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
+
                 [
-                    'code' => 'int.type',
-                    'template' => 'Type should be "int", {{given}} given',
-                    'variables' => [
-                        'given' => 'NULL',
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
                     ],
                 ],
-            ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 
@@ -138,24 +145,32 @@ final class UnionSchemaTest extends AbstractTestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new UnionSchema([new StringSchema(), new IntSchema()]))
-            ->catch(function (mixed $input, ParserErrorException $parserErrorException) {
+            ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
+
                 self::assertSame([
                     [
-                        'code' => 'string.type',
-                        'template' => 'Type should be "string", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'string.type',
+                            'template' => 'Type should be "string", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
+
                     [
-                        'code' => 'int.type',
-                        'template' => 'Type should be "int", {{given}} given',
-                        'variables' => [
-                            'given' => 'NULL',
+                        'path' => '',
+                        'error' => [
+                            'code' => 'int.type',
+                            'template' => 'Type should be "int", {{given}} given',
+                            'variables' => [
+                                'given' => 'NULL',
+                            ],
                         ],
                     ],
-                ], $this->errorsToSimpleArray($parserErrorException->getErrors()));
+                ], $errorsException->errors->jsonSerialize());
 
                 return 'catched';
             })
@@ -188,19 +203,25 @@ final class UnionSchemaTest extends AbstractTestCase
 
         self::assertSame([
             [
-                'code' => 'string.type',
-                'template' => 'Type should be "string", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'string.type',
+                    'template' => 'Type should be "string", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
             [
-                'code' => 'int.type',
-                'template' => 'Type should be "int", {{given}} given',
-                'variables' => [
-                    'given' => 'NULL',
+                'path' => '',
+                'error' => [
+                    'code' => 'int.type',
+                    'template' => 'Type should be "int", {{given}} given',
+                    'variables' => [
+                        'given' => 'NULL',
+                    ],
                 ],
             ],
-        ], $this->errorsToSimpleArray($schema->safeParse(null)->exception->getErrors()));
+        ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Result;
 
 abstract class AbstractSchema implements SchemaInterface
@@ -22,7 +22,7 @@ abstract class AbstractSchema implements SchemaInterface
     protected array $postParses = [];
 
     /**
-     * @var \Closure(mixed, ParserErrorException): mixed
+     * @var \Closure(mixed, ErrorsException): mixed
      */
     protected ?\Closure $catch = null;
 
@@ -63,13 +63,13 @@ abstract class AbstractSchema implements SchemaInterface
     {
         try {
             return new Result($this->parse($input), null);
-        } catch (ParserErrorException $parserErrorException) {
-            return new Result(null, $parserErrorException);
+        } catch (ErrorsException $e) {
+            return new Result(null, $e);
         }
     }
 
     /**
-     * @param \Closure(mixed $input, ParserErrorException $parserErrorException): mixed $catch
+     * @param \Closure(mixed $input, ErrorsException $e): mixed $catch
      */
     final public function catch(\Closure $catch): static
     {

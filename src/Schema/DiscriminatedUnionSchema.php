@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\Errors;
+use Chubbyphp\Parsing\ErrorsException;
 
 final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInterface
 {
@@ -73,7 +74,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
             }
 
             if (!\is_array($input)) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_TYPE_CODE,
                         self::ERROR_TYPE_TEMPLATE,
@@ -83,7 +84,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
             }
 
             if (!isset($input[$this->discriminatorFieldName])) {
-                throw new ParserErrorException(
+                throw new ErrorsException(
                     new Error(
                         self::ERROR_DISCRIMINATOR_FIELD_CODE,
                         self::ERROR_DISCRIMINATOR_FIELD_TEMPLATE,
@@ -95,18 +96,18 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
             $output = $this->parseObjectSchemas($input, $input[$this->discriminatorFieldName]);
 
             return $this->dispatchPostParses($output);
-        } catch (ParserErrorException $parserErrorException) {
+        } catch (ErrorsException $e) {
             if ($this->catch) {
-                return ($this->catch)($input, $parserErrorException);
+                return ($this->catch)($input, $e);
             }
 
-            throw $parserErrorException;
+            throw $e;
         }
     }
 
     private function parseObjectSchemas(mixed $input, mixed $discriminator): mixed
     {
-        $parserErrorException = new ParserErrorException();
+        $errors = new Errors();
 
         foreach ($this->objectSchemas as $objectSchema) {
             /** @var SchemaInterface $discriminatorFieldSchema */
@@ -114,8 +115,8 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
 
             try {
                 $discriminatorFieldSchema->parse($discriminator);
-            } catch (ParserErrorException $childParserErrorException) {
-                $parserErrorException->addParserErrorException($childParserErrorException);
+            } catch (ErrorsException $e) {
+                $errors->add($e->errors);
 
                 continue;
             }
@@ -123,6 +124,6 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
             return $objectSchema->parse($input);
         }
 
-        throw $parserErrorException;
+        throw new ErrorsException($errors);
     }
 }

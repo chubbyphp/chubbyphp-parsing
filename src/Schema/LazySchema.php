@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ParserErrorException;
+use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Result;
 
 /**
@@ -46,7 +46,7 @@ final class LazySchema implements SchemaInterface
     }
 
     /**
-     * @param \Closure(mixed $input, ParserErrorException $parserErrorException): mixed $catch
+     * @param \Closure(mixed $input, ErrorsException $e): mixed $catch
      */
     public function catch(\Closure $catch): static
     {
