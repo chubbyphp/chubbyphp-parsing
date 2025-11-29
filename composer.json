@@ -21,15 +21,15 @@
     },
     "require-dev": {
         "chubbyphp/chubbyphp-dev-helper": "dev-master",
-        "infection/infection": "^0.29.12",
-        "php-coveralls/php-coveralls": "^2.7.0",
+        "infection/infection": "^0.31.9",
+        "php-coveralls/php-coveralls": "^2.9",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^2.1.6",
-        "phpunit/phpunit": "^11.5.9",
-        "respect/validation": "^2.4"
+        "phpstan/phpstan": "^2.1.32",
+        "phpunit/phpunit": "^11.5.44",
+        "respect/validation": "^2.4.4"
     },
     "suggest": {
-        "respect/validation": "If your interested in using the respect/validation, please install it with ^2.4"
+        "respect/validation": "If your interested in using the respect/validation, please install it with ^2.4.4"
     },
     "autoload": {
         "psr-4": {

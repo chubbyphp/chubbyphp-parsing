@@ -318,7 +318,7 @@ $data = $schema->parse([
 ### respectValidation
 
 ```sh
-composer require respect/validation "^2.4"
+composer require respect/validation "^2.4.4"
 ```
 
 ```php

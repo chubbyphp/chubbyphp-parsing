@@ -7,7 +7,7 @@ namespace Chubbyphp\Parsing;
 /**
  * @phpstan-type ErrorAsJson array{code: string, template: string, variables: array<string, mixed>}
  */
-final class Error implements \JsonSerializable
+final class Error implements \JsonSerializable, \Stringable
 {
     /**
      * @param array<string, mixed> $variables

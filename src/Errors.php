@@ -12,7 +12,7 @@ namespace Chubbyphp\Parsing;
  * @phpstan-type ErrorsWithPathJson array<ErrorWithPathJson>
  * @phpstan-type ApiProblemInvalidParameter array{name: string, reason: string, details: non-empty-array<string, mixed>}
  */
-final class Errors implements \JsonSerializable
+final class Errors implements \JsonSerializable, \Stringable
 {
     /**
      * @var ErrorsWithPath
