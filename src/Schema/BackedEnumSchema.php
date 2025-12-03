@@ -9,11 +9,11 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'backedEnum.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "int|string", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'backedEnum.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "int|string", {{given}} given';
 
-    public const ERROR_VALUE_CODE = 'backedEnum.value';
-    public const ERROR_VALUE_TEMPLATE = 'Value should be one of {{cases}}, {{given}} given';
+    public const string ERROR_VALUE_CODE = 'backedEnum.value';
+    public const string ERROR_VALUE_TEMPLATE = 'Value should be one of {{cases}}, {{given}} given';
 
     private \BackedEnum $backedEnum;
 

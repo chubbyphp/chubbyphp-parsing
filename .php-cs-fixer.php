@@ -16,6 +16,7 @@ $config = require __DIR__ . '/vendor/chubbyphp/chubbyphp-dev-helper/phpcs.php';
 unset($config['rules']['simplified_null_return']);
 
 return (new PhpCsFixer\Config)
+    ->setUnsupportedPhpVersionAllowed(true)
     ->setIndent($config['indent'])
     ->setLineEnding($config['lineEnding'])
     ->setRules($config['rules'])

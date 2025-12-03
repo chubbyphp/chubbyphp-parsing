@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.2"
+        "php": "^8.3"
     },
     "require-dev": {
         "chubbyphp/chubbyphp-dev-helper": "dev-master",
@@ -25,7 +25,7 @@
         "php-coveralls/php-coveralls": "^2.9",
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan": "^2.1.32",
-        "phpunit/phpunit": "^11.5.44",
+        "phpunit/phpunit": "^12.4.5",
         "respect/validation": "^2.4.4"
     },
     "suggest": {
@@ -50,11 +50,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.0-dev"
+            "dev-master": "2.1-dev"
         }
     },
     "scripts": {
-        "fix:cs": "mkdir -p build && PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --cache-file=build/phpcs.cache",
+        "fix:cs": "mkdir -p build && vendor/bin/php-cs-fixer fix --cache-file=build/phpcs.cache",
         "test": [
             "@test:lint",
             "@test:unit",
@@ -63,7 +63,7 @@
             "@test:static-analysis",
             "@test:cs"
         ],
-        "test:cs": "mkdir -p build && PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation --cache-file=build/phpcs.cache",
+        "test:cs": "mkdir -p build && vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation --cache-file=build/phpcs.cache",
         "test:infection": "vendor/bin/infection --threads=$(nproc) --min-msi=100 --verbose --coverage=build/phpunit",
         "test:integration": "vendor/bin/phpunit --testsuite=Integration --cache-directory=build/phpunit",
         "test:lint": "mkdir -p build && find src tests -name '*.php' -print0 | xargs -0 -n1 -P$(nproc) php -l | tee build/phplint.log",

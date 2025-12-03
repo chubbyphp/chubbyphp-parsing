@@ -9,14 +9,14 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'datetime.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "\DateTimeInterface", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'datetime.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "\DateTimeInterface", {{given}} given';
 
-    public const ERROR_FROM_CODE = 'datetime.from';
-    public const ERROR_FROM_TEMPLATE = 'From datetime {{from}}, {{given}} given';
+    public const string ERROR_FROM_CODE = 'datetime.from';
+    public const string ERROR_FROM_TEMPLATE = 'From datetime {{from}}, {{given}} given';
 
-    public const ERROR_TO_CODE = 'datetime.to';
-    public const ERROR_TO_TEMPLATE = 'To datetime {{to}}, {{given}} given';
+    public const string ERROR_TO_CODE = 'datetime.to';
+    public const string ERROR_TO_TEMPLATE = 'To datetime {{to}}, {{given}} given';
 
     public function parse(mixed $input): mixed
     {

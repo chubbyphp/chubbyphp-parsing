@@ -10,20 +10,20 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class ArraySchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'array.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'array.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "array", {{given}} given';
 
-    public const ERROR_LENGTH_CODE = 'array.length';
-    public const ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
+    public const string ERROR_LENGTH_CODE = 'array.length';
+    public const string ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
 
-    public const ERROR_MIN_LENGTH_CODE = 'array.minLength';
-    public const ERROR_MIN_LENGTH_TEMPLATE = 'Min length {{min}}, {{given}} given';
+    public const string ERROR_MIN_LENGTH_CODE = 'array.minLength';
+    public const string ERROR_MIN_LENGTH_TEMPLATE = 'Min length {{min}}, {{given}} given';
 
-    public const ERROR_MAX_LENGTH_CODE = 'array.maxLength';
-    public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
+    public const string ERROR_MAX_LENGTH_CODE = 'array.maxLength';
+    public const string ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
-    public const ERROR_INCLUDES_CODE = 'array.includes';
-    public const ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
+    public const string ERROR_INCLUDES_CODE = 'array.includes';
+    public const string ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
 
     public function __construct(private SchemaInterface $itemSchema) {}
 

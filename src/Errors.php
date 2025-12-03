@@ -19,7 +19,7 @@ final class Errors implements \JsonSerializable, \Stringable
      */
     private array $errorsWithPath = [];
 
-    public function __toString()
+    public function __toString(): string
     {
         return implode(PHP_EOL, array_map(static fn ($error) => ('' !== $error['path'] ? $error['path'].': ' : '').$error['error'], $this->errorsWithPath));
     }

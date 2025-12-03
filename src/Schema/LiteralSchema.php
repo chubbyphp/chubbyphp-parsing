@@ -9,11 +9,11 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class LiteralSchema extends AbstractSchema
 {
-    public const ERROR_TYPE_CODE = 'literal.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "bool|float|int|string", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'literal.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "bool|float|int|string", {{given}} given';
 
-    public const ERROR_EQUALS_CODE = 'literal.equals';
-    public const ERROR_EQUALS_TEMPLATE = 'Input should be {{expected}}, {{given}} given';
+    public const string ERROR_EQUALS_CODE = 'literal.equals';
+    public const string ERROR_EQUALS_TEMPLATE = 'Input should be {{expected}}, {{given}} given';
 
     public function __construct(private bool|float|int|string $literal) {}
 

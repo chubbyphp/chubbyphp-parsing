@@ -14,7 +14,7 @@ final class Error implements \JsonSerializable, \Stringable
      */
     public function __construct(public readonly string $code, public readonly string $template, public readonly array $variables) {}
 
-    public function __toString()
+    public function __toString(): string
     {
         $message = $this->template;
         foreach ($this->variables as $name => $value) {

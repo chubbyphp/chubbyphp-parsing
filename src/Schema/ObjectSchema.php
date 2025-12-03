@@ -10,11 +10,11 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'object.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'object.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", {{given}} given';
 
-    public const ERROR_UNKNOWN_FIELD_CODE = 'object.unknownField';
-    public const ERROR_UNKNOWN_FIELD_TEMPLATE = 'Unknown field {{fieldName}}';
+    public const string ERROR_UNKNOWN_FIELD_CODE = 'object.unknownField';
+    public const string ERROR_UNKNOWN_FIELD_TEMPLATE = 'Unknown field {{fieldName}}';
 
     /**
      * @var array<string, SchemaInterface>

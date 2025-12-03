@@ -9,8 +9,8 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class BoolSchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'bool.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "bool", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'bool.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "bool", {{given}} given';
 
     public function parse(mixed $input): mixed
     {

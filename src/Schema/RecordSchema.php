@@ -10,8 +10,8 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class RecordSchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'record.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'record.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", {{given}} given';
 
     public function __construct(private SchemaInterface $fieldSchema) {}
 

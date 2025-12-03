@@ -28,14 +28,14 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 
 ## Requirements
 
- * php: ^8.2
+ * php: ^8.3
 
 ## Installation
 
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-parsing "^2.0"
+composer require chubbyphp/chubbyphp-parsing "^2.1"
 ```
 
 ## Usage

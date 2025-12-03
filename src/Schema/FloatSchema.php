@@ -9,23 +9,23 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class FloatSchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'float.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "float", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'float.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "float", {{given}} given';
 
-    public const ERROR_GT_CODE = 'float.gt';
-    public const ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
+    public const string ERROR_GT_CODE = 'float.gt';
+    public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
 
-    public const ERROR_GTE_CODE = 'float.gte';
-    public const ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
+    public const string ERROR_GTE_CODE = 'float.gte';
+    public const string ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
 
-    public const ERROR_LT_CODE = 'float.lt';
-    public const ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
+    public const string ERROR_LT_CODE = 'float.lt';
+    public const string ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
 
-    public const ERROR_LTE_CODE = 'float.lte';
-    public const ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
+    public const string ERROR_LTE_CODE = 'float.lte';
+    public const string ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
-    public const ERROR_INT_CODE = 'float.int';
-    public const ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
+    public const string ERROR_INT_CODE = 'float.int';
+    public const string ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
 
     public function parse(mixed $input): mixed
     {

@@ -9,20 +9,20 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class IntSchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'int.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "int", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'int.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "int", {{given}} given';
 
-    public const ERROR_GT_CODE = 'int.gt';
-    public const ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
+    public const string ERROR_GT_CODE = 'int.gt';
+    public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
 
-    public const ERROR_GTE_CODE = 'int.gte';
-    public const ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
+    public const string ERROR_GTE_CODE = 'int.gte';
+    public const string ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
 
-    public const ERROR_LT_CODE = 'int.lt';
-    public const ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
+    public const string ERROR_LT_CODE = 'int.lt';
+    public const string ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
 
-    public const ERROR_LTE_CODE = 'int.lte';
-    public const ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
+    public const string ERROR_LTE_CODE = 'int.lte';
+    public const string ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
     public function parse(mixed $input): mixed
     {

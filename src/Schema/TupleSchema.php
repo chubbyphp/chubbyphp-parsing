@@ -10,17 +10,17 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class TupleSchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'tuple.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "array", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'tuple.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "array", {{given}} given';
 
-    public const ERROR_LENGTH_CODE = 'tuple.length';
-    public const ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
+    public const string ERROR_LENGTH_CODE = 'tuple.length';
+    public const string ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
 
-    public const ERROR_MISSING_INDEX_CODE = 'tuple.missingIndex';
-    public const ERROR_MISSING_INDEX_TEMPLATE = 'Missing input at index {{index}}';
+    public const string ERROR_MISSING_INDEX_CODE = 'tuple.missingIndex';
+    public const string ERROR_MISSING_INDEX_TEMPLATE = 'Missing input at index {{index}}';
 
-    public const ERROR_ADDITIONAL_INDEX_CODE = 'tuple.additionalIndex';
-    public const ERROR_ADDITIONAL_INDEX_TEMPLATE = 'Additional input at index {{index}}';
+    public const string ERROR_ADDITIONAL_INDEX_CODE = 'tuple.additionalIndex';
+    public const string ERROR_ADDITIONAL_INDEX_TEMPLATE = 'Additional input at index {{index}}';
 
     /**
      * @var array<SchemaInterface>

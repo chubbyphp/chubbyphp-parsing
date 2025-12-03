@@ -9,53 +9,53 @@ use Chubbyphp\Parsing\ErrorsException;
 
 final class StringSchema extends AbstractSchema implements SchemaInterface
 {
-    public const ERROR_TYPE_CODE = 'string.type';
-    public const ERROR_TYPE_TEMPLATE = 'Type should be "string", {{given}} given';
+    public const string ERROR_TYPE_CODE = 'string.type';
+    public const string ERROR_TYPE_TEMPLATE = 'Type should be "string", {{given}} given';
 
-    public const ERROR_LENGTH_CODE = 'string.length';
-    public const ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
+    public const string ERROR_LENGTH_CODE = 'string.length';
+    public const string ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
 
-    public const ERROR_MIN_LENGTH_CODE = 'string.minLength';
-    public const ERROR_MIN_LENGTH_TEMPLATE = 'Min length {{min}}, {{given}} given';
+    public const string ERROR_MIN_LENGTH_CODE = 'string.minLength';
+    public const string ERROR_MIN_LENGTH_TEMPLATE = 'Min length {{min}}, {{given}} given';
 
-    public const ERROR_MAX_LENGTH_CODE = 'string.maxLength';
-    public const ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
+    public const string ERROR_MAX_LENGTH_CODE = 'string.maxLength';
+    public const string ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
-    public const ERROR_INCLUDES_CODE = 'string.includes';
-    public const ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
+    public const string ERROR_INCLUDES_CODE = 'string.includes';
+    public const string ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
 
-    public const ERROR_STARTSWITH_CODE = 'string.startsWith';
-    public const ERROR_STARTSWITH_TEMPLATE = '{{given}} does not starts with {{startsWith}}';
+    public const string ERROR_STARTSWITH_CODE = 'string.startsWith';
+    public const string ERROR_STARTSWITH_TEMPLATE = '{{given}} does not starts with {{startsWith}}';
 
-    public const ERROR_ENDSWITH_CODE = 'string.endsWith';
-    public const ERROR_ENDSWITH_TEMPLATE = '{{given}} does not ends with {{endsWith}}';
+    public const string ERROR_ENDSWITH_CODE = 'string.endsWith';
+    public const string ERROR_ENDSWITH_TEMPLATE = '{{given}} does not ends with {{endsWith}}';
 
-    public const ERROR_MATCH_CODE = 'string.match';
-    public const ERROR_MATCH_TEMPLATE = '{{given}} does not match {{match}}';
+    public const string ERROR_MATCH_CODE = 'string.match';
+    public const string ERROR_MATCH_TEMPLATE = '{{given}} does not match {{match}}';
 
-    public const ERROR_EMAIL_CODE = 'string.email';
-    public const ERROR_EMAIL_TEMPLATE = 'Invalid email {{given}}';
+    public const string ERROR_EMAIL_CODE = 'string.email';
+    public const string ERROR_EMAIL_TEMPLATE = 'Invalid email {{given}}';
 
-    public const ERROR_IP_CODE = 'string.ip';
-    public const ERROR_IP_TEMPLATE = 'Invalid ip {{version}} {{given}}';
+    public const string ERROR_IP_CODE = 'string.ip';
+    public const string ERROR_IP_TEMPLATE = 'Invalid ip {{version}} {{given}}';
 
-    public const ERROR_URL_CODE = 'string.url';
-    public const ERROR_URL_TEMPLATE = 'Invalid url {{given}}';
+    public const string ERROR_URL_CODE = 'string.url';
+    public const string ERROR_URL_TEMPLATE = 'Invalid url {{given}}';
 
-    public const ERROR_UUID_CODE = 'string.uuid';
-    public const ERROR_UUID_TEMPLATE = 'Invalid uuid {{version}} {{given}}';
+    public const string ERROR_UUID_CODE = 'string.uuid';
+    public const string ERROR_UUID_TEMPLATE = 'Invalid uuid {{version}} {{given}}';
 
-    public const ERROR_FLOAT_CODE = 'string.float';
-    public const ERROR_FLOAT_TEMPLATE = 'Cannot convert {{given}} to float';
+    public const string ERROR_FLOAT_CODE = 'string.float';
+    public const string ERROR_FLOAT_TEMPLATE = 'Cannot convert {{given}} to float';
 
-    public const ERROR_INT_CODE = 'string.int';
-    public const ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
+    public const string ERROR_INT_CODE = 'string.int';
+    public const string ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
 
-    public const ERROR_DATETIME_CODE = 'string.datetime';
-    public const ERROR_DATETIME_TEMPLATE = 'Cannot convert {{given}} to datetime';
+    public const string ERROR_DATETIME_CODE = 'string.datetime';
+    public const string ERROR_DATETIME_TEMPLATE = 'Cannot convert {{given}} to datetime';
 
-    private const UUID_V4_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
-    private const UUID_V5_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
+    private const string UUID_V4_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
+    private const string UUID_V5_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
 
     public function parse(mixed $input): mixed
     {
