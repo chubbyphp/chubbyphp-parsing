@@ -38,375 +38,103 @@ Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 composer require chubbyphp/chubbyphp-parsing "^2.1"
 ```
 
-## Usage
+## Quick Start
+
+```php
+use Chubbyphp\Parsing\Parser;
+
+$p = new Parser();
+
+// Define a schema
+$userSchema = $p->object([
+    'name' => $p->string()->minLength(1)->maxLength(100),
+    'email' => $p->string()->email(),
+    'age' => $p->int()->gte(0)->lte(150),
+]);
+
+// Parse and validate data
+$user = $userSchema->parse([
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+    'age' => 30,
+]);
+```
+
+## Schema Types
+
+### Primitives
+
+| Schema | Description | Documentation |
+|--------|-------------|---------------|
+| `string()` | String validation with length, pattern, format checks | [StringSchema](doc/Schema/StringSchema.md) |
+| `int()` | Integer validation with numeric constraints | [IntSchema](doc/Schema/IntSchema.md) |
+| `float()` | Float validation with numeric constraints | [FloatSchema](doc/Schema/FloatSchema.md) |
+| `bool()` | Boolean validation | [BoolSchema](doc/Schema/BoolSchema.md) |
+| `dateTime()` | DateTime validation with range constraints | [DateTimeSchema](doc/Schema/DateTimeSchema.md) |
+
+### Complex Types
+
+| Schema | Description | Documentation |
+|--------|-------------|---------------|
+| `array()` | Arrays with item validation | [ArraySchema](doc/Schema/ArraySchema.md) |
+| `object()` | Objects/DTOs with field schemas | [ObjectSchema](doc/Schema/ObjectSchema.md) |
+| `tuple()` | Fixed-length arrays with positional types | [TupleSchema](doc/Schema/TupleSchema.md) |
+| `record()` | Key-value maps with uniform value types | [RecordSchema](doc/Schema/RecordSchema.md) |
+
+### Union Types
+
+| Schema | Description | Documentation |
+|--------|-------------|---------------|
+| `union()` | Value matches one of several schemas | [UnionSchema](doc/Schema/UnionSchema.md) |
+| `discriminatedUnion()` | Tagged unions with a discriminator field | [DiscriminatedUnionSchema](doc/Schema/DiscriminatedUnionSchema.md) |
+
+### Special Types
+
+| Schema | Description | Documentation |
+|--------|-------------|---------------|
+| `literal()` | Exact value matching | [LiteralSchema](doc/Schema/LiteralSchema.md) |
+| `backedEnum()` | PHP BackedEnum validation | [BackedEnumSchema](doc/Schema/BackedEnumSchema.md) |
+| `lazy()` | Recursive/self-referencing schemas | [LazySchema](doc/Schema/LazySchema.md) |
+| `respectValidation()` | Integration with Respect/Validation | [RespectValidationSchema](doc/Schema/RespectValidationSchema.md) |
+
+## Common Schema Methods
+
+All schemas support these methods:
+
+```php
+$schema->nullable();       // Allow null values
+$schema->default($value);  // Provide default when input is null
+$schema->preParse($fn);    // Transform input before parsing
+$schema->postParse($fn);   // Transform output after parsing
+$schema->catch($fn);       // Handle errors and provide fallback
+$schema->parse($input);    // Parse and throw on error
+$schema->safeParse($input); // Parse and return Result object
+```
+
+## Error Handling
 
 ```php
 use Chubbyphp\Parsing\ErrorsException;
-use Chubbyphp\Parsing\Schema\SchemaInterface;
-
-/** @var SchemaInterface $schema */
-$schema = ...;
-
-$schema->nullable();
-$schema->preParse(static fn ($input) => $input);
-$schema->postParse(static fn (string $output) => $output);
-$schema->parse('test');
-$schema->safeParse('test');
-$schema->catch(static fn (string $output, ErrorsException $e) => $output);
 
 try {
-    $schema->parse('test');
-} catch (ErrorsException $e)  {
-    var_dump($e->errors->toApiProblemInvalidParameters());
+    $schema->parse($input);
+} catch (ErrorsException $e) {
+    $e->errors->jsonSerialize();                   // JSON structure
+    $e->errors->toApiProblemInvalidParameters();   // RFC 7807 format
+    $e->errors->toTree();                          // Hierarchical structure
 }
 ```
 
-### array
+See [Error Handling](doc/ErrorHandling.md) for detailed documentation.
 
-```php
-use Chubbyphp\Parsing\Parser;
+## Documentation
 
-$p = new Parser();
-
-$schema = $p->array($p->int());
-
-$data = $schema->parse([1, 2, 3, 4, 5]);
-
-// validations
-$schema->length(5);
-$schema->minLength(5);
-$schema->maxLength(5);
-$schema->includes(5);
-
-// transformations
-$schema->filter(static fn (int $value) => 0 === $value % 2);
-$schema->map(static fn (int $value) => $value * 2);
-$schema->sort();
-$schema->sort(static fn (int $a, int $b) => $b - $a);
-
-// conversions
-$schema->reduce(static fn (int $sum, int $current) => $sum + $current, 0);
-```
-
-### backedEnum
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-enum BackedSuit: string
-{
-    case Hearts = 'H';
-    case Diamonds = 'D';
-    case Clubs = 'C';
-    case Spades = 'S';
-}
-
-$p = new Parser();
-
-$schema = $p->backedEnum(BackedSuit::class);
-
-$data = $schema->parse('D');
-
-// validations
-
-// transformations
-
-// conversions
-$schema->toInt();
-$schema->toString();
-```
-
-### bool
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->bool();
-
-$data = $schema->parse(true);
-
-// validations
-
-// transformations
-
-// conversions
-$schema->toInt();
-$schema->toString();
-```
-
-### dateTime
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->dateTime();
-
-$data = $schema->parse(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
-
-// validations
-$schema->from(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
-$schema->to(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
-
-// transformations
-
-// conversions
-$schema->toInt();
-$schema->toString();
-```
-
-### discriminatedUnion
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->discriminatedUnion([
-    $p->object(['_type' => $p->literal('email'), 'address' => $p->string()]),
-    $p->object(['_type' => $p->literal('phone'), 'number' => $p->string()]),
-]);
-
-$data = $schema->parse(['_type' => 'phone', 'number' => '+41790000000']);
-```
-
-### float
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->float();
-
-$data = $schema->parse(4.2);
-
-// validations
-$schema->gt(5.0);
-$schema->gte(5.0);
-$schema->lt(5.0);
-$schema->lte(5.0);
-$schema->positive();
-$schema->nonNegative();
-$schema->negative();
-$schema->nonPositive();
-
-// transformations
-
-// conversions
-$schema->toInt();
-$schema->toString();
-```
-
-### int
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->int();
-
-$data = $schema->parse(1337);
-
-// validations
-$schema->gt(5);
-$schema->gte(5);
-$schema->lt(5);
-$schema->lte(5);
-$schema->positive();
-$schema->nonNegative();
-$schema->negative();
-$schema->nonPositive();
-
-// transformations
-
-// conversions
-$schema->toDateTime();
-$schema->toFloat();
-$schema->toString();
-```
-
-### lazy
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->lazy(static function () use ($p, &$schema) {
-    return $p->object([
-        'name' => $p->string(),
-        'child' => $schema,
-    ])->nullable();
-});
-
-$data = $schema->parse([
-    'name' => 'name1',
-    'child' => [
-        'name' => 'name2',
-        'child' => null
-    ],
-]);
-```
-
-### literal
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->literal('email'); // supports string|float|int|bool
-
-$data = $schema->parse('email');
-```
-
-### object
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-// stdClass example
-$schema = $p->object(['name' => $p->string()]);
-$object = $schema->parse(['name' => 'example']);
-
-// SampleNamespace\SampleClass example
-$schema = $p->object(['name' => $p->string()], SampleNamespace\SampleClass::class);
-$object = $schema->parse(['name' => 'example']);
-
-// getFieldToSchema
-$schema = $p->object(['name' => $p->string()]);
-$extendedSchema = $p->object([...$schema->getFieldToSchema(), 'value' => $p->string()]);
-
-// getFieldSchema
-$schema = $p->object(['name' => $p->string()]);
-$nameSchema = $schema->getFieldSchema('name');
-
-// if the key 'name' does not exist on input, it won't exists on the output
-$schema->optional(['name']);
-
-// validations
-$schema->strict();
-$schema->strict(['_id']); // strip _id if given, but complain about any other additional field
-
-// transformations
-
-// conversions
-```
-
-### record
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->record($p->string());
-
-$data = $schema->parse([
-    'key1' => 'value1',
-    'key2' => 'value2'
-]);
-```
-
-### respectValidation
-
-```sh
-composer require respect/validation "^2.4.4"
-```
-
-```php
-use Chubbyphp\Parsing\Parser;
-use Respect\Validation\Validator as v;
-
-$p = new Parser();
-
-$schema = $p->respectValidation(v::numericVal()->positive()->between(1, 255));
-
-$data = $schema->parse(5);
-```
-
-### string
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->string();
-
-$data = $schema->parse('example');
-
-// validations
-$schema->length(5);
-$schema->minLength(5);
-$schema->maxLength(5);
-$schema->includes('amp');
-$schema->startsWith('exa');
-$schema->endsWith('mpl');
-$schema->match('/^[a-z]+$/i');
-$schema->email();
-$schema->ipV4();
-$schema->ipV6();
-$schema->url();
-$schema->uuidV4();
-$schema->uuidV5();
-
-// transformations
-$schema->trim();
-$schema->trimStart();
-$schema->trimEnd();
-$schema->toLowerCase();
-$schema->toUpperCase();
-
-// conversions
-$schema->toDateTime();
-$schema->toFloat();
-$schema->toInt();
-
-// examples
-$notBlankSchema = $schema->trim()->minSize(1);
-```
-
-### tuple
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->tuple([$p->float(), $p->float()]);
-
-$data = $schema->parse([47.1, 8.2]);
-```
-
-### union
-
-```php
-use Chubbyphp\Parsing\Parser;
-
-$p = new Parser();
-
-$schema = $p->union([$p->string(), $p->int()]);
-
-$data = $schema->parse('42');
-```
-
-## Migration
-
- * [1.x to 2.x][10]
+- **Schema Types**: [doc/Schema/](doc/Schema/)
+- **Error Handling**: [doc/ErrorHandling.md](doc/ErrorHandling.md)
+- **Migration**: [1.x to 2.x](doc/Migration/1.x-2.x.md)
 
 ## Copyright
 
 2025 Dominik Zogg
 
 [1]: https://packagist.org/packages/chubbyphp/chubbyphp-parsing
-
-
-[10]: doc/Migration/1.x-2.x.md
