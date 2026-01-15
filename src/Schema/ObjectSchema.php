@@ -19,7 +19,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     /**
      * @var array<string, SchemaInterface>
      */
-    private array $fieldToSchema;
+    private array $fieldToSchema = [];
 
     /**
      * @var null|array<string>
@@ -32,8 +32,8 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     private ?array $optional = null;
 
     /**
-     * @param array<string, SchemaInterface> $fieldToSchema
-     * @param class-string                   $classname
+     * @param array<mixed, mixed> $fieldToSchema
+     * @param class-string        $classname
      */
     public function __construct(array $fieldToSchema, private string $classname = \stdClass::class)
     {
@@ -58,9 +58,9 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                     )
                 );
             }
-        }
 
-        $this->fieldToSchema = $fieldToSchema;
+            $this->fieldToSchema[$fieldName] = $fieldSchema;
+        }
     }
 
     public function parse(mixed $input): mixed
@@ -90,6 +90,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 );
             }
 
+            /** @var array<string, mixed> $input */
             $output = new $this->classname();
 
             $childrenErrors = new Errors();

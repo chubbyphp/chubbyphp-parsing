@@ -34,10 +34,13 @@ final class Error implements \JsonSerializable, \Stringable
      */
     public function jsonSerialize(): array
     {
+        /** @var array<string, mixed> $variables */
+        $variables = json_decode(json_encode($this->variables, JSON_THROW_ON_ERROR), true);
+
         return [
             'code' => $this->code,
             'template' => $this->template,
-            'variables' => json_decode(json_encode($this->variables, JSON_THROW_ON_ERROR), true),
+            'variables' => $variables,
         ];
     }
 }

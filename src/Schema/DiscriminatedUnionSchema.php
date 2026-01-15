@@ -20,10 +20,10 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
     /**
      * @var array<ObjectSchemaInterface>
      */
-    private array $objectSchemas;
+    private array $objectSchemas = [];
 
     /**
-     * @param array<ObjectSchemaInterface> $objectSchemas
+     * @param array<mixed> $objectSchemas
      */
     public function __construct(array $objectSchemas, private string $discriminatorFieldName)
     {
@@ -51,9 +51,9 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
                     )
                 );
             }
-        }
 
-        $this->objectSchemas = $objectSchemas;
+            $this->objectSchemas[] = $objectSchema;
+        }
     }
 
     public function parse(mixed $input): mixed

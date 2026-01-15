@@ -17,7 +17,7 @@ abstract class AbstractSchema implements SchemaInterface
     protected array $preParses = [];
 
     /**
-     * @var array<\Closure(mixed): mixed>
+     * @var array<\Closure>
      */
     protected array $postParses = [];
 
@@ -47,9 +47,6 @@ abstract class AbstractSchema implements SchemaInterface
         return $clone;
     }
 
-    /**
-     * @param \Closure(mixed $input): mixed $postParse
-     */
     final public function postParse(\Closure $postParse): static
     {
         $clone = clone $this;

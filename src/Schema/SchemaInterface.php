@@ -16,9 +16,6 @@ interface SchemaInterface
      */
     public function preParse(\Closure $preParse): static;
 
-    /**
-     * @param \Closure(mixed $input): mixed $postParse
-     */
     public function postParse(\Closure $postParse): static;
 
     public function parse(mixed $input): mixed;

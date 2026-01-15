@@ -147,12 +147,12 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     }
 
     /**
-     * @param \Closure(mixed $value, int $index): mixed $filter
+     * @param \Closure(mixed $value, int $index): bool $filter
      */
     public function filter(\Closure $filter): static
     {
         return $this->postParse(
-            static fn (array $array) => array_values(array_filter($array, $filter, ARRAY_FILTER_USE_BOTH))
+            static fn (array $array): array => array_values(array_filter($array, $filter, ARRAY_FILTER_USE_BOTH))
         );
     }
 
@@ -165,11 +165,11 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     }
 
     /**
-     * @param null|\Closure(mixed $a, mixed $b): mixed $compare
+     * @param null|\Closure(mixed $a, mixed $b): int $compare
      */
     public function sort(?\Closure $compare = null): static
     {
-        return $this->postParse(static function (array $array) use ($compare) {
+        return $this->postParse(static function (array $array) use ($compare): array {
             if ($compare) {
                 usort($array, $compare);
             } else {

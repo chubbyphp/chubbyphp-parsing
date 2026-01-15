@@ -12,10 +12,10 @@ final class UnionSchema extends AbstractSchema implements SchemaInterface
     /**
      * @var array<SchemaInterface>
      */
-    private array $schemas;
+    private array $schemas = [];
 
     /**
-     * @param array<SchemaInterface> $schemas
+     * @param array<mixed> $schemas
      */
     public function __construct(array $schemas)
     {
@@ -30,9 +30,9 @@ final class UnionSchema extends AbstractSchema implements SchemaInterface
                     )
                 );
             }
-        }
 
-        $this->schemas = $schemas;
+            $this->schemas[] = $schema;
+        }
     }
 
     public function parse(mixed $input): mixed
