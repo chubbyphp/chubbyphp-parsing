@@ -35,7 +35,7 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-parsing "^2.1"
+composer require chubbyphp/chubbyphp-parsing "^2.2"
 ```
 
 ## Quick Start
@@ -77,6 +77,7 @@ $user = $userSchema->parse([
 | Schema | Description | Documentation |
 |--------|-------------|---------------|
 | `array()` | Arrays with item validation | [ArraySchema](doc/Schema/ArraySchema.md) |
+| `assoc()` | Associative arrays with field schemas | [AssocSchema](doc/Schema/AssocSchema.md) |
 | `object()` | Objects/DTOs with field schemas | [ObjectSchema](doc/Schema/ObjectSchema.md) |
 | `tuple()` | Fixed-length arrays with positional types | [TupleSchema](doc/Schema/TupleSchema.md) |
 | `record()` | Key-value maps with uniform value types | [RecordSchema](doc/Schema/RecordSchema.md) |

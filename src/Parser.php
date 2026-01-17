@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Parsing;
 
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\AssocSchema;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
 use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
@@ -28,6 +29,14 @@ final class Parser implements ParserInterface
     public function array(SchemaInterface $itemSchema): ArraySchema
     {
         return new ArraySchema($itemSchema);
+    }
+
+    /**
+     * @param array<string, SchemaInterface> $fieldNameToSchema
+     */
+    public function assoc(array $fieldNameToSchema): AssocSchema
+    {
+        return new AssocSchema($fieldNameToSchema);
     }
 
     /**

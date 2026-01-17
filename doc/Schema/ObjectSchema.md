@@ -2,6 +2,8 @@
 
 The `ObjectSchema` validates objects/DTOs with named fields. It can parse input data into `stdClass` objects or custom class instances.
 
+> **Note:** If you need an associative array as output instead of an object, use [AssocSchema](AssocSchema.md).
+
 ## Basic Usage
 
 ```php

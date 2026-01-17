@@ -147,7 +147,7 @@ $nestedSchema->parse([
 ]);
 ```
 
-## Record vs Object
+## Record vs Object vs Assoc
 
 Use **RecordSchema** when:
 - Keys are dynamic/unknown at schema definition time
@@ -158,13 +158,27 @@ Use **ObjectSchema** when:
 - Keys are known and fixed
 - Different fields have different types
 - You want field-specific validation
+- You need an object (`stdClass` or custom class) as output
+
+Use **AssocSchema** when:
+- Keys are known and fixed
+- Different fields have different types
+- You want field-specific validation
+- You need an associative array as output
 
 ```php
 // Record: unknown keys, all string values
 $translations = $p->record($p->string());
 
-// Object: known keys with specific types
+// Object: known keys with specific types, returns stdClass
 $user = $p->object([
+    'name' => $p->string(),
+    'age' => $p->int(),
+    'email' => $p->string()->email(),
+]);
+
+// Assoc: known keys with specific types, returns array
+$userData = $p->assoc([
     'name' => $p->string(),
     'age' => $p->int(),
     'email' => $p->string()->email(),

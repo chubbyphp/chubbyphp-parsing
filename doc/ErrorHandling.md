@@ -232,7 +232,7 @@ $requestSchema = $p->object([
 function handleRequest(array $input): array
 {
     global $requestSchema;
-    
+
     try {
         $data = $requestSchema->parse($input);
         return [
@@ -271,7 +271,8 @@ Each schema type uses a consistent error code prefix:
 | float | `float.` | `float.type`, `float.gte`, `float.negative` |
 | bool | `bool.` | `bool.type` |
 | array | `array.` | `array.type`, `array.minLength` |
-| object | `object.` | `object.type`, `object.strict` |
+| assoc | `assoc.` | `assoc.type`, `assoc.unknownField` |
+| object | `object.` | `object.type`, `object.unknownField` |
 | dateTime | `dateTime.` | `dateTime.type`, `dateTime.from` |
 | tuple | `tuple.` | `tuple.type`, `tuple.length` |
 | record | `record.` | `record.type` |

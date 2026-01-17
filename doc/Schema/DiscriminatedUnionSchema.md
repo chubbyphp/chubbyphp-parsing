@@ -2,6 +2,8 @@
 
 The `DiscriminatedUnionSchema` validates tagged unions where a discriminator field determines which object schema to use. This is more efficient than `UnionSchema` for objects because it doesn't need to try each schema sequentially.
 
+It supports both `ObjectSchema` and `AssocSchema` as union members.
+
 ## Basic Usage
 
 ```php
@@ -9,13 +11,23 @@ use Chubbyphp\Parsing\Parser;
 
 $p = new Parser();
 
+// Using ObjectSchema (returns stdClass)
 $schema = $p->discriminatedUnion([
     $p->object(['_type' => $p->literal('email'), 'address' => $p->string()->email()]),
     $p->object(['_type' => $p->literal('phone'), 'number' => $p->string()]),
-], '_type'); // '_type' is the default discriminator field
+], '_type');
 
 $email = $schema->parse(['_type' => 'email', 'address' => 'user@example.com']);
 $phone = $schema->parse(['_type' => 'phone', 'number' => '+41790000000']);
+
+// Using AssocSchema (returns array)
+$schemaAssoc = $p->discriminatedUnion([
+    $p->assoc(['_type' => $p->literal('email'), 'address' => $p->string()->email()]),
+    $p->assoc(['_type' => $p->literal('phone'), 'number' => $p->string()]),
+], '_type');
+
+$emailArr = $schemaAssoc->parse(['_type' => 'email', 'address' => 'user@example.com']);
+// Returns: ['_type' => 'email', 'address' => 'user@example.com']
 ```
 
 ## How It Works
