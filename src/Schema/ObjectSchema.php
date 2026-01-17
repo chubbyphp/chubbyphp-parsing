@@ -91,13 +91,11 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
             }
 
             /** @var array<string, mixed> $input */
-            $output = new $this->classname();
-
             $childrenErrors = new Errors();
 
             $this->unknownFields($input, $childrenErrors);
 
-            $this->parseFields($input, $output, $childrenErrors);
+            $output = $this->parseFields($input, $childrenErrors);
 
             if ($childrenErrors->has()) {
                 throw new ErrorsException($childrenErrors);
@@ -171,8 +169,10 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     /**
      * @param array<string, mixed> $input
      */
-    private function parseFields(array $input, object $object, Errors $childrenErrors): void
+    private function parseFields(array $input, Errors $childrenErrors): object
     {
+        $object = new $this->classname();
+
         foreach ($this->fieldToSchema as $fieldName => $fieldSchema) {
             try {
                 if (
@@ -188,5 +188,7 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
                 $childrenErrors->add($e->errors, $fieldName);
             }
         }
+
+        return $object;
     }
 }
