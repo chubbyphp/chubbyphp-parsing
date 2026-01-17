@@ -89,9 +89,9 @@ final class AssocSchema extends AbstractSchema implements ObjectSchemaInterface
                 );
             }
 
+            /** @var array<string, mixed> $input */
             $childrenErrors = new Errors();
 
-            /** @var array<string, mixed> $input */
             $this->unknownFields($input, $childrenErrors);
 
             $output = $this->parseFields($input, $childrenErrors);
