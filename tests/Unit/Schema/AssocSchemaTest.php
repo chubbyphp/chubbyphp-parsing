@@ -133,6 +133,19 @@ final class AssocSchemaTest extends TestCase
         self::assertSame((array) $input, $output);
     }
 
+    public function testParseSuccessWithNumberAtTheBeginningOfTheString(): void
+    {
+        $input = ['1field' => 'test', '2field' => 1];
+
+        $schema = new AssocSchema(['1field' => new StringSchema(), '2field' => new IntSchema()]);
+
+        $output = $schema->parse([...$input, 'field3' => 1.5]);
+
+        self::assertIsArray($output);
+
+        self::assertSame($input, $output);
+    }
+
     public function testParseSuccessWithOptional(): void
     {
         $input = ['field2' => 'test', 'field3' => null];
