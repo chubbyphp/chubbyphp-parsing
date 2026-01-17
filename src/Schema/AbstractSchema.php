@@ -29,7 +29,6 @@ abstract class AbstractSchema implements SchemaInterface
     final public function nullable(bool $nullable = true): static
     {
         $clone = clone $this;
-
         $clone->nullable = $nullable;
 
         return $clone;
@@ -41,7 +40,6 @@ abstract class AbstractSchema implements SchemaInterface
     final public function preParse(\Closure $preParse): static
     {
         $clone = clone $this;
-
         $clone->preParses[] = $preParse;
 
         return $clone;
@@ -50,7 +48,6 @@ abstract class AbstractSchema implements SchemaInterface
     final public function postParse(\Closure $postParse): static
     {
         $clone = clone $this;
-
         $clone->postParses[] = $postParse;
 
         return $clone;
@@ -71,7 +68,6 @@ abstract class AbstractSchema implements SchemaInterface
     final public function catch(\Closure $catch): static
     {
         $clone = clone $this;
-
         $clone->catch = $catch;
 
         return $clone;

@@ -132,7 +132,6 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     public function optional(array $optional = []): static
     {
         $clone = clone $this;
-
         $clone->optional = $optional;
 
         return $clone;
@@ -144,7 +143,6 @@ final class ObjectSchema extends AbstractSchema implements ObjectSchemaInterface
     public function strict(array $strict = []): static
     {
         $clone = clone $this;
-
         $clone->strict = $strict;
 
         return $clone;
