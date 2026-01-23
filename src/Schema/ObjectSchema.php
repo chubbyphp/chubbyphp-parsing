@@ -26,7 +26,7 @@ final class ObjectSchema extends AbstractObjectSchema implements ObjectSchemaInt
      */
     protected function parseFields(array $input, Errors $childrenErrors): object
     {
-        $object = new $this->classname();
+        $object = new ($this->classname);
 
         foreach ($this->getFieldToSchema() as $fieldName => $fieldSchema) {
             try {
