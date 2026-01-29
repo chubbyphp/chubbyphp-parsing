@@ -48,6 +48,9 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const string ERROR_UUID_CODE = 'string.uuid';
     public const string ERROR_UUID_TEMPLATE = 'Invalid uuid {{version}} {{given}}';
 
+    public const string ERROR_BOOL_CODE = 'string.bool';
+    public const string ERROR_BOOL_TEMPLATE = 'Cannot convert {{given}} to bool';
+
     public const string ERROR_FLOAT_CODE = 'string.float';
     public const string ERROR_FLOAT_TEMPLATE = 'Cannot convert {{given}} to float';
 
@@ -404,6 +407,32 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                     ['given' => $input]
                 )
             );
+        })->nullable($this->nullable);
+    }
+
+    public function toBool(): BoolSchema
+    {
+        return (new BoolSchema())->preParse(function ($input): ?bool {
+            /** @var null|string $input */
+            $input = $this->parse($input);
+
+            if (null === $input) {
+                return null;
+            }
+
+            $boolInput = filter_var($input, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+
+            if (null === $boolInput) {
+                throw new ErrorsException(
+                    new Error(
+                        self::ERROR_BOOL_CODE,
+                        self::ERROR_BOOL_TEMPLATE,
+                        ['given' => $input]
+                    )
+                );
+            }
+
+            return $boolInput;
         })->nullable($this->nullable);
     }
 

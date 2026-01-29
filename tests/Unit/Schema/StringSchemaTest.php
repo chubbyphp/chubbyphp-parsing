@@ -848,6 +848,53 @@ final class StringSchemaTest extends TestCase
         self::assertNull($schema->parse(null));
     }
 
+    public function testParseWithValidtoBool(): void
+    {
+        $schema = (new StringSchema())->toBool();
+
+        self::assertTrue($schema->parse('true'));
+        self::assertTrue($schema->parse('yes'));
+        self::assertTrue($schema->parse('on'));
+        self::assertTrue($schema->parse('1'));
+        self::assertFalse($schema->parse('false'));
+        self::assertFalse($schema->parse('no'));
+        self::assertFalse($schema->parse('off'));
+        self::assertFalse($schema->parse('0'));
+    }
+
+    public function testParseWithInvalidToBool(): void
+    {
+        $input = 'truee';
+
+        $schema = (new StringSchema())->toBool();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.bool',
+                        'template' => 'Cannot convert {{given}} to bool',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidtoBoolNullable(): void
+    {
+        $schema = (new StringSchema())->nullable()->toBool();
+
+        self::assertNull($schema->parse(null));
+    }
+
     public function testParseWithValidtoFloat(): void
     {
         $input = '4.2';

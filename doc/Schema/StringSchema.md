@@ -64,6 +64,7 @@ Convert the string to another type:
 $schema->toDateTime(); // Convert ISO 8601 string to DateTimeImmutable
 $schema->toFloat();    // Convert numeric string to float
 $schema->toInt();      // Convert numeric string to integer
+$schema->toBool();     // Convert boolean string to integer ('true', 'yes', 'on', '1' to true and 'false', 'no', 'off', '0' to false)
 ```
 
 ## Common Patterns
