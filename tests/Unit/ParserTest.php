@@ -138,15 +138,6 @@ final class ParserTest extends TestCase
         self::assertInstanceOf(ObjectSchema::class, $objectSchema);
     }
 
-    public function testString(): void
-    {
-        $p = new Parser();
-
-        $stringSchema = $p->string();
-
-        self::assertInstanceOf(StringSchema::class, $stringSchema);
-    }
-
     public function testRecord(): void
     {
         $p = new Parser();
@@ -154,6 +145,15 @@ final class ParserTest extends TestCase
         $recordSchema = $p->record($p->string());
 
         self::assertInstanceOf(RecordSchema::class, $recordSchema);
+    }
+
+    public function testString(): void
+    {
+        $p = new Parser();
+
+        $stringSchema = $p->string();
+
+        self::assertInstanceOf(StringSchema::class, $stringSchema);
     }
 
     public function testTuple(): void

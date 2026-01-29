@@ -103,13 +103,13 @@ $user = $userSchema->parse([
 All schemas support these methods:
 
 ```php
-$schema->nullable();       // Allow null values
-$schema->default($value);  // Provide default when input is null
-$schema->preParse($fn);    // Transform input before parsing
-$schema->postParse($fn);   // Transform output after parsing
-$schema->catch($fn);       // Handle errors and provide fallback
-$schema->parse($input);    // Parse and throw on error
-$schema->safeParse($input); // Parse and return Result object
+$schema->nullable();              // Allow null values
+$schema->default($value);         // Provide default when input is null
+$schema->preParse($fn);           // Transform input before parsing
+$schema->postParse($fn);          // Transform output after parsing
+$schema->parse($input);           // Parse and throw on error
+$schema->safeParse($input);       // Parse and return Result object
+$schema->catch($fn);              // Handle errors and provide fallback
 ```
 
 ## Error Handling

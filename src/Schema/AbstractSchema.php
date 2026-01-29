@@ -34,6 +34,11 @@ abstract class AbstractSchema implements SchemaInterface
         return $clone;
     }
 
+    final public function default(mixed $default): static
+    {
+        return $this->preParse(static fn (mixed $input) => $input ?? $default);
+    }
+
     /**
      * @param \Closure(mixed $input): mixed $preParse
      */
@@ -71,11 +76,6 @@ abstract class AbstractSchema implements SchemaInterface
         $clone->catch = $catch;
 
         return $clone;
-    }
-
-    final public function default(mixed $default): static
-    {
-        return $this->preParse(static fn (mixed $input) => $input ?? $default);
     }
 
     final protected function dispatchPreParses(mixed $data): mixed

@@ -7,9 +7,14 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Result;
 
+/**
+ * @method static default(mixed $default)
+ */
 interface SchemaInterface
 {
     public function nullable(bool $nullable = true): static;
+
+    // public function default(mixed $default): static;
 
     /**
      * @param \Closure(mixed $input): mixed $preParse

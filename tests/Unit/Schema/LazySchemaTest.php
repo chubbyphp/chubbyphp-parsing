@@ -17,6 +17,78 @@ use PHPUnit\Framework\TestCase;
  */
 final class LazySchemaTest extends TestCase
 {
+    public function testNullableT(): void
+    {
+        $schema = new LazySchema(static function () use (&$schema) {
+            return (new ObjectSchema([
+                'name' => new StringSchema(),
+                'child' => $schema,
+            ]))->nullable();
+        });
+
+        try {
+            $schema->nullable();
+
+            throw new \Exception('code should not be reached');
+        } catch (\BadMethodCallException $e) {
+            self::assertSame('LazySchema does not support any modification, "nullable" called.', $e->getMessage());
+        }
+    }
+
+    public function testDefault(): void
+    {
+        $schema = new LazySchema(static function () use (&$schema) {
+            return (new ObjectSchema([
+                'name' => new StringSchema(),
+                'child' => $schema,
+            ]))->nullable();
+        });
+
+        try {
+            $schema->default('test');
+
+            throw new \Exception('code should not be reached');
+        } catch (\BadMethodCallException $e) {
+            self::assertSame('LazySchema does not support any modification, "default" called.', $e->getMessage());
+        }
+    }
+
+    public function testPreParse(): void
+    {
+        $schema = new LazySchema(static function () use (&$schema) {
+            return (new ObjectSchema([
+                'name' => new StringSchema(),
+                'child' => $schema,
+            ]))->nullable();
+        });
+
+        try {
+            $schema->preParse(static function (): void {});
+
+            throw new \Exception('code should not be reached');
+        } catch (\BadMethodCallException $e) {
+            self::assertSame('LazySchema does not support any modification, "preParse" called.', $e->getMessage());
+        }
+    }
+
+    public function testPostParse(): void
+    {
+        $schema = new LazySchema(static function () use (&$schema) {
+            return (new ObjectSchema([
+                'name' => new StringSchema(),
+                'child' => $schema,
+            ]))->nullable();
+        });
+
+        try {
+            $schema->postParse(static function (): void {});
+
+            throw new \Exception('code should not be reached');
+        } catch (\BadMethodCallException $e) {
+            self::assertSame('LazySchema does not support any modification, "postParse" called.', $e->getMessage());
+        }
+    }
+
     public function testParseSuccess(): void
     {
         $input = [
@@ -71,78 +143,6 @@ final class LazySchemaTest extends TestCase
         self::assertInstanceOf(\stdClass::class, $result->data);
 
         self::assertSame($input, json_decode(json_encode($result->data), true));
-    }
-
-    public function testNullableTrue(): void
-    {
-        $schema = new LazySchema(static function () use (&$schema) {
-            return (new ObjectSchema([
-                'name' => new StringSchema(),
-                'child' => $schema,
-            ]))->nullable();
-        });
-
-        try {
-            $schema->nullable();
-
-            throw new \Exception('code should not be reached');
-        } catch (\BadMethodCallException $e) {
-            self::assertSame('LazySchema does not support any modification, "nullable" called with true.', $e->getMessage());
-        }
-    }
-
-    public function testNullableFalse(): void
-    {
-        $schema = new LazySchema(static function () use (&$schema) {
-            return (new ObjectSchema([
-                'name' => new StringSchema(),
-                'child' => $schema,
-            ]))->nullable();
-        });
-
-        try {
-            $schema->nullable(false);
-
-            throw new \Exception('code should not be reached');
-        } catch (\BadMethodCallException $e) {
-            self::assertSame('LazySchema does not support any modification, "nullable" called with false.', $e->getMessage());
-        }
-    }
-
-    public function testPreParse(): void
-    {
-        $schema = new LazySchema(static function () use (&$schema) {
-            return (new ObjectSchema([
-                'name' => new StringSchema(),
-                'child' => $schema,
-            ]))->nullable();
-        });
-
-        try {
-            $schema->preParse(static function (): void {});
-
-            throw new \Exception('code should not be reached');
-        } catch (\BadMethodCallException $e) {
-            self::assertSame('LazySchema does not support any modification, "preParse" called.', $e->getMessage());
-        }
-    }
-
-    public function testPostParse(): void
-    {
-        $schema = new LazySchema(static function () use (&$schema) {
-            return (new ObjectSchema([
-                'name' => new StringSchema(),
-                'child' => $schema,
-            ]))->nullable();
-        });
-
-        try {
-            $schema->postParse(static function (): void {});
-
-            throw new \Exception('code should not be reached');
-        } catch (\BadMethodCallException $e) {
-            self::assertSame('LazySchema does not support any modification, "postParse" called.', $e->getMessage());
-        }
     }
 
     public function testCatch(): void

@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
-use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Result;
 
-/**
- * @phpstan-type Call array{name: string, arguments: array<mixed>}
- */
 final class LazySchema implements SchemaInterface
 {
     private ?SchemaInterface $schema = null;
@@ -19,18 +15,30 @@ final class LazySchema implements SchemaInterface
      */
     public function __construct(private \Closure $lazy) {}
 
+    /**
+     * @internal
+     *
+     * @infection-ignore-all
+     */
     public function nullable(bool $nullable = true): static
     {
-        throw new \BadMethodCallException(
-            \sprintf(
-                'LazySchema does not support any modification, "nullable" called with %s.',
-                $nullable ? 'true' : 'false'
-            )
-        );
+        throw new \BadMethodCallException('LazySchema does not support any modification, "nullable" called.');
     }
 
     /**
-     * @param \Closure(mixed $input): mixed $preParse
+     * @internal
+     *
+     * @infection-ignore-all
+     */
+    public function default(mixed $default): static
+    {
+        throw new \BadMethodCallException('LazySchema does not support any modification, "default" called.');
+    }
+
+    /**
+     * @internal
+     *
+     * @infection-ignore-all
      */
     public function preParse(\Closure $preParse): static
     {
@@ -38,19 +46,13 @@ final class LazySchema implements SchemaInterface
     }
 
     /**
-     * @param \Closure(mixed $input): mixed $postParse
+     * @internal
+     *
+     * @infection-ignore-all
      */
     public function postParse(\Closure $postParse): static
     {
         throw new \BadMethodCallException('LazySchema does not support any modification, "postParse" called.');
-    }
-
-    /**
-     * @param \Closure(mixed $input, ErrorsException $e): mixed $catch
-     */
-    public function catch(\Closure $catch): static
-    {
-        throw new \BadMethodCallException('LazySchema does not support any modification, "catch" called.');
     }
 
     public function parse(mixed $input): mixed
@@ -65,6 +67,14 @@ final class LazySchema implements SchemaInterface
         $schema = $this->resolveSchema();
 
         return $schema->safeParse($input);
+    }
+
+    /**
+     * @internal
+     */
+    public function catch(\Closure $catch): static
+    {
+        throw new \BadMethodCallException('LazySchema does not support any modification, "catch" called.');
     }
 
     private function resolveSchema(): SchemaInterface

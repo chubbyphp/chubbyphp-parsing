@@ -501,22 +501,6 @@ final class IntSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidToDateTime(): void
-    {
-        $input = 1705742100;
-
-        $schema = (new IntSchema())->toDateTime()->from(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
-
-        self::assertEquals(new \DateTimeImmutable('@'.$input), $schema->parse($input));
-    }
-
-    public function testParseWithToDateTimeNullable(): void
-    {
-        $schema = (new IntSchema())->nullable()->toDateTime();
-
-        self::assertNull($schema->parse(null));
-    }
-
     public function testParseWithToFloat(): void
     {
         $input = 42;
@@ -545,6 +529,22 @@ final class IntSchemaTest extends TestCase
     public function testParseWithToStringNullable(): void
     {
         $schema = (new IntSchema())->nullable()->toString();
+
+        self::assertNull($schema->parse(null));
+    }
+
+    public function testParseWithValidToDateTime(): void
+    {
+        $input = 1705742100;
+
+        $schema = (new IntSchema())->toDateTime()->from(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
+
+        self::assertEquals(new \DateTimeImmutable('@'.$input), $schema->parse($input));
+    }
+
+    public function testParseWithToDateTimeNullable(): void
+    {
+        $schema = (new IntSchema())->nullable()->toDateTime();
 
         self::assertNull($schema->parse(null));
     }
