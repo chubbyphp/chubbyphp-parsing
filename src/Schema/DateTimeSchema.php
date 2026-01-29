@@ -83,7 +83,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): IntSchema
     {
-        return (new IntSchema())->preParse(function ($input) {
+        return (new IntSchema())->preParse(function ($input): ?int {
             /** @var null|\DateTimeInterface $input */
             $input = $this->parse($input);
 
@@ -93,7 +93,7 @@ final class DateTimeSchema extends AbstractSchema implements SchemaInterface
 
     public function toString(): StringSchema
     {
-        return (new StringSchema())->preParse(function ($input) {
+        return (new StringSchema())->preParse(function ($input): ?string {
             /** @var null|\DateTimeInterface $input */
             $input = $this->parse($input);
 

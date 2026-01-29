@@ -81,11 +81,8 @@ $coordinatesSchema->parse(['lat' => 47.1, 'lng' => 8.2]);
 | Code | Description |
 |------|-------------|
 | `float.type` | Value is not a float |
-| `float.gt` | Value is not greater than threshold |
-| `float.gte` | Value is not greater than or equal to threshold |
-| `float.lt` | Value is not less than threshold |
-| `float.lte` | Value is not less than or equal to threshold |
-| `float.positive` | Value is not positive |
-| `float.nonNegative` | Value is negative |
-| `float.negative` | Value is not negative |
-| `float.nonPositive` | Value is positive |
+| `float.gt` | Value is not greater than threshold (used by `gt()` and `positive()`) |
+| `float.gte` | Value is not greater than or equal to threshold (used by `gte()` and `nonNegative()`) |
+| `float.lt` | Value is not less than threshold (used by `lt()` and `negative()`) |
+| `float.lte` | Value is not less than or equal to threshold (used by `lte()` and `nonPositive()`) |
+| `float.int` | Cannot convert float to int without precision loss (for `toInt()`) |

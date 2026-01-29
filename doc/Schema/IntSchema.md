@@ -90,11 +90,7 @@ $date = $timestampSchema->parse(1705744500);
 | Code | Description |
 |------|-------------|
 | `int.type` | Value is not an integer |
-| `int.gt` | Value is not greater than threshold |
-| `int.gte` | Value is not greater than or equal to threshold |
-| `int.lt` | Value is not less than threshold |
-| `int.lte` | Value is not less than or equal to threshold |
-| `int.positive` | Value is not positive |
-| `int.nonNegative` | Value is negative |
-| `int.negative` | Value is not negative |
-| `int.nonPositive` | Value is positive |
+| `int.gt` | Value is not greater than threshold (used by `gt()` and `positive()`) |
+| `int.gte` | Value is not greater than or equal to threshold (used by `gte()` and `nonNegative()`) |
+| `int.lt` | Value is not less than threshold (used by `lt()` and `negative()`) |
+| `int.lte` | Value is not less than or equal to threshold (used by `lte()` and `nonPositive()`) |

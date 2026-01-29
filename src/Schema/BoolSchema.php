@@ -43,7 +43,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
     public function toFloat(): FloatSchema
     {
-        return (new FloatSchema())->preParse(function ($input) {
+        return (new FloatSchema())->preParse(function ($input): ?float {
             /** @var null|bool $input */
             $input = $this->parse($input);
 
@@ -53,7 +53,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): IntSchema
     {
-        return (new IntSchema())->preParse(function ($input) {
+        return (new IntSchema())->preParse(function ($input): ?int {
             /** @var null|bool $input */
             $input = $this->parse($input);
 
@@ -63,7 +63,7 @@ final class BoolSchema extends AbstractSchema implements SchemaInterface
 
     public function toString(): StringSchema
     {
-        return (new StringSchema())->preParse(function ($input) {
+        return (new StringSchema())->preParse(function ($input): ?string {
             /** @var null|bool $input */
             $input = $this->parse($input);
 

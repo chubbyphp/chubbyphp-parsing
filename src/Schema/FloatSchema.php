@@ -146,7 +146,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): IntSchema
     {
-        return (new IntSchema())->preParse(function ($input) {
+        return (new IntSchema())->preParse(function ($input): ?int {
             /** @var null|float $input */
             $input = $this->parse($input);
 
@@ -172,7 +172,7 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
 
     public function toString(): StringSchema
     {
-        return (new StringSchema())->preParse(function ($input) {
+        return (new StringSchema())->preParse(function ($input): ?string {
             /** @var null|float $input */
             $input = $this->parse($input);
 

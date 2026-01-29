@@ -231,6 +231,5 @@ $schema = $p->union([$p->literal('active'), $p->literal('inactive')]);
 
 | Code | Description |
 |------|-------------|
-| `backedEnum.type` | Value is not a valid backing value for the enum |
-
-The error will include the invalid value and the enum class name.
+| `backedEnum.type` | Value is not a string or int (expected backing type) |
+| `backedEnum.value` | Value is not one of the valid enum case values |

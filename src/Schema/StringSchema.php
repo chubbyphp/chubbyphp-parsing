@@ -201,7 +201,9 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         }
 
         return $this->postParse(static function (string $string) use ($match) {
-            if (0 === preg_match($match, $string)) {
+            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $match]]);
+
+            if (false === $doesMatch) {
                 throw new ErrorsException(
                     new Error(
                         self::ERROR_MATCH_CODE,
@@ -344,7 +346,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function toDateTime(): DateTimeSchema
     {
-        return (new DateTimeSchema())->preParse(function ($input) {
+        return (new DateTimeSchema())->preParse(function ($input): ?\DateTimeImmutable {
             /** @var null|string $input */
             $input = $this->parse($input);
 
@@ -376,7 +378,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function toFloat(): FloatSchema
     {
-        return (new FloatSchema())->preParse(function ($input) {
+        return (new FloatSchema())->preParse(function ($input): ?float {
             /** @var null|string $input */
             $input = $this->parse($input);
 
@@ -384,9 +386,9 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                 return null;
             }
 
-            $floatInput = (float) $input;
+            $floatInput = filter_var($input, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
 
-            if ((string) $floatInput !== $input) {
+            if (null === $floatInput) {
                 throw new ErrorsException(
                     new Error(
                         self::ERROR_FLOAT_CODE,
@@ -402,7 +404,7 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     public function toInt(): IntSchema
     {
-        return (new IntSchema())->preParse(function ($input) {
+        return (new IntSchema())->preParse(function ($input): ?int {
             /** @var null|string $input */
             $input = $this->parse($input);
 
@@ -410,9 +412,9 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                 return null;
             }
 
-            $intInput = (int) $input;
+            $intInput = filter_var($input, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
 
-            if ((string) $intInput !== $input) {
+            if (null === $intInput) {
                 throw new ErrorsException(
                     new Error(
                         self::ERROR_INT_CODE,

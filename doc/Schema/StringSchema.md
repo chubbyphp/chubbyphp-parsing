@@ -128,3 +128,7 @@ $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 | `string.url` | Invalid URL format |
 | `string.uuidV4` | Invalid UUID v4 format |
 | `string.uuidV5` | Invalid UUID v5 format |
+| `string.bool` | Cannot convert string to bool (for `toBool()`) |
+| `string.float` | Cannot convert string to float (for `toFloat()`) |
+| `string.int` | Cannot convert string to int (for `toInt()`) |
+| `string.datetime` | Cannot convert string to datetime (for `toDateTime()`) |
