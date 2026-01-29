@@ -30,17 +30,23 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const string ERROR_ENDSWITH_CODE = 'string.endsWith';
     public const string ERROR_ENDSWITH_TEMPLATE = '{{given}} does not ends with {{endsWith}}';
 
-    public const string ERROR_MATCH_CODE = 'string.match';
-    public const string ERROR_MATCH_TEMPLATE = '{{given}} does not match {{match}}';
-
-    public const string ERROR_REGEXP_CODE = 'string.regexp';
-    public const string ERROR_REGEXP_TEMPLATE = '{{given}} does not regexp {{regexp}}';
+    public const string ERROR_DOMAIN_CODE = 'string.domain';
+    public const string ERROR_DOMAIN_TEMPLATE = 'Invalid domain {{given}}';
 
     public const string ERROR_EMAIL_CODE = 'string.email';
     public const string ERROR_EMAIL_TEMPLATE = 'Invalid email {{given}}';
 
     public const string ERROR_IP_CODE = 'string.ip';
     public const string ERROR_IP_TEMPLATE = 'Invalid ip {{version}} {{given}}';
+
+    public const string ERROR_MAC_CODE = 'string.mac';
+    public const string ERROR_MAC_TEMPLATE = 'Invalid mac {{given}}';
+
+    public const string ERROR_MATCH_CODE = 'string.match';
+    public const string ERROR_MATCH_TEMPLATE = '{{given}} does not match {{match}}';
+
+    public const string ERROR_REGEXP_CODE = 'string.regexp';
+    public const string ERROR_REGEXP_TEMPLATE = '{{given}} does not regexp {{regexp}}';
 
     public const string ERROR_URL_CODE = 'string.url';
     public const string ERROR_URL_TEMPLATE = 'Invalid url {{given}}';
@@ -200,49 +206,15 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
-    public function regexp(string $regexp): static
+    public function domain(): static
     {
-        if (false === @preg_match($regexp, '')) {
-            throw new \InvalidArgumentException(\sprintf('Invalid regexp "%s" given', $regexp));
-        }
-
-        return $this->postParse(static function (string $string) use ($regexp) {
-            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $regexp]]);
-
-            if (false === $doesMatch) {
+        return $this->postParse(static function (string $string) {
+            if (!filter_var($string, FILTER_VALIDATE_DOMAIN)) {
                 throw new ErrorsException(
                     new Error(
-                        self::ERROR_REGEXP_CODE,
-                        self::ERROR_REGEXP_TEMPLATE,
-                        ['regexp' => $regexp, 'given' => $string]
-                    )
-                );
-            }
-
-            return $string;
-        });
-    }
-
-    /**
-     * @deprecated: use regexp
-     */
-    public function match(string $match): static
-    {
-        @trigger_error('Use regexp instead', E_USER_DEPRECATED);
-
-        if (false === @preg_match($match, '')) {
-            throw new \InvalidArgumentException(\sprintf('Invalid match "%s" given', $match));
-        }
-
-        return $this->postParse(static function (string $string) use ($match) {
-            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $match]]);
-
-            if (false === $doesMatch) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_MATCH_CODE,
-                        self::ERROR_MATCH_TEMPLATE,
-                        ['match' => $match, 'given' => $string]
+                        self::ERROR_DOMAIN_CODE,
+                        self::ERROR_DOMAIN_TEMPLATE,
+                        ['given' => $string]
                     )
                 );
             }
@@ -294,6 +266,74 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
                         self::ERROR_IP_CODE,
                         self::ERROR_IP_TEMPLATE,
                         ['version' => 'v6', 'given' => $string]
+                    )
+                );
+            }
+
+            return $string;
+        });
+    }
+
+    public function mac(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (!filter_var($string, FILTER_VALIDATE_MAC)) {
+                throw new ErrorsException(
+                    new Error(
+                        self::ERROR_MAC_CODE,
+                        self::ERROR_MAC_TEMPLATE,
+                        ['given' => $string]
+                    )
+                );
+            }
+
+            return $string;
+        });
+    }
+
+    /**
+     * @deprecated: use regexp
+     */
+    public function match(string $match): static
+    {
+        @trigger_error('Use regexp instead', E_USER_DEPRECATED);
+
+        if (false === @preg_match($match, '')) {
+            throw new \InvalidArgumentException(\sprintf('Invalid match "%s" given', $match));
+        }
+
+        return $this->postParse(static function (string $string) use ($match) {
+            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $match]]);
+
+            if (false === $doesMatch) {
+                throw new ErrorsException(
+                    new Error(
+                        self::ERROR_MATCH_CODE,
+                        self::ERROR_MATCH_TEMPLATE,
+                        ['match' => $match, 'given' => $string]
+                    )
+                );
+            }
+
+            return $string;
+        });
+    }
+
+    public function regexp(string $regexp): static
+    {
+        if (false === @preg_match($regexp, '')) {
+            throw new \InvalidArgumentException(\sprintf('Invalid regexp "%s" given', $regexp));
+        }
+
+        return $this->postParse(static function (string $string) use ($regexp) {
+            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $regexp]]);
+
+            if (false === $doesMatch) {
+                throw new ErrorsException(
+                    new Error(
+                        self::ERROR_REGEXP_CODE,
+                        self::ERROR_REGEXP_TEMPLATE,
+                        ['regexp' => $regexp, 'given' => $string]
                     )
                 );
             }

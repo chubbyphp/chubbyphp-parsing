@@ -36,9 +36,11 @@ $schema->regexp('/^[a-z]+$/i'); // Must match regex pattern
 ### Format Validations
 
 ```php
+$schema->domain();  // Valid domain
 $schema->email();   // Valid email address
 $schema->ipV4();    // Valid IPv4 address
 $schema->ipV6();    // Valid IPv6 address
+$schema->mac();     // Valid mac address
 $schema->url();     // Valid URL
 $schema->uuidV4();  // Valid UUID v4
 $schema->uuidV5();  // Valid UUID v5
@@ -122,10 +124,12 @@ $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 | `string.includes` | String doesn't contain required substring |
 | `string.startsWith` | String doesn't start with required prefix |
 | `string.endsWith` | String doesn't end with required suffix |
-| `string.regexp` | String doesn't match regex pattern |
+| `string.domain` | Invalid domain format |
 | `string.email` | Invalid email format |
 | `string.ipV4` | Invalid IPv4 format |
 | `string.ipV6` | Invalid IPv6 format |
+| `string.mac` | Invalid mac format |
+| `string.regexp` | String doesn't match regex pattern |
 | `string.url` | Invalid URL format |
 | `string.uuidV4` | Invalid UUID v4 format |
 | `string.uuidV5` | Invalid UUID v5 format |

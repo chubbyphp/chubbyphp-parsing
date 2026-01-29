@@ -365,31 +365,20 @@ final class StringSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithRegexpWithInvalidPattern(): void
+    public function testParseWithValidDomain(): void
     {
-        try {
-            (new StringSchema())->regexp('test');
+        $input = 'example.com';
 
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid regexp "test" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidRegexp(): void
-    {
-        $input = 'aBcDeFg';
-
-        $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
+        $schema = (new StringSchema())->domain();
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidRegexp(): void
+    public function testParseWithInvalidDomain(): void
     {
-        $input = 'a1B2C3d4';
+        $input = 'example..com';
 
-        $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
+        $schema = (new StringSchema())->domain();
 
         try {
             $schema->parse($input);
@@ -400,67 +389,9 @@ final class StringSchemaTest extends TestCase
                 [
                     'path' => '',
                     'error' => [
-                        'code' => 'string.regexp',
-                        'template' => '{{given}} does not regexp {{regexp}}',
+                        'code' => 'string.domain',
+                        'template' => 'Invalid domain {{given}}',
                         'variables' => [
-                            'regexp' => '/^[a-z]+$/i',
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
-    public function testParseWithMatchWithInvalidPattern(): void
-    {
-        try {
-            (new StringSchema())->match('test');
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid match "test" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidMatch(): void
-    {
-        error_clear_last();
-
-        $input = 'aBcDeFg';
-
-        $schema = (new StringSchema())->match('/^[a-z]+$/i');
-
-        self::assertSame($input, $schema->parse($input));
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use regexp instead', $lastError['message']);
-    }
-
-    public function testParseWithInvalidMatch(): void
-    {
-        $input = 'a1B2C3d4';
-
-        $schema = (new StringSchema())->match('/^[a-z]+$/i');
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'string.match',
-                        'template' => '{{given}} does not match {{match}}',
-                        'variables' => [
-                            'match' => '/^[a-z]+$/i',
                             'given' => $input,
                         ],
                     ],
@@ -568,6 +499,145 @@ final class StringSchemaTest extends TestCase
                         'template' => 'Invalid ip {{version}} {{given}}',
                         'variables' => [
                             'version' => 'v6',
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidMac(): void
+    {
+        $input = 'ff:ff:ff:ff:ff:ff';
+
+        $schema = (new StringSchema())->mac();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMac(): void
+    {
+        $input = 'ff:ff:ff:ff:ff:fg';
+
+        $schema = (new StringSchema())->mac();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.mac',
+                        'template' => 'Invalid mac {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithMatchWithInvalidPattern(): void
+    {
+        try {
+            (new StringSchema())->match('test');
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid match "test" given', $e->getMessage());
+        }
+    }
+
+    public function testParseWithValidMatch(): void
+    {
+        error_clear_last();
+
+        $input = 'aBcDeFg';
+
+        $schema = (new StringSchema())->match('/^[a-z]+$/i');
+
+        self::assertSame($input, $schema->parse($input));
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use regexp instead', $lastError['message']);
+    }
+
+    public function testParseWithInvalidMatch(): void
+    {
+        $input = 'a1B2C3d4';
+
+        $schema = (new StringSchema())->match('/^[a-z]+$/i');
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.match',
+                        'template' => '{{given}} does not match {{match}}',
+                        'variables' => [
+                            'match' => '/^[a-z]+$/i',
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithRegexpWithInvalidPattern(): void
+    {
+        try {
+            (new StringSchema())->regexp('test');
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid regexp "test" given', $e->getMessage());
+        }
+    }
+
+    public function testParseWithValidRegexp(): void
+    {
+        $input = 'aBcDeFg';
+
+        $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidRegexp(): void
+    {
+        $input = 'a1B2C3d4';
+
+        $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.regexp',
+                        'template' => '{{given}} does not regexp {{regexp}}',
+                        'variables' => [
+                            'regexp' => '/^[a-z]+$/i',
                             'given' => $input,
                         ],
                     ],
