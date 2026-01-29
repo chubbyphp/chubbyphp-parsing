@@ -365,6 +365,53 @@ final class StringSchemaTest extends TestCase
         }
     }
 
+    public function testParseWithRegexpWithInvalidPattern(): void
+    {
+        try {
+            (new StringSchema())->regexp('test');
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid regexp "test" given', $e->getMessage());
+        }
+    }
+
+    public function testParseWithValidRegexp(): void
+    {
+        $input = 'aBcDeFg';
+
+        $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidRegexp(): void
+    {
+        $input = 'a1B2C3d4';
+
+        $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.regexp',
+                        'template' => '{{given}} does not regexp {{regexp}}',
+                        'variables' => [
+                            'regexp' => '/^[a-z]+$/i',
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseWithMatchWithInvalidPattern(): void
     {
         try {
@@ -378,11 +425,21 @@ final class StringSchemaTest extends TestCase
 
     public function testParseWithValidMatch(): void
     {
+        error_clear_last();
+
         $input = 'aBcDeFg';
 
         $schema = (new StringSchema())->match('/^[a-z]+$/i');
 
         self::assertSame($input, $schema->parse($input));
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use regexp instead', $lastError['message']);
     }
 
     public function testParseWithInvalidMatch(): void

@@ -33,6 +33,9 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
     public const string ERROR_MATCH_CODE = 'string.match';
     public const string ERROR_MATCH_TEMPLATE = '{{given}} does not match {{match}}';
 
+    public const string ERROR_REGEXP_CODE = 'string.regexp';
+    public const string ERROR_REGEXP_TEMPLATE = '{{given}} does not regexp {{regexp}}';
+
     public const string ERROR_EMAIL_CODE = 'string.email';
     public const string ERROR_EMAIL_TEMPLATE = 'Invalid email {{given}}';
 
@@ -194,8 +197,36 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
         });
     }
 
+    public function regexp(string $regexp): static
+    {
+        if (false === @preg_match($regexp, '')) {
+            throw new \InvalidArgumentException(\sprintf('Invalid regexp "%s" given', $regexp));
+        }
+
+        return $this->postParse(static function (string $string) use ($regexp) {
+            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $regexp]]);
+
+            if (false === $doesMatch) {
+                throw new ErrorsException(
+                    new Error(
+                        self::ERROR_REGEXP_CODE,
+                        self::ERROR_REGEXP_TEMPLATE,
+                        ['regexp' => $regexp, 'given' => $string]
+                    )
+                );
+            }
+
+            return $string;
+        });
+    }
+
+    /**
+     * @deprecated: use regexp
+     */
     public function match(string $match): static
     {
+        @trigger_error('Use regexp instead', E_USER_DEPRECATED);
+
         if (false === @preg_match($match, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid match "%s" given', $match));
         }

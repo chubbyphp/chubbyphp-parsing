@@ -30,7 +30,7 @@ $schema->maxLength(100); // Maximum 100 characters
 $schema->includes('amp');    // Must contain 'amp'
 $schema->startsWith('exa');  // Must start with 'exa'
 $schema->endsWith('ple');    // Must end with 'ple'
-$schema->match('/^[a-z]+$/i'); // Must match regex pattern
+$schema->regexp('/^[a-z]+$/i'); // Must match regex pattern
 ```
 
 ### Format Validations
@@ -105,7 +105,7 @@ $usernameSchema = $p->string()
     ->toLowerCase()
     ->minLength(3)
     ->maxLength(20)
-    ->match('/^[a-z0-9_]+$/');
+    ->regexp('/^[a-z0-9_]+$/');
 
 $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 ```
@@ -121,7 +121,7 @@ $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 | `string.includes` | String doesn't contain required substring |
 | `string.startsWith` | String doesn't start with required prefix |
 | `string.endsWith` | String doesn't end with required suffix |
-| `string.match` | String doesn't match regex pattern |
+| `string.regexp` | String doesn't match regex pattern |
 | `string.email` | Invalid email format |
 | `string.ipV4` | Invalid IPv4 format |
 | `string.ipV6` | Invalid IPv6 format |
