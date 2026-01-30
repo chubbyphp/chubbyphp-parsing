@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\Errors;
 use Chubbyphp\Parsing\ErrorsException;
 
-final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInterface
+final class DiscriminatedUnionSchema extends AbstractSchemaInnerParse implements SchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'discriminatedUnion.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", {{given}} given';
@@ -54,59 +54,42 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
 
             $this->objectSchemas[] = $objectSchema;
         }
+
+        $this->preParses[] = static function (mixed $input) {
+            if ($input instanceof \stdClass || $input instanceof \Traversable) {
+                return (array) $input;
+            }
+
+            if ($input instanceof \JsonSerializable) {
+                return $input->jsonSerialize();
+            }
+
+            return $input;
+        };
     }
 
-    public function parse(mixed $input): mixed
+    protected function innerParse(mixed $input): mixed
     {
-        if ($input instanceof \stdClass || $input instanceof \Traversable) {
-            $input = (array) $input;
+        if (!\is_array($input)) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TYPE_CODE,
+                    self::ERROR_TYPE_TEMPLATE,
+                    ['given' => $this->getDataType($input)]
+                )
+            );
         }
 
-        if ($input instanceof \JsonSerializable) {
-            $input = $input->jsonSerialize();
+        if (!isset($input[$this->discriminatorFieldName])) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_DISCRIMINATOR_FIELD_CODE,
+                    self::ERROR_DISCRIMINATOR_FIELD_TEMPLATE,
+                    ['discriminatorFieldName' => $this->discriminatorFieldName]
+                )
+            );
         }
 
-        try {
-            $input = $this->dispatchPreParses($input);
-
-            if (null === $input && $this->nullable) {
-                return null;
-            }
-
-            if (!\is_array($input)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_TYPE_CODE,
-                        self::ERROR_TYPE_TEMPLATE,
-                        ['given' => $this->getDataType($input)]
-                    )
-                );
-            }
-
-            if (!isset($input[$this->discriminatorFieldName])) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_DISCRIMINATOR_FIELD_CODE,
-                        self::ERROR_DISCRIMINATOR_FIELD_TEMPLATE,
-                        ['discriminatorFieldName' => $this->discriminatorFieldName]
-                    )
-                );
-            }
-
-            $output = $this->parseObjectSchemas($input, $input[$this->discriminatorFieldName]);
-
-            return $this->dispatchPostParses($output);
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
-        }
-    }
-
-    private function parseObjectSchemas(mixed $input, mixed $discriminator): mixed
-    {
         $errors = new Errors();
 
         foreach ($this->objectSchemas as $objectSchema) {
@@ -114,7 +97,7 @@ final class DiscriminatedUnionSchema extends AbstractSchema implements SchemaInt
             $discriminatorFieldSchema = $objectSchema->getFieldSchema($this->discriminatorFieldName);
 
             try {
-                $discriminatorFieldSchema->parse($discriminator);
+                $discriminatorFieldSchema->parse($input[$this->discriminatorFieldName]);
             } catch (ErrorsException $e) {
                 $errors->add($e->errors);
 

@@ -7,10 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Result;
 
-/**
- * @deprecated use Chubbyphp\Parsing\Schem\AbstractSchemaInnerParse
- */
-abstract class AbstractSchema implements SchemaInterface
+abstract class AbstractSchemaInnerParse implements SchemaInterface
 {
     protected bool $nullable = false;
 
@@ -61,6 +58,27 @@ abstract class AbstractSchema implements SchemaInterface
         return $clone;
     }
 
+    final public function parse(mixed $input): mixed
+    {
+        try {
+            $input = $this->dispatchPreParses($input);
+
+            if (null === $input && $this->nullable) {
+                return null;
+            }
+
+            $output = $this->innerParse($input);
+
+            return $this->dispatchPostParses($output);
+        } catch (ErrorsException $e) {
+            if ($this->catch) {
+                return ($this->catch)($input, $e);
+            }
+
+            throw $e;
+        }
+    }
+
     final public function safeParse(mixed $input): Result
     {
         try {
@@ -80,6 +98,8 @@ abstract class AbstractSchema implements SchemaInterface
 
         return $clone;
     }
+
+    abstract protected function innerParse(mixed $input): mixed;
 
     final protected function dispatchPreParses(mixed $data): mixed
     {
