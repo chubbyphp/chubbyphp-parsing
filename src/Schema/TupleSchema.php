@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\Errors;
 use Chubbyphp\Parsing\ErrorsException;
 
-final class TupleSchema extends AbstractSchema implements SchemaInterface
+final class TupleSchema extends AbstractSchemaV2 implements SchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'tuple.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "array", {{given}} given';
@@ -48,69 +48,55 @@ final class TupleSchema extends AbstractSchema implements SchemaInterface
         }
     }
 
-    public function parse(mixed $input): mixed
+    protected function innerParse(mixed $input): mixed
     {
-        try {
-            $input = $this->dispatchPreParses($input);
+        if (!\is_array($input)) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TYPE_CODE,
+                    self::ERROR_TYPE_TEMPLATE,
+                    ['given' => $this->getDataType($input)]
+                )
+            );
+        }
 
-            if (null === $input && $this->nullable) {
-                return null;
-            }
+        $childrenErrors = new Errors();
 
-            if (!\is_array($input)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_TYPE_CODE,
-                        self::ERROR_TYPE_TEMPLATE,
-                        ['given' => $this->getDataType($input)]
-                    )
-                );
-            }
+        $output = [];
 
-            $childrenErrors = new Errors();
-
-            $output = [];
-
-            foreach ($this->schemas as $i => $schema) {
-                if (!isset($input[$i])) {
-                    $childrenErrors->add(new Error(
-                        self::ERROR_MISSING_INDEX_CODE,
-                        self::ERROR_MISSING_INDEX_TEMPLATE,
-                        ['index' => $i]
-                    ), (string) $i);
-
-                    continue;
-                }
-
-                try {
-                    $output[$i] = $schema->parse($input[$i]);
-                } catch (ErrorsException $e) {
-                    $childrenErrors->add($e->errors, (string) $i);
-                }
-            }
-
-            $inputCount = \count($input);
-            $schemaCount = \count($this->schemas);
-
-            for ($i = $schemaCount; $i < $inputCount; ++$i) {
+        foreach ($this->schemas as $i => $schema) {
+            if (!isset($input[$i])) {
                 $childrenErrors->add(new Error(
-                    self::ERROR_ADDITIONAL_INDEX_CODE,
-                    self::ERROR_ADDITIONAL_INDEX_TEMPLATE,
+                    self::ERROR_MISSING_INDEX_CODE,
+                    self::ERROR_MISSING_INDEX_TEMPLATE,
                     ['index' => $i]
                 ), (string) $i);
+
+                continue;
             }
 
-            if ($childrenErrors->has()) {
-                throw new ErrorsException($childrenErrors);
+            try {
+                $output[$i] = $schema->parse($input[$i]);
+            } catch (ErrorsException $e) {
+                $childrenErrors->add($e->errors, (string) $i);
             }
-
-            return $this->dispatchPostParses($output);
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
         }
+
+        $inputCount = \count($input);
+        $schemaCount = \count($this->schemas);
+
+        for ($i = $schemaCount; $i < $inputCount; ++$i) {
+            $childrenErrors->add(new Error(
+                self::ERROR_ADDITIONAL_INDEX_CODE,
+                self::ERROR_ADDITIONAL_INDEX_TEMPLATE,
+                ['index' => $i]
+            ), (string) $i);
+        }
+
+        if ($childrenErrors->has()) {
+            throw new ErrorsException($childrenErrors);
+        }
+
+        return $output;
     }
 }

@@ -35,7 +35,6 @@ enum BackedSuitInt: int
 enum BackedEmpty: string {}
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\BackedEnumSchema
  *
  * @internal

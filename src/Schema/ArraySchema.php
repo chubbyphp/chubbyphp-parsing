@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\Errors;
 use Chubbyphp\Parsing\ErrorsException;
 
-final class ArraySchema extends AbstractSchema implements SchemaInterface
+final class ArraySchema extends AbstractSchemaV2 implements SchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'array.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "array", {{given}} given';
@@ -26,51 +26,6 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     public const string ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
 
     public function __construct(private SchemaInterface $itemSchema) {}
-
-    public function parse(mixed $input): mixed
-    {
-        try {
-            $input = $this->dispatchPreParses($input);
-
-            if (null === $input && $this->nullable) {
-                return null;
-            }
-
-            if (!\is_array($input)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_TYPE_CODE,
-                        self::ERROR_TYPE_TEMPLATE,
-                        ['given' => $this->getDataType($input)]
-                    )
-                );
-            }
-
-            $array = [];
-
-            $childrenErrors = new Errors();
-
-            foreach ($input as $i => $item) {
-                try {
-                    $array[$i] = $this->itemSchema->parse($item);
-                } catch (ErrorsException $e) {
-                    $childrenErrors->add($e->errors, (string) $i);
-                }
-            }
-
-            if ($childrenErrors->has()) {
-                throw new ErrorsException($childrenErrors);
-            }
-
-            return $this->dispatchPostParses($array);
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
-        }
-    }
 
     public function length(int $length): static
     {
@@ -186,5 +141,36 @@ final class ArraySchema extends AbstractSchema implements SchemaInterface
     public function reduce(\Closure $reduce, mixed $initial = null): static
     {
         return $this->postParse(static fn (array $array) => array_reduce($array, $reduce, $initial));
+    }
+
+    protected function innerParse(mixed $input): mixed
+    {
+        if (!\is_array($input)) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TYPE_CODE,
+                    self::ERROR_TYPE_TEMPLATE,
+                    ['given' => $this->getDataType($input)]
+                )
+            );
+        }
+
+        $output = [];
+
+        $childrenErrors = new Errors();
+
+        foreach ($input as $i => $item) {
+            try {
+                $output[$i] = $this->itemSchema->parse($item);
+            } catch (ErrorsException $e) {
+                $childrenErrors->add($e->errors, (string) $i);
+            }
+        }
+
+        if ($childrenErrors->has()) {
+            throw new ErrorsException($childrenErrors);
+        }
+
+        return $output;
     }
 }

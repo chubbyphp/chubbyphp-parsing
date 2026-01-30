@@ -7,7 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 
-final class IntSchema extends AbstractSchema implements SchemaInterface
+final class IntSchema extends AbstractSchemaV2 implements SchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'int.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "int", {{given}} given';
@@ -23,35 +23,6 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
     public const string ERROR_LTE_CODE = 'int.lte';
     public const string ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
-
-    public function parse(mixed $input): mixed
-    {
-        try {
-            $input = $this->dispatchPreParses($input);
-
-            if (null === $input && $this->nullable) {
-                return null;
-            }
-
-            if (!\is_int($input)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_TYPE_CODE,
-                        self::ERROR_TYPE_TEMPLATE,
-                        ['given' => $this->getDataType($input)]
-                    )
-                );
-            }
-
-            return $this->dispatchPostParses($input);
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
-        }
-    }
 
     public function gt(int $gt): static
     {
@@ -170,5 +141,20 @@ final class IntSchema extends AbstractSchema implements SchemaInterface
 
             return null !== $input ? new \DateTimeImmutable('@'.$input) : null;
         })->nullable($this->nullable);
+    }
+
+    protected function innerParse(mixed $input): mixed
+    {
+        if (!\is_int($input)) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TYPE_CODE,
+                    self::ERROR_TYPE_TEMPLATE,
+                    ['given' => $this->getDataType($input)]
+                )
+            );
+        }
+
+        return $input;
     }
 }

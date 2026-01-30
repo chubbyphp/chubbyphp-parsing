@@ -11,32 +11,18 @@ use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Exceptions\ValidationException;
 use Respect\Validation\Validatable;
 
-final class RespectValidationSchema extends AbstractSchema implements SchemaInterface
+final class RespectValidationSchema extends AbstractSchemaV2 implements SchemaInterface
 {
     public function __construct(private Validatable $validatable) {}
 
-    public function parse(mixed $input): mixed
+    protected function innerParse(mixed $input): mixed
     {
         try {
-            $input = $this->dispatchPreParses($input);
+            $this->validatable->assert($input);
 
-            if (null === $input && $this->nullable) {
-                return null;
-            }
-
-            try {
-                $this->validatable->assert($input);
-
-                return $this->dispatchPostParses($input);
-            } catch (ValidationException $e) {
-                throw $this->convertException($e);
-            }
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
+            return $input;
+        } catch (ValidationException $e) {
+            throw $this->convertException($e);
         }
     }
 

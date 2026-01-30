@@ -9,7 +9,6 @@ use Chubbyphp\Parsing\Schema\LiteralSchema;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\LiteralSchema
  *
  * @internal
