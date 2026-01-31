@@ -9,7 +9,6 @@ use Chubbyphp\Parsing\Schema\BoolSchema;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\BoolSchema
  *
  * @internal

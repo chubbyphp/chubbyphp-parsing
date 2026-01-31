@@ -27,7 +27,6 @@ final class AssocDemo implements \JsonSerializable
 }
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\AssocSchema
  *
  * @internal

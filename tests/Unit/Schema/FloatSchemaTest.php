@@ -9,7 +9,6 @@ use Chubbyphp\Parsing\Schema\FloatSchema;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\FloatSchema
  *
  * @internal

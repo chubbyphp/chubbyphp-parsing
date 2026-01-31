@@ -28,7 +28,6 @@ final class DiscriminatedUnionDemo implements \JsonSerializable
 }
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema
  *
  * @internal

@@ -24,7 +24,6 @@ final class RecordDemo implements \JsonSerializable
 }
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\RecordSchema
  *
  * @internal

@@ -10,7 +10,6 @@ use Chubbyphp\Parsing\Schema\TupleSchema;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\TupleSchema
  *
  * @internal

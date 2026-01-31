@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 use Respect\Validation\Validator as v;
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\RespectValidationSchema
  *
  * @internal

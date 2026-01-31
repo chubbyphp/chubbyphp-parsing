@@ -11,7 +11,6 @@ use Chubbyphp\Parsing\Schema\UnionSchema;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Chubbyphp\Parsing\Schema\AbstractSchema
  * @covers \Chubbyphp\Parsing\Schema\UnionSchema
  *
  * @internal
