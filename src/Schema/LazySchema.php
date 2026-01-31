@@ -55,6 +55,17 @@ final class LazySchema implements SchemaInterface
         throw new \BadMethodCallException('LazySchema does not support any modification, "postParse" called.');
     }
 
+    /**
+     * internal.
+     *
+     * @param \Closure(mixed $output): bool $refine
+     * @param array<string, mixed>          $variables
+     */
+    public function refine(\Closure $refine, string $code, string $template, array $variables = []): static
+    {
+        throw new \BadMethodCallException('LazySchema does not support any modification, "refine" called.');
+    }
+
     public function parse(mixed $input): mixed
     {
         $schema = $this->resolveSchema();

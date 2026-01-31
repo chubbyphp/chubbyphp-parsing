@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Result;
 
@@ -56,6 +57,27 @@ abstract class AbstractSchemaInnerParse implements SchemaInterface
         $clone->postParses[] = $postParse;
 
         return $clone;
+    }
+
+    /**
+     * @param \Closure(mixed $output): bool $refine
+     * @param array<string, mixed>          $variables
+     */
+    final public function refine(\Closure $refine, string $code, string $template, array $variables = []): static
+    {
+        return $this->postParse(static function (mixed $output) use ($refine, $code, $template, $variables): mixed {
+            if (!$refine($output)) {
+                throw new ErrorsException(
+                    new Error(
+                        $code,
+                        $template,
+                        $variables
+                    )
+                );
+            }
+
+            return $output;
+        });
     }
 
     final public function parse(mixed $input): mixed
