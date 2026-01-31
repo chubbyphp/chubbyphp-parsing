@@ -8,7 +8,7 @@ use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\Errors;
 use Chubbyphp\Parsing\ErrorsException;
 
-abstract class AbstractObjectSchema extends AbstractSchema implements ObjectSchemaInterface
+abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements ObjectSchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'abstract_object.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", {{given}} given';
@@ -64,54 +64,18 @@ abstract class AbstractObjectSchema extends AbstractSchema implements ObjectSche
         }
 
         $this->fieldToSchema = $typeCheckedFieldToSchema;
-    }
 
-    final public function parse(mixed $input): mixed
-    {
-        if ($input instanceof \stdClass || $input instanceof \Traversable) {
-            $input = (array) $input;
-        }
-
-        if ($input instanceof \JsonSerializable) {
-            $input = $input->jsonSerialize();
-        }
-
-        try {
-            $input = $this->dispatchPreParses($input);
-
-            if (null === $input && $this->nullable) {
-                return null;
+        $this->preParses[] = static function (mixed $input) {
+            if ($input instanceof \stdClass || $input instanceof \Traversable) {
+                return (array) $input;
             }
 
-            if (!\is_array($input)) {
-                throw new ErrorsException(
-                    new Error(
-                        static::ERROR_TYPE_CODE,
-                        static::ERROR_TYPE_TEMPLATE,
-                        ['given' => $this->getDataType($input)]
-                    )
-                );
+            if ($input instanceof \JsonSerializable) {
+                return $input->jsonSerialize();
             }
 
-            /** @var array<string, mixed> $input */
-            $childrenErrors = new Errors();
-
-            $this->unknownFields($input, $childrenErrors);
-
-            $output = $this->parseFields($input, $childrenErrors);
-
-            if ($childrenErrors->has()) {
-                throw new ErrorsException($childrenErrors);
-            }
-
-            return $this->dispatchPostParses($output);
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
-        }
+            return $input;
+        };
     }
 
     /**
@@ -144,6 +108,32 @@ abstract class AbstractObjectSchema extends AbstractSchema implements ObjectSche
         $clone->optional = $optional;
 
         return $clone;
+    }
+
+    protected function innerParse(mixed $input): mixed
+    {
+        if (!\is_array($input)) {
+            throw new ErrorsException(
+                new Error(
+                    static::ERROR_TYPE_CODE,
+                    static::ERROR_TYPE_TEMPLATE,
+                    ['given' => $this->getDataType($input)]
+                )
+            );
+        }
+
+        /** @var array<string, mixed> $input */
+        $childrenErrors = new Errors();
+
+        $this->unknownFields($input, $childrenErrors);
+
+        $output = $this->parseFields($input, $childrenErrors);
+
+        if ($childrenErrors->has()) {
+            throw new ErrorsException($childrenErrors);
+        }
+
+        return $output;
     }
 
     /**

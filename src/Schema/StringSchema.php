@@ -7,7 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 
-final class StringSchema extends AbstractSchema implements SchemaInterface
+final class StringSchema extends AbstractSchemaInnerParse implements SchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'string.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "string", {{given}} given';
@@ -68,35 +68,6 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
     private const string UUID_V4_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
     private const string UUID_V5_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
-
-    public function parse(mixed $input): mixed
-    {
-        try {
-            $input = $this->dispatchPreParses($input);
-
-            if (null === $input && $this->nullable) {
-                return null;
-            }
-
-            if (!\is_string($input)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_TYPE_CODE,
-                        self::ERROR_TYPE_TEMPLATE,
-                        ['given' => $this->getDataType($input)]
-                    )
-                );
-            }
-
-            return $this->dispatchPostParses($input);
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
-        }
-    }
 
     public function length(int $length): static
     {
@@ -526,5 +497,20 @@ final class StringSchema extends AbstractSchema implements SchemaInterface
 
             return $intInput;
         })->nullable($this->nullable);
+    }
+
+    protected function innerParse(mixed $input): mixed
+    {
+        if (!\is_string($input)) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TYPE_CODE,
+                    self::ERROR_TYPE_TEMPLATE,
+                    ['given' => $this->getDataType($input)]
+                )
+            );
+        }
+
+        return $input;
     }
 }

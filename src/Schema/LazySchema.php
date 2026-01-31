@@ -11,9 +11,9 @@ final class LazySchema implements SchemaInterface
     private ?SchemaInterface $schema = null;
 
     /**
-     * @param \Closure(): SchemaInterface $lazy
+     * @param \Closure(): SchemaInterface $schemaFactory
      */
-    public function __construct(private \Closure $lazy) {}
+    public function __construct(private \Closure $schemaFactory) {}
 
     /**
      * @internal
@@ -80,7 +80,7 @@ final class LazySchema implements SchemaInterface
     private function resolveSchema(): SchemaInterface
     {
         if (!$this->schema) {
-            $this->schema = ($this->lazy)();
+            $this->schema = ($this->schemaFactory)();
         }
 
         return $this->schema;

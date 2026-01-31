@@ -7,7 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 
-final class FloatSchema extends AbstractSchema implements SchemaInterface
+final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'float.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "float", {{given}} given';
@@ -26,35 +26,6 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
 
     public const string ERROR_INT_CODE = 'float.int';
     public const string ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
-
-    public function parse(mixed $input): mixed
-    {
-        try {
-            $input = $this->dispatchPreParses($input);
-
-            if (null === $input && $this->nullable) {
-                return null;
-            }
-
-            if (!\is_float($input)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_TYPE_CODE,
-                        self::ERROR_TYPE_TEMPLATE,
-                        ['given' => $this->getDataType($input)]
-                    )
-                );
-            }
-
-            return $this->dispatchPostParses($input);
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
-        }
-    }
 
     public function gt(float $gt): static
     {
@@ -178,5 +149,20 @@ final class FloatSchema extends AbstractSchema implements SchemaInterface
 
             return null !== $input ? (string) $input : null;
         })->nullable($this->nullable);
+    }
+
+    protected function innerParse(mixed $input): mixed
+    {
+        if (!\is_float($input)) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TYPE_CODE,
+                    self::ERROR_TYPE_TEMPLATE,
+                    ['given' => $this->getDataType($input)]
+                )
+            );
+        }
+
+        return $input;
     }
 }

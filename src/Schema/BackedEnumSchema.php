@@ -7,7 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 
-final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
+final class BackedEnumSchema extends AbstractSchemaInnerParse implements SchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'backedEnum.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "int|string", {{given}} given';
@@ -47,50 +47,6 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
         $this->backedEnum = $backedEnum;
     }
 
-    public function parse(mixed $input): mixed
-    {
-        try {
-            $input = $this->dispatchPreParses($input);
-
-            if (null === $input && $this->nullable) {
-                return null;
-            }
-
-            if (!\is_int($input) && !\is_string($input)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_TYPE_CODE,
-                        self::ERROR_TYPE_TEMPLATE,
-                        ['given' => $this->getDataType($input)]
-                    )
-                );
-            }
-
-            $output = ($this->backedEnum)::tryFrom($input);
-
-            if (null === $output) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_VALUE_CODE,
-                        self::ERROR_VALUE_TEMPLATE,
-                        [
-                            'cases' => $this->casesToCasesValues($this->backedEnum),
-                            'given' => $input,
-                        ]
-                    )
-                );
-            }
-
-            return $this->dispatchPostParses($output);
-        } catch (ErrorsException $e) {
-            if ($this->catch) {
-                return ($this->catch)($input, $e);
-            }
-
-            throw $e;
-        }
-    }
-
     public function toInt(): IntSchema
     {
         return (new IntSchema())->preParse(function ($input) {
@@ -109,6 +65,36 @@ final class BackedEnumSchema extends AbstractSchema implements SchemaInterface
 
             return null !== $input ? $input->value : null;
         })->nullable($this->nullable);
+    }
+
+    protected function innerParse(mixed $input): mixed
+    {
+        if (!\is_int($input) && !\is_string($input)) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TYPE_CODE,
+                    self::ERROR_TYPE_TEMPLATE,
+                    ['given' => $this->getDataType($input)]
+                )
+            );
+        }
+
+        $output = ($this->backedEnum)::tryFrom($input);
+
+        if (null === $output) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_VALUE_CODE,
+                    self::ERROR_VALUE_TEMPLATE,
+                    [
+                        'cases' => $this->casesToCasesValues($this->backedEnum),
+                        'given' => $input,
+                    ]
+                )
+            );
+        }
+
+        return $output;
     }
 
     /**
