@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Result;
 
 abstract class AbstractSchemaInnerParse implements SchemaInterface
 {
+    public const string ERROR_REFINE_CODE = 'refine';
+    public const string ERROR_REFINE_TEMPLATE = '{{message}}';
+
     protected bool $nullable = false;
 
     /**
@@ -56,6 +60,26 @@ abstract class AbstractSchemaInnerParse implements SchemaInterface
         $clone->postParses[] = $postParse;
 
         return $clone;
+    }
+
+    /**
+     * @param \Closure(mixed $output): bool $refine
+     */
+    final public function refine(\Closure $refine, string $message): static
+    {
+        return $this->postParse(static function (mixed $output) use ($refine, $message): mixed {
+            if (!$refine($output)) {
+                throw new ErrorsException(
+                    new Error(
+                        self::ERROR_REFINE_CODE,
+                        self::ERROR_REFINE_TEMPLATE,
+                        ['message' => $message]
+                    )
+                );
+            }
+
+            return $output;
+        });
     }
 
     final public function parse(mixed $input): mixed

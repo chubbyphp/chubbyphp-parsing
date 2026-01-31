@@ -9,6 +9,7 @@ use Chubbyphp\Parsing\Result;
 
 /**
  * @method static default(mixed $default)
+ * @method static refine(\Closure(mixed $output): bool $refine, string $message)
  */
 interface SchemaInterface
 {
@@ -22,6 +23,11 @@ interface SchemaInterface
     public function preParse(\Closure $preParse): static;
 
     public function postParse(\Closure $postParse): static;
+
+    // /**
+    //  * @param \Closure(mixed $output): bool $refine
+    //  */
+    // public function refine(\Closure $refine, string $message): static;
 
     public function parse(mixed $input): mixed;
 
