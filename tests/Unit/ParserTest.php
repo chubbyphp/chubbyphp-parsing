@@ -6,6 +6,7 @@ namespace Chubbyphp\Tests\Parsing\Unit;
 
 use Chubbyphp\Parsing\Parser;
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\AssocSchema;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
 use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
@@ -45,6 +46,17 @@ final class ParserTest extends TestCase
         $arraySchema = $p->array($p->string());
 
         self::assertInstanceOf(ArraySchema::class, $arraySchema);
+    }
+
+    public function testAssoc(): void
+    {
+        $p = new Parser();
+
+        $assocSchema = $p->assoc([
+            'field' => $p->string(),
+        ]);
+
+        self::assertInstanceOf(AssocSchema::class, $assocSchema);
     }
 
     public function testBackedEnum(): void
