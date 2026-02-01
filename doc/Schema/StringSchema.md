@@ -36,14 +36,16 @@ $schema->regexp('/^[a-z]+$/i'); // Must match regex pattern
 ### Format Validations
 
 ```php
-$schema->domain();  // Valid domain
-$schema->email();   // Valid email address
-$schema->ipV4();    // Valid IPv4 address
-$schema->ipV6();    // Valid IPv6 address
-$schema->mac();     // Valid mac address
-$schema->url();     // Valid URL
-$schema->uuidV4();  // Valid UUID v4
-$schema->uuidV5();  // Valid UUID v5
+use Chubbyphp\Parsing\Enum\Uuid;
+
+$schema->domain();        // Valid domain
+$schema->email();         // Valid email address
+$schema->ipV4();          // Valid IPv4 address
+$schema->ipV6();          // Valid IPv6 address
+$schema->mac();           // Valid mac address
+$schema->url();           // Valid URL
+$schema->uuid();          // Valid UUID v4
+$schema->uuid(Uuid::v5);  // Valid UUID v5
 ```
 
 ## Transformations

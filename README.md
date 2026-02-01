@@ -35,7 +35,7 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-parsing "^2.2"
+composer require chubbyphp/chubbyphp-parsing "^2.4"
 ```
 
 ## Quick Start

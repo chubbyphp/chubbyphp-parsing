@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
+use Chubbyphp\Parsing\Enum\Uuid;
 use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\StringSchema;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -680,20 +682,20 @@ final class StringSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidUuidV4(): void
+    public function testParseWithValidUuid(): void
     {
         $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
 
-        $schema = (new StringSchema())->uuidV4();
+        $schema = (new StringSchema())->uuid();
 
         self::assertSame($input, $schema->parse($input));
     }
 
-    public function testParseWithInvalidUuidV4(): void
+    public function testParseWithInvalidUuid(): void
     {
         $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
 
-        $schema = (new StringSchema())->uuidV4();
+        $schema = (new StringSchema())->uuid();
 
         try {
             $schema->parse($input);
@@ -716,25 +718,60 @@ final class StringSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidUuidV5(): void
+    #[DataProvider('provideParseWithValidUuidsCases')]
+    public function testParseWithValidUuids(Uuid $version, string $uuid): void
     {
-        $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuidV5();
-
-        self::assertSame($input, $schema->parse($input));
+        self::assertSame($uuid, (new StringSchema())->uuid($version)->parse($uuid));
     }
 
-    public function testParseWithInvalidUuidV5(): void
+    /**
+     * @return array<string, array{Uuid, string}>
+     */
+    public static function provideParseWithValidUuidsCases(): iterable
     {
-        $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
+        return [
+            'v1 timestamp + MAC' => [
+                Uuid::v1,
+                '6fa459ea-ee8a-1d13-a3ac-0800200c9a66',
+            ],
+            'v2 DCE security' => [
+                Uuid::v2,
+                '000003e8-ee8a-2d13-8500-0800200c9a66',
+            ],
+            'v3 MD5 hash' => [
+                Uuid::v3,
+                '5df41881-3aed-3515-88a7-2f4a814cf09e',
+            ],
+            'v4 random' => [
+                Uuid::v4,
+                'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+            ],
+            'v5 SHA-1 hash' => [
+                Uuid::v5,
+                'a6e4eb18-bba0-5a2d-b0aa-b85e4718e89f',
+            ],
+            'v6 reordered timestamp' => [
+                Uuid::v6,
+                '1d13ee8a-6fa4-659e-a3ac-0800200c9a66',
+            ],
+            'v7 unix timestamp' => [
+                Uuid::v7,
+                '019490a9-5e00-7d34-b5f6-4a1b2c3d4e5f',
+            ],
+            'v8 custom' => [
+                Uuid::v8,
+                'c0ffee00-cafe-8bad-beef-deaddeadbeef',
+            ],
+        ];
+    }
 
-        $schema = (new StringSchema())->uuidV5();
-
+    #[DataProvider('provideParseWithInvalidUuidsCases')]
+    public function testParseWithInvalidUuids(Uuid $version, string $uuid): void
+    {
         try {
-            $schema->parse($input);
+            (new StringSchema())->uuid($version)->parse($uuid);
 
-            throw new \Exception('code should not be reached');
+            self::fail('Expected ErrorsException was not thrown');
         } catch (ErrorsException $errorsException) {
             self::assertSame([
                 [
@@ -743,13 +780,72 @@ final class StringSchemaTest extends TestCase
                         'code' => 'string.uuid',
                         'template' => 'Invalid uuid {{version}} {{given}}',
                         'variables' => [
-                            'version' => 'v5',
-                            'given' => $input,
+                            'version' => 'v'.$version->value,
+                            'given' => $uuid,
                         ],
                     ],
                 ],
             ], $errorsException->errors->jsonSerialize());
         }
+    }
+
+    /**
+     * @return array<string, array{Uuid, string}>
+     */
+    public static function provideParseWithInvalidUuidsCases(): iterable
+    {
+        return [
+            'v1 with invalid variant c' => [
+                Uuid::v1,
+                '6fa459ea-ee8a-1d13-c3ac-0800200c9a66',
+            ],
+            'v2 with invalid variant 0' => [
+                Uuid::v2,
+                '000003e8-ee8a-2d13-0500-0800200c9a66',
+            ],
+            'v3 with invalid hex character g' => [
+                Uuid::v3,
+                '5df41881-3aed-3515-88a7-2f4a814cg09e',
+            ],
+            'v4 with wrong version 5' => [
+                Uuid::v4,
+                'f47ac10b-58cc-5372-a567-0e02b2c3d479',
+            ],
+            'v5 with invalid variant 7' => [
+                Uuid::v5,
+                'a6e4eb18-bba0-5a2d-70aa-b85e4718e89f',
+            ],
+            'v6 with wrong version 1' => [
+                Uuid::v6,
+                '1d13ee8a-6fa4-159e-a3ac-0800200c9a66',
+            ],
+            'v7 with invalid variant f' => [
+                Uuid::v7,
+                '019490a9-5e00-7d34-f5f6-4a1b2c3d4e5f',
+            ],
+            'v8 with wrong version 0' => [
+                Uuid::v8,
+                'c0ffee00-cafe-0bad-beef-deaddeadbeef',
+            ],
+        ];
+    }
+
+    public function testParseWithValidUuidV4(): void
+    {
+        $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
+
+        $schema = (new StringSchema())->uuidV4();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidUuidV5(): void
+    {
+        $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
+
+        $schema = (new StringSchema())->uuidV5();
+
+        self::assertSame($input, $schema->parse($input));
     }
 
     public function testParseWithTrim(): void

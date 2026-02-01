@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Enum\Uuid;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 
@@ -66,8 +67,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_DATETIME_CODE = 'string.datetime';
     public const string ERROR_DATETIME_TEMPLATE = 'Cannot convert {{given}} to datetime';
 
-    private const string UUID_V4_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
-    private const string UUID_V5_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-(8|9|a|b)[0-9a-f]{3}-[0-9a-f]{12}$/i';
+    private const string UUID_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-(\d{1})[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
     public function length(int $length): static
     {
@@ -330,15 +330,18 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
-    public function uuidV4(): static
+    public function uuid(Uuid $version = Uuid::v4): static
     {
-        return $this->postParse(static function (string $string) {
-            if (0 === preg_match(self::UUID_V4_PATTERN, $string)) {
+        return $this->postParse(static function (string $string) use ($version) {
+            $matches = [];
+            preg_match(self::UUID_PATTERN, $string, $matches);
+
+            if ((int) ($matches[1] ?? '-1') !== $version->value) {
                 throw new ErrorsException(
                     new Error(
                         self::ERROR_UUID_CODE,
                         self::ERROR_UUID_TEMPLATE,
-                        ['version' => 'v4', 'given' => $string]
+                        ['version' => 'v'.$version->value, 'given' => $string]
                     )
                 );
             }
@@ -347,21 +350,20 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
+    /**
+     * @deprecated use uuid()
+     */
+    public function uuidV4(): static
+    {
+        return $this->uuid(Uuid::v4);
+    }
+
+    /**
+     * @deprecated use uuid(Chubbyphp\Parsing\Enum\Uuid::v5)
+     */
     public function uuidV5(): static
     {
-        return $this->postParse(static function (string $string) {
-            if (0 === preg_match(self::UUID_V5_PATTERN, $string)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_UUID_CODE,
-                        self::ERROR_UUID_TEMPLATE,
-                        ['version' => 'v5', 'given' => $string]
-                    )
-                );
-            }
-
-            return $string;
-        });
+        return $this->uuid(Uuid::v5);
     }
 
     public function trim(): static
