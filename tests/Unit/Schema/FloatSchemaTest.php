@@ -149,12 +149,284 @@ final class FloatSchemaTest extends TestCase
         ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 
+    public function testParseWithValidMinimum(): void
+    {
+        $input = 4.1;
+        $minimum = 4.1;
+
+        $schema = (new FloatSchema())->minimum($minimum);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMinimum(): void
+    {
+        $input = 4.1;
+        $minimum = 4.2;
+
+        $schema = (new FloatSchema())->minimum($minimum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.minimum',
+                        'template' => 'Value should be greater than or equal {{minimum}}, {{given}} given',
+                        'variables' => [
+                            'minimum' => $minimum,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidExclusiveMinimum(): void
+    {
+        $input = 4.2;
+        $exclusiveMinimum = 4.1;
+
+        $schema = (new FloatSchema())->exclusiveMinimum($exclusiveMinimum);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidExclusiveMinimumEqual(): void
+    {
+        $input = 4.1;
+        $exclusiveMinimum = 4.1;
+
+        $schema = (new FloatSchema())->exclusiveMinimum($exclusiveMinimum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'float.exclusiveMinimum',
+                            'template' => 'Value should be greater than {{exclusiveMinimum}}, {{given}} given',
+                            'variables' => [
+                                'exclusiveMinimum' => $exclusiveMinimum,
+                                'given' => $input,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithInvalidExclusiveMinimumLesser(): void
+    {
+        $input = 4.1;
+        $exclusiveMinimum = 4.2;
+
+        $schema = (new FloatSchema())->exclusiveMinimum($exclusiveMinimum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'float.exclusiveMinimum',
+                            'template' => 'Value should be greater than {{exclusiveMinimum}}, {{given}} given',
+                            'variables' => [
+                                'exclusiveMinimum' => $exclusiveMinimum,
+                                'given' => $input,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithValidExclusiveMaximum(): void
+    {
+        $input = 4.1;
+        $exclusiveMaximum = 4.2;
+
+        $schema = (new FloatSchema())->exclusiveMaximum($exclusiveMaximum);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidExclusiveMaximumEqual(): void
+    {
+        $input = 4.1;
+        $exclusiveMaximum = 4.1;
+
+        $schema = (new FloatSchema())->exclusiveMaximum($exclusiveMaximum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.exclusiveMaximum',
+                        'template' => 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given',
+                        'variables' => [
+                            'exclusiveMaximum' => $exclusiveMaximum,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidExclusiveMaximumLesser(): void
+    {
+        $input = 4.2;
+        $exclusiveMaximum = 4.1;
+
+        $schema = (new FloatSchema())->exclusiveMaximum($exclusiveMaximum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.exclusiveMaximum',
+                        'template' => 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given',
+                        'variables' => [
+                            'exclusiveMaximum' => $exclusiveMaximum,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidMaximum(): void
+    {
+        $input = 4.1;
+        $maximum = 4.1;
+
+        $schema = (new FloatSchema())->maximum($maximum);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMaximum(): void
+    {
+        $input = 4.2;
+        $maximum = 4.1;
+
+        $schema = (new FloatSchema())->maximum($maximum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.maximum',
+                        'template' => 'Value should be lesser than or equal {{maximum}}, {{given}} given',
+                        'variables' => [
+                            'maximum' => $maximum,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidGte(): void
+    {
+        $input = 4.1;
+        $gte = 4.1;
+
+        error_clear_last();
+
+        $schema = (new FloatSchema())->gte($gte);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use minimum instead', $lastError['message']);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidGte(): void
+    {
+        $input = 4.1;
+        $gte = 4.2;
+
+        $schema = (new FloatSchema())->gte($gte);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.gte',
+                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                        'variables' => [
+                            'gte' => $gte,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseWithValidGt(): void
     {
         $input = 4.2;
         $gt = 4.1;
 
+        error_clear_last();
+
         $schema = (new FloatSchema())->gt($gt);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use exclusiveMinimum instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -221,50 +493,22 @@ final class FloatSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidGte(): void
-    {
-        $input = 4.1;
-        $gte = 4.1;
-
-        $schema = (new FloatSchema())->gte($gte);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidGte(): void
-    {
-        $input = 4.1;
-        $gte = 4.2;
-
-        $schema = (new FloatSchema())->gte($gte);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'float.gte',
-                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
-                        'variables' => [
-                            'gte' => $gte,
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
     public function testParseWithValidLt(): void
     {
         $input = 4.1;
         $lt = 4.2;
 
+        error_clear_last();
+
         $schema = (new FloatSchema())->lt($lt);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use exclusiveMaximum instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -330,7 +574,17 @@ final class FloatSchemaTest extends TestCase
         $input = 4.1;
         $lte = 4.1;
 
+        error_clear_last();
+
         $schema = (new FloatSchema())->lte($lte);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use maximum instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }

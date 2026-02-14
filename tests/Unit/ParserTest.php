@@ -9,6 +9,7 @@ use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\AssocSchema;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
 use Chubbyphp\Parsing\Schema\BoolSchema;
+use Chubbyphp\Parsing\Schema\ConstSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
@@ -77,6 +78,15 @@ final class ParserTest extends TestCase
         self::assertInstanceOf(BoolSchema::class, $BoolSchema);
     }
 
+    public function testConst(): void
+    {
+        $p = new Parser();
+
+        $constSchema = $p->const('person');
+
+        self::assertInstanceOf(ConstSchema::class, $constSchema);
+    }
+
     public function testDateTime(): void
     {
         $p = new Parser();
@@ -92,7 +102,7 @@ final class ParserTest extends TestCase
 
         $discriminatedUnionSchema = $p->discriminatedUnion([
             $p->object([
-                '_type' => $p->literal('person'),
+                '_type' => $p->const('person'),
             ]),
         ], '_type');
 
@@ -134,7 +144,17 @@ final class ParserTest extends TestCase
     {
         $p = new Parser();
 
+        error_clear_last();
+
         $literalSchema = $p->literal('person');
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use const instead', $lastError['message']);
 
         self::assertInstanceOf(LiteralSchema::class, $literalSchema);
     }

@@ -22,6 +22,9 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_MAX_LENGTH_CODE = 'string.maxLength';
     public const string ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
+    public const string ERROR_CONTAINS_CODE = 'string.contains';
+    public const string ERROR_CONTAINS_TEMPLATE = '{{given}} does not contain {{contains}}';
+
     public const string ERROR_INCLUDES_CODE = 'string.includes';
     public const string ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
 
@@ -30,6 +33,9 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
 
     public const string ERROR_ENDSWITH_CODE = 'string.endsWith';
     public const string ERROR_ENDSWITH_TEMPLATE = '{{given}} does not ends with {{endsWith}}';
+
+    public const string ERROR_HOSTNAME_CODE = 'string.hostname';
+    public const string ERROR_HOSTNAME_TEMPLATE = 'Invalid hostname {{given}}';
 
     public const string ERROR_DOMAIN_CODE = 'string.domain';
     public const string ERROR_DOMAIN_TEMPLATE = 'Invalid domain {{given}}';
@@ -46,8 +52,14 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_MATCH_CODE = 'string.match';
     public const string ERROR_MATCH_TEMPLATE = '{{given}} does not match {{match}}';
 
+    public const string ERROR_PATTERN_CODE = 'string.pattern';
+    public const string ERROR_PATTERN_TEMPLATE = '{{given}} does not pattern {{pattern}}';
+
     public const string ERROR_REGEXP_CODE = 'string.regexp';
     public const string ERROR_REGEXP_TEMPLATE = '{{given}} does not regexp {{regexp}}';
+
+    public const string ERROR_URI_CODE = 'string.uri';
+    public const string ERROR_URI_TEMPLATE = 'Invalid uri {{given}}';
 
     public const string ERROR_URL_CODE = 'string.url';
     public const string ERROR_URL_TEMPLATE = 'Invalid url {{given}}';
@@ -74,17 +86,17 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         return $this->postParse(static function (string $string) use ($length) {
             $stringLength = \strlen($string);
 
-            if ($stringLength !== $length) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_LENGTH_CODE,
-                        self::ERROR_LENGTH_TEMPLATE,
-                        ['length' => $length, 'given' => $stringLength]
-                    )
-                );
+            if ($stringLength === $length) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_LENGTH_CODE,
+                    self::ERROR_LENGTH_TEMPLATE,
+                    ['length' => $length, 'given' => $stringLength]
+                )
+            );
         });
     }
 
@@ -93,17 +105,17 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         return $this->postParse(static function (string $string) use ($minLength) {
             $stringLength = \strlen($string);
 
-            if ($stringLength < $minLength) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_MIN_LENGTH_CODE,
-                        self::ERROR_MIN_LENGTH_TEMPLATE,
-                        ['minLength' => $minLength, 'given' => $stringLength]
-                    )
-                );
+            if ($stringLength >= $minLength) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MIN_LENGTH_CODE,
+                    self::ERROR_MIN_LENGTH_TEMPLATE,
+                    ['minLength' => $minLength, 'given' => $stringLength]
+                )
+            );
         });
     }
 
@@ -112,162 +124,206 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         return $this->postParse(static function (string $string) use ($maxLength) {
             $stringLength = \strlen($string);
 
-            if ($stringLength > $maxLength) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_MAX_LENGTH_CODE,
-                        self::ERROR_MAX_LENGTH_TEMPLATE,
-                        ['maxLength' => $maxLength, 'given' => $stringLength]
-                    )
-                );
+            if ($stringLength <= $maxLength) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MAX_LENGTH_CODE,
+                    self::ERROR_MAX_LENGTH_TEMPLATE,
+                    ['maxLength' => $maxLength, 'given' => $stringLength]
+                )
+            );
         });
     }
 
-    public function includes(string $includes): static
+    public function contains(string $contains): static
     {
-        return $this->postParse(static function (string $string) use ($includes) {
-            if (!str_contains($string, $includes)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_INCLUDES_CODE,
-                        self::ERROR_INCLUDES_TEMPLATE,
-                        ['includes' => $includes, 'given' => $string]
-                    )
-                );
+        return $this->postParse(static function (string $string) use ($contains) {
+            if (str_contains($string, $contains)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_CONTAINS_CODE,
+                    self::ERROR_CONTAINS_TEMPLATE,
+                    ['contains' => $contains, 'given' => $string]
+                )
+            );
+        });
+    }
+
+    /**
+     * @deprecated use contains
+     */
+    public function includes(string $includes): static
+    {
+        @trigger_error('Use contains instead', E_USER_DEPRECATED);
+
+        return $this->postParse(static function (string $string) use ($includes) {
+            if (str_contains($string, $includes)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_INCLUDES_CODE,
+                    self::ERROR_INCLUDES_TEMPLATE,
+                    ['includes' => $includes, 'given' => $string]
+                )
+            );
         });
     }
 
     public function startsWith(string $startsWith): static
     {
         return $this->postParse(static function (string $string) use ($startsWith) {
-            if (!str_starts_with($string, $startsWith)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_STARTSWITH_CODE,
-                        self::ERROR_STARTSWITH_TEMPLATE,
-                        ['startsWith' => $startsWith, 'given' => $string]
-                    )
-                );
+            if (str_starts_with($string, $startsWith)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_STARTSWITH_CODE,
+                    self::ERROR_STARTSWITH_TEMPLATE,
+                    ['startsWith' => $startsWith, 'given' => $string]
+                )
+            );
         });
     }
 
     public function endsWith(string $endsWith): static
     {
         return $this->postParse(static function (string $string) use ($endsWith) {
-            if (!str_ends_with($string, $endsWith)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_ENDSWITH_CODE,
-                        self::ERROR_ENDSWITH_TEMPLATE,
-                        ['endsWith' => $endsWith, 'given' => $string]
-                    )
-                );
+            if (str_ends_with($string, $endsWith)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_ENDSWITH_CODE,
+                    self::ERROR_ENDSWITH_TEMPLATE,
+                    ['endsWith' => $endsWith, 'given' => $string]
+                )
+            );
         });
     }
 
-    public function domain(): static
+    public function hostname(): static
     {
         return $this->postParse(static function (string $string) {
-            if (!filter_var($string, FILTER_VALIDATE_DOMAIN)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_DOMAIN_CODE,
-                        self::ERROR_DOMAIN_TEMPLATE,
-                        ['given' => $string]
-                    )
-                );
+            if (filter_var($string, FILTER_VALIDATE_DOMAIN)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_HOSTNAME_CODE,
+                    self::ERROR_HOSTNAME_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    /**
+     * @deprecated use hostname
+     */
+    public function domain(): static
+    {
+        @trigger_error('Use hostname instead', E_USER_DEPRECATED);
+
+        return $this->postParse(static function (string $string) {
+            if (filter_var($string, FILTER_VALIDATE_DOMAIN)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_DOMAIN_CODE,
+                    self::ERROR_DOMAIN_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
         });
     }
 
     public function email(): static
     {
         return $this->postParse(static function (string $string) {
-            if (!filter_var($string, FILTER_VALIDATE_EMAIL)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_EMAIL_CODE,
-                        self::ERROR_EMAIL_TEMPLATE,
-                        ['given' => $string]
-                    )
-                );
+            if (filter_var($string, FILTER_VALIDATE_EMAIL)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_EMAIL_CODE,
+                    self::ERROR_EMAIL_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
         });
     }
 
     public function ipV4(): static
     {
         return $this->postParse(static function (string $string) {
-            if (!filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_IP_CODE,
-                        self::ERROR_IP_TEMPLATE,
-                        ['version' => 'v4', 'given' => $string]
-                    )
-                );
+            if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_IP_CODE,
+                    self::ERROR_IP_TEMPLATE,
+                    ['version' => 'v4', 'given' => $string]
+                )
+            );
         });
     }
 
     public function ipV6(): static
     {
         return $this->postParse(static function (string $string) {
-            if (!filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_IP_CODE,
-                        self::ERROR_IP_TEMPLATE,
-                        ['version' => 'v6', 'given' => $string]
-                    )
-                );
+            if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_IP_CODE,
+                    self::ERROR_IP_TEMPLATE,
+                    ['version' => 'v6', 'given' => $string]
+                )
+            );
         });
     }
 
     public function mac(): static
     {
         return $this->postParse(static function (string $string) {
-            if (!filter_var($string, FILTER_VALIDATE_MAC)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_MAC_CODE,
-                        self::ERROR_MAC_TEMPLATE,
-                        ['given' => $string]
-                    )
-                );
+            if (filter_var($string, FILTER_VALIDATE_MAC)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MAC_CODE,
+                    self::ERROR_MAC_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
         });
     }
 
     /**
-     * @deprecated: use regexp
+     * @deprecated: use pattern
      */
     public function match(string $match): static
     {
-        @trigger_error('Use regexp instead', E_USER_DEPRECATED);
+        @trigger_error('Use pattern instead', E_USER_DEPRECATED);
 
         if (false === @preg_match($match, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid match "%s" given', $match));
@@ -276,22 +332,50 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         return $this->postParse(static function (string $string) use ($match) {
             $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $match]]);
 
-            if (false === $doesMatch) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_MATCH_CODE,
-                        self::ERROR_MATCH_TEMPLATE,
-                        ['match' => $match, 'given' => $string]
-                    )
-                );
+            if ($doesMatch) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MATCH_CODE,
+                    self::ERROR_MATCH_TEMPLATE,
+                    ['match' => $match, 'given' => $string]
+                )
+            );
         });
     }
 
+    public function pattern(string $pattern): static
+    {
+        if (false === @preg_match($pattern, '')) {
+            throw new \InvalidArgumentException(\sprintf('Invalid pattern "%s" given', $pattern));
+        }
+
+        return $this->postParse(static function (string $string) use ($pattern) {
+            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $pattern]]);
+
+            if ($doesMatch) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_PATTERN_CODE,
+                    self::ERROR_PATTERN_TEMPLATE,
+                    ['pattern' => $pattern, 'given' => $string]
+                )
+            );
+        });
+    }
+
+    /**
+     * @deprecated: use pattern
+     */
     public function regexp(string $regexp): static
     {
+        @trigger_error('Use pattern instead', E_USER_DEPRECATED);
+
         if (false === @preg_match($regexp, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid regexp "%s" given', $regexp));
         }
@@ -299,34 +383,56 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         return $this->postParse(static function (string $string) use ($regexp) {
             $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $regexp]]);
 
-            if (false === $doesMatch) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_REGEXP_CODE,
-                        self::ERROR_REGEXP_TEMPLATE,
-                        ['regexp' => $regexp, 'given' => $string]
-                    )
-                );
+            if ($doesMatch) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_REGEXP_CODE,
+                    self::ERROR_REGEXP_TEMPLATE,
+                    ['regexp' => $regexp, 'given' => $string]
+                )
+            );
         });
     }
 
-    public function url(): static
+    public function uri(): static
     {
         return $this->postParse(static function (string $string) {
-            if (!filter_var($string, FILTER_VALIDATE_URL)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_URL_CODE,
-                        self::ERROR_URL_TEMPLATE,
-                        ['given' => $string]
-                    )
-                );
+            if (filter_var($string, FILTER_VALIDATE_URL)) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_URI_CODE,
+                    self::ERROR_URI_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    /**
+     * @deprecated use uri
+     */
+    public function url(): static
+    {
+        @trigger_error('Use uri instead', E_USER_DEPRECATED);
+
+        return $this->postParse(static function (string $string) {
+            if (filter_var($string, FILTER_VALIDATE_URL)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_URL_CODE,
+                    self::ERROR_URL_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
         });
     }
 
@@ -336,17 +442,17 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
             $matches = [];
             preg_match(self::UUID_PATTERN, $string, $matches);
 
-            if ((int) ($matches[1] ?? '-1') !== $version->value) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_UUID_CODE,
-                        self::ERROR_UUID_TEMPLATE,
-                        ['version' => 'v'.$version->value, 'given' => $string]
-                    )
-                );
+            if ((int) ($matches[1] ?? '-1') === $version->value) {
+                return $string;
             }
 
-            return $string;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_UUID_CODE,
+                    self::ERROR_UUID_TEMPLATE,
+                    ['version' => 'v'.$version->value, 'given' => $string]
+                )
+            );
         });
     }
 
@@ -435,17 +541,17 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
 
             $boolInput = filter_var($input, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
 
-            if (null === $boolInput) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_BOOL_CODE,
-                        self::ERROR_BOOL_TEMPLATE,
-                        ['given' => $input]
-                    )
-                );
+            if (null !== $boolInput) {
+                return $boolInput;
             }
 
-            return $boolInput;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_BOOL_CODE,
+                    self::ERROR_BOOL_TEMPLATE,
+                    ['given' => $input]
+                )
+            );
         })->nullable($this->nullable);
     }
 
@@ -461,17 +567,17 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
 
             $floatInput = filter_var($input, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
 
-            if (null === $floatInput) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_FLOAT_CODE,
-                        self::ERROR_FLOAT_TEMPLATE,
-                        ['given' => $input]
-                    )
-                );
+            if (null !== $floatInput) {
+                return $floatInput;
             }
 
-            return $floatInput;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_FLOAT_CODE,
+                    self::ERROR_FLOAT_TEMPLATE,
+                    ['given' => $input]
+                )
+            );
         })->nullable($this->nullable);
     }
 
@@ -487,32 +593,32 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
 
             $intInput = filter_var($input, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
 
-            if (null === $intInput) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_INT_CODE,
-                        self::ERROR_INT_TEMPLATE,
-                        ['given' => $input]
-                    )
-                );
+            if (null !== $intInput) {
+                return $intInput;
             }
 
-            return $intInput;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_INT_CODE,
+                    self::ERROR_INT_TEMPLATE,
+                    ['given' => $input]
+                )
+            );
         })->nullable($this->nullable);
     }
 
     protected function innerParse(mixed $input): mixed
     {
-        if (!\is_string($input)) {
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_TYPE_CODE,
-                    self::ERROR_TYPE_TEMPLATE,
-                    ['given' => $this->getDataType($input)]
-                )
-            );
+        if (\is_string($input)) {
+            return $input;
         }
 
-        return $input;
+        throw new ErrorsException(
+            new Error(
+                self::ERROR_TYPE_CODE,
+                self::ERROR_TYPE_TEMPLATE,
+                ['given' => $this->getDataType($input)]
+            )
+        );
     }
 }

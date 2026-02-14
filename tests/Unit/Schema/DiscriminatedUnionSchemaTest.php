@@ -6,9 +6,9 @@ namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\ArraySchema;
+use Chubbyphp\Parsing\Schema\ConstSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
-use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use PHPUnit\Framework\TestCase;
@@ -37,8 +37,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
     public function testImmutability(): void
     {
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         self::assertNotSame($schema, $schema->nullable());
@@ -82,8 +82,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input = ['field1' => 'type2', 'field2' => 'test'];
 
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         $output = $schema->parse($input);
@@ -100,8 +100,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input->field2 = 'test';
 
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         $output = $schema->parse($input);
@@ -116,8 +116,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input = new \ArrayIterator(['field1' => 'type2', 'field2' => 'test']);
 
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         $output = $schema->parse($input);
@@ -134,8 +134,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input->field2 = 'test';
 
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         $output = $schema->parse($input);
@@ -167,8 +167,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input2 = ['field1' => 'type2', 'field2' => 'test2'];
 
         $schema = (new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1'))->default($input1);
 
         self::assertSame($input1, (array) $schema->parse(null));
@@ -178,8 +178,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
     public function testParseSuccessWithNullAndNullable(): void
     {
         $schema = (new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1'))->nullable();
 
         self::assertNull($schema->parse(null));
@@ -188,8 +188,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
     public function testParseFailedWithNull(): void
     {
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         try {
@@ -217,8 +217,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input = ['field2' => 'test'];
 
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         try {
@@ -246,8 +246,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input = ['field1' => 'type3', 'field2' => 'test'];
 
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         try {
@@ -259,7 +259,7 @@ final class DiscriminatedUnionSchemaTest extends TestCase
                 [
                     'path' => '',
                     'error' => [
-                        'code' => 'literal.equals',
+                        'code' => 'const.equals',
                         'template' => 'Input should be {{expected}}, {{given}} given',
                         'variables' => [
                             'expected' => 'type1',
@@ -270,7 +270,7 @@ final class DiscriminatedUnionSchemaTest extends TestCase
                 [
                     'path' => '',
                     'error' => [
-                        'code' => 'literal.equals',
+                        'code' => 'const.equals',
                         'template' => 'Input should be {{expected}}, {{given}} given',
                         'variables' => [
                             'expected' => 'type2',
@@ -287,8 +287,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input = ['field1' => 'type2', 'field2' => 'test'];
 
         $schema = (new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1'))->preParse(static fn () => $input);
 
         self::assertSame($input, (array) $schema->parse(null));
@@ -299,8 +299,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input = ['field1' => 'type2', 'field2' => 'test'];
 
         $schema = (new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1'))->postParse(static function (\stdClass $output) {
             $output->field3 = 'test';
 
@@ -313,8 +313,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
     public function testParseFailedWithCatch(): void
     {
         $schema = (new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1'))
             ->catch(static function (mixed $input, ErrorsException $errorsException) {
                 self::assertNull($input);
@@ -343,8 +343,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
         $input = ['field1' => 'type2', 'field2' => 'test'];
 
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         self::assertSame($input, (array) $schema->safeParse($input)->data);
@@ -353,8 +353,8 @@ final class DiscriminatedUnionSchemaTest extends TestCase
     public function testSafeParseFailed(): void
     {
         $schema = new DiscriminatedUnionSchema([
-            new ObjectSchema(['field1' => new LiteralSchema('type1')]),
-            new ObjectSchema(['field1' => new LiteralSchema('type2'), 'field2' => new StringSchema()]),
+            new ObjectSchema(['field1' => new ConstSchema('type1')]),
+            new ObjectSchema(['field1' => new ConstSchema('type2'), 'field2' => new StringSchema()]),
         ], 'field1');
 
         self::assertSame([

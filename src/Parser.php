@@ -8,6 +8,7 @@ use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\AssocSchema;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
 use Chubbyphp\Parsing\Schema\BoolSchema;
+use Chubbyphp\Parsing\Schema\ConstSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
@@ -57,6 +58,11 @@ final class Parser implements ParserInterface
         return new DateTimeSchema();
     }
 
+    public function const(bool|float|int|string $const): ConstSchema
+    {
+        return new ConstSchema($const);
+    }
+
     /**
      * @param array<ObjectSchemaInterface> $objectSchemas
      */
@@ -83,8 +89,13 @@ final class Parser implements ParserInterface
         return new LazySchema($lazy);
     }
 
+    /**
+     * @deprecated use const
+     */
     public function literal(bool|float|int|string $literal): LiteralSchema
     {
+        @trigger_error('Use const instead', E_USER_DEPRECATED);
+
         return new LiteralSchema($literal);
     }
 

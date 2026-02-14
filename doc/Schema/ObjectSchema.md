@@ -123,7 +123,7 @@ $userSchema = $p->object([
 $createUserSchema = $p->object([
     'name' => $p->string()->trim()->minLength(1)->maxLength(100),
     'email' => $p->string()->trim()->toLowerCase()->email(),
-    'age' => $p->int()->gte(0)->lte(150),
+    'age' => $p->int()->minimum(0)->maximum(150),
 ])->strict();
 ```
 
@@ -133,7 +133,7 @@ $createUserSchema = $p->object([
 $addressSchema = $p->object([
     'street' => $p->string(),
     'city' => $p->string(),
-    'zipCode' => $p->string()->regexp('/^\d{5}$/'),
+    'zipCode' => $p->string()->pattern('/^\d{5}$/'),
 ]);
 
 $personSchema = $p->object([
@@ -182,8 +182,8 @@ $petSchema = $p->object([
 
 $listRequestSchema = $p->object([
     'offset' => $p->int()->nonNegative(),
-    'limit' => $p->int()->positive()->lte(100),
-    'sort' => $p->record($p->literal('asc')),
+    'limit' => $p->int()->positive()->maximum(100),
+    'sort' => $p->record($p->const('asc')),
     'items' => $p->array($petSchema),
 ]);
 ```

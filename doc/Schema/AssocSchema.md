@@ -158,7 +158,7 @@ echo $config['database']['host']; // 'localhost'
 $addressSchema = $p->assoc([
     'street' => $p->string(),
     'city' => $p->string(),
-    'zipCode' => $p->string()->regexp('/^\d{5}$/'),
+    'zipCode' => $p->string()->pattern('/^\d{5}$/'),
 ]);
 
 $personSchema = $p->assoc([

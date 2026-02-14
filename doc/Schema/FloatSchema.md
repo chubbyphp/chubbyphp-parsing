@@ -19,10 +19,10 @@ $data = $schema->parse(4.2); // Returns: 4.2
 ### Comparison Constraints
 
 ```php
-$schema->gt(5.0);   // Greater than 5.0
-$schema->gte(5.0);  // Greater than or equal to 5.0
-$schema->lt(10.0);  // Less than 10.0
-$schema->lte(10.0); // Less than or equal to 10.0
+$schema->minimum(5.0);  // Greater than or equal to 5.0
+$schema->exclusiveMinimum(5.0);   // Greater than 5.0
+$schema->exclusiveMaximum(10.0);  // Less than 10.0
+$schema->maximum(10.0); // Less than or equal to 10.0
 ```
 
 ### Sign Constraints
@@ -56,17 +56,18 @@ $priceSchema->parse(-5.0);  // Throws: nonNegative validation error
 ### Percentage
 
 ```php
-$percentageSchema = $p->float()->gte(0.0)->lte(100.0);
+$percentageSchema = $p->float()->minimum(0.0)->maximum(100.0);
 
 $percentageSchema->parse(75.5); // Returns: 75.5
-$percentageSchema->parse(150.0); // Throws: lte validation error
+$percentageSchema->parse(-1.0); // Throws: minimum validation error
+$percentageSchema->parse(150.0); // Throws: maximum validation error
 ```
 
 ### Coordinates
 
 ```php
-$latitudeSchema = $p->float()->gte(-90.0)->lte(90.0);
-$longitudeSchema = $p->float()->gte(-180.0)->lte(180.0);
+$latitudeSchema = $p->float()->minimum(-90.0)->maximum(90.0);
+$longitudeSchema = $p->float()->minimum(-180.0)->maximum(180.0);
 
 $coordinatesSchema = $p->object([
     'lat' => $latitudeSchema,
@@ -81,8 +82,8 @@ $coordinatesSchema->parse(['lat' => 47.1, 'lng' => 8.2]);
 | Code | Description |
 |------|-------------|
 | `float.type` | Value is not a float |
-| `float.gt` | Value is not greater than threshold (used by `gt()` and `positive()`) |
-| `float.gte` | Value is not greater than or equal to threshold (used by `gte()` and `nonNegative()`) |
-| `float.lt` | Value is not less than threshold (used by `lt()` and `negative()`) |
-| `float.lte` | Value is not less than or equal to threshold (used by `lte()` and `nonPositive()`) |
+| `float.minimum` | Value is not greater than or equal to threshold (used by `minimum` and `nonNegative()`) |
+| `float.exclusiveMinimum` | Value is not greater than threshold (used by `exclusiveMinimum()` and `positive()`) |
+| `float.exclusiveMaximum` | Value is not less than threshold (used by `exclusiveMaximum()` and `negative()`) |
+| `float.maximum` | Value is not less than or equal to threshold (used by `maximum()` and `nonPositive()`) |
 | `float.int` | Cannot convert float to int without precision loss (for `toInt()`) |

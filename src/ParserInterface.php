@@ -8,6 +8,7 @@ use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\AssocSchema;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
 use Chubbyphp\Parsing\Schema\BoolSchema;
+use Chubbyphp\Parsing\Schema\ConstSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
@@ -23,6 +24,7 @@ use Chubbyphp\Parsing\Schema\UnionSchema;
 
 /**
  * @method AssocSchema assoc(array<string, SchemaInterface> $fieldNameToSchema)
+ * @method ConstSchema const(bool|float|int|string $const)
  */
 interface ParserInterface
 {
@@ -40,6 +42,8 @@ interface ParserInterface
 
     public function bool(): BoolSchema;
 
+    // public function const(bool|float|int|string $const): ConstSchema;
+
     public function dateTime(): DateTimeSchema;
 
     /**
@@ -56,6 +60,9 @@ interface ParserInterface
      */
     public function lazy(\Closure $lazy): SchemaInterface;
 
+    /**
+     * @deprecated use const() instead
+     */
     public function literal(bool|float|int|string $literal): LiteralSchema;
 
     /**

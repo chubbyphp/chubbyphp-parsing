@@ -13,8 +13,8 @@ $p = new Parser();
 
 // Using ObjectSchema (returns stdClass)
 $schema = $p->discriminatedUnion([
-    $p->object(['_type' => $p->literal('email'), 'address' => $p->string()->email()]),
-    $p->object(['_type' => $p->literal('phone'), 'number' => $p->string()]),
+    $p->object(['_type' => $p->const('email'), 'address' => $p->string()->email()]),
+    $p->object(['_type' => $p->const('phone'), 'number' => $p->string()]),
 ], '_type');
 
 $email = $schema->parse(['_type' => 'email', 'address' => 'user@example.com']);
@@ -22,8 +22,8 @@ $phone = $schema->parse(['_type' => 'phone', 'number' => '+41790000000']);
 
 // Using AssocSchema (returns array)
 $schemaAssoc = $p->discriminatedUnion([
-    $p->assoc(['_type' => $p->literal('email'), 'address' => $p->string()->email()]),
-    $p->assoc(['_type' => $p->literal('phone'), 'number' => $p->string()]),
+    $p->assoc(['_type' => $p->const('email'), 'address' => $p->string()->email()]),
+    $p->assoc(['_type' => $p->const('phone'), 'number' => $p->string()]),
 ], '_type');
 
 $emailArr = $schemaAssoc->parse(['_type' => 'email', 'address' => 'user@example.com']);
@@ -33,7 +33,7 @@ $emailArr = $schemaAssoc->parse(['_type' => 'email', 'address' => 'user@example.
 ## How It Works
 
 1. The schema reads the discriminator field from the input
-2. It finds the matching object schema based on the literal value
+2. It finds the matching object schema based on the const value
 3. The input is validated against that specific schema
 
 This is O(1) lookup vs O(n) sequential trying in regular unions.
@@ -45,8 +45,8 @@ The default discriminator field is `_type`, but you can customize it:
 ```php
 // Using 'kind' as discriminator
 $schema = $p->discriminatedUnion([
-    $p->object(['kind' => $p->literal('circle'), 'radius' => $p->float()]),
-    $p->object(['kind' => $p->literal('rectangle'), 'width' => $p->float(), 'height' => $p->float()]),
+    $p->object(['kind' => $p->const('circle'), 'radius' => $p->float()]),
+    $p->object(['kind' => $p->const('rectangle'), 'width' => $p->float(), 'height' => $p->float()]),
 ], 'kind');
 ```
 
@@ -57,17 +57,17 @@ $schema = $p->discriminatedUnion([
 ```php
 $contactSchema = $p->discriminatedUnion([
     $p->object([
-        '_type' => $p->literal('email'),
+        '_type' => $p->const('email'),
         'address' => $p->string()->email(),
         'verified' => $p->bool(),
     ]),
     $p->object([
-        '_type' => $p->literal('phone'),
-        'number' => $p->string()->regexp('/^\+\d{10,15}$/'),
+        '_type' => $p->const('phone'),
+        'number' => $p->string()->pattern('/^\+\d{10,15}$/'),
         'country' => $p->string()->length(2),
     ]),
     $p->object([
-        '_type' => $p->literal('address'),
+        '_type' => $p->const('address'),
         'street' => $p->string(),
         'city' => $p->string(),
         'zipCode' => $p->string(),
@@ -80,16 +80,16 @@ $contactSchema = $p->discriminatedUnion([
 ```php
 $shapeSchema = $p->discriminatedUnion([
     $p->object([
-        'type' => $p->literal('circle'),
+        'type' => $p->const('circle'),
         'radius' => $p->float()->positive(),
     ]),
     $p->object([
-        'type' => $p->literal('rectangle'),
+        'type' => $p->const('rectangle'),
         'width' => $p->float()->positive(),
         'height' => $p->float()->positive(),
     ]),
     $p->object([
-        'type' => $p->literal('triangle'),
+        'type' => $p->const('triangle'),
         'base' => $p->float()->positive(),
         'height' => $p->float()->positive(),
     ]),
@@ -101,17 +101,17 @@ $shapeSchema = $p->discriminatedUnion([
 ```php
 $eventSchema = $p->discriminatedUnion([
     $p->object([
-        'event' => $p->literal('user.created'),
+        'event' => $p->const('user.created'),
         'userId' => $p->string()->uuidV4(),
         'email' => $p->string()->email(),
     ]),
     $p->object([
-        'event' => $p->literal('user.updated'),
+        'event' => $p->const('user.updated'),
         'userId' => $p->string()->uuidV4(),
         'changes' => $p->record($p->string()),
     ]),
     $p->object([
-        'event' => $p->literal('user.deleted'),
+        'event' => $p->const('user.deleted'),
         'userId' => $p->string()->uuidV4(),
         'deletedAt' => $p->string()->toDateTime(),
     ]),
@@ -123,18 +123,18 @@ $eventSchema = $p->discriminatedUnion([
 ```php
 $paymentSchema = $p->discriminatedUnion([
     $p->object([
-        'method' => $p->literal('credit_card'),
-        'cardNumber' => $p->string()->regexp('/^\d{16}$/'),
-        'expiry' => $p->string()->regexp('/^\d{2}\/\d{2}$/'),
-        'cvv' => $p->string()->regexp('/^\d{3,4}$/'),
+        'method' => $p->const('credit_card'),
+        'cardNumber' => $p->string()->pattern('/^\d{16}$/'),
+        'expiry' => $p->string()->pattern('/^\d{2}\/\d{2}$/'),
+        'cvv' => $p->string()->pattern('/^\d{3,4}$/'),
     ]),
     $p->object([
-        'method' => $p->literal('bank_transfer'),
+        'method' => $p->const('bank_transfer'),
         'iban' => $p->string(),
         'bic' => $p->string(),
     ]),
     $p->object([
-        'method' => $p->literal('paypal'),
+        'method' => $p->const('paypal'),
         'email' => $p->string()->email(),
     ]),
 ], 'method');
@@ -147,8 +147,8 @@ class EmailContact { public string $address; }
 class PhoneContact { public string $number; }
 
 $schema = $p->discriminatedUnion([
-    $p->object(['_type' => $p->literal('email'), 'address' => $p->string()], EmailContact::class),
-    $p->object(['_type' => $p->literal('phone'), 'number' => $p->string()], PhoneContact::class),
+    $p->object(['_type' => $p->const('email'), 'address' => $p->string()], EmailContact::class),
+    $p->object(['_type' => $p->const('phone'), 'number' => $p->string()], PhoneContact::class),
 ]);
 
 $contact = $schema->parse(['_type' => 'email', 'address' => 'test@example.com']);

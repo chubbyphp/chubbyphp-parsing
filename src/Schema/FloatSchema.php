@@ -12,11 +12,23 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
     public const string ERROR_TYPE_CODE = 'float.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "float", {{given}} given';
 
-    public const string ERROR_GT_CODE = 'float.gt';
-    public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
+    public const string ERROR_MINIMUM_CODE = 'float.minimum';
+    public const string ERROR_MINIMUM_TEMPLATE = 'Value should be greater than or equal {{minimum}}, {{given}} given';
+
+    public const string ERROR_EXCLUSIVE_MINIMUM_CODE = 'float.exclusiveMinimum';
+    public const string ERROR_EXCLUSIVE_MINIMUM_TEMPLATE = 'Value should be greater than {{exclusiveMinimum}}, {{given}} given';
+
+    public const string ERROR_EXCLUSIVE_MAXIMUM_CODE = 'float.exclusiveMaximum';
+    public const string ERROR_EXCLUSIVE_MAXIMUM_TEMPLATE = 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given';
+
+    public const string ERROR_MAXIMUM_CODE = 'float.maximum';
+    public const string ERROR_MAXIMUM_TEMPLATE = 'Value should be lesser than or equal {{maximum}}, {{given}} given';
 
     public const string ERROR_GTE_CODE = 'float.gte';
     public const string ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
+
+    public const string ERROR_GT_CODE = 'float.gt';
+    public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
 
     public const string ERROR_LT_CODE = 'float.lt';
     public const string ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
@@ -27,71 +39,159 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
     public const string ERROR_INT_CODE = 'float.int';
     public const string ERROR_INT_TEMPLATE = 'Cannot convert {{given}} to int';
 
-    public function gt(float $gt): static
+    public function minimum(float $minimum): static
     {
-        return $this->postParse(static function (float $float) use ($gt) {
-            if ($float <= $gt) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_GT_CODE,
-                        self::ERROR_GT_TEMPLATE,
-                        ['gt' => $gt, 'given' => $float]
-                    )
-                );
+        return $this->postParse(static function (float $float) use ($minimum) {
+            if ($float >= $minimum) {
+                return $float;
             }
 
-            return $float;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MINIMUM_CODE,
+                    self::ERROR_MINIMUM_TEMPLATE,
+                    ['minimum' => $minimum, 'given' => $float]
+                )
+            );
         });
     }
 
+    public function exclusiveMinimum(float $exclusiveMinimum): static
+    {
+        return $this->postParse(static function (float $float) use ($exclusiveMinimum) {
+            if ($float > $exclusiveMinimum) {
+                return $float;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_EXCLUSIVE_MINIMUM_CODE,
+                    self::ERROR_EXCLUSIVE_MINIMUM_TEMPLATE,
+                    ['exclusiveMinimum' => $exclusiveMinimum, 'given' => $float]
+                )
+            );
+        });
+    }
+
+    public function exclusiveMaximum(float $exclusiveMaximum): static
+    {
+        return $this->postParse(static function (float $float) use ($exclusiveMaximum) {
+            if ($float < $exclusiveMaximum) {
+                return $float;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_EXCLUSIVE_MAXIMUM_CODE,
+                    self::ERROR_EXCLUSIVE_MAXIMUM_TEMPLATE,
+                    ['exclusiveMaximum' => $exclusiveMaximum, 'given' => $float]
+                )
+            );
+        });
+    }
+
+    public function maximum(float $maximum): static
+    {
+        return $this->postParse(static function (float $float) use ($maximum) {
+            if ($float <= $maximum) {
+                return $float;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MAXIMUM_CODE,
+                    self::ERROR_MAXIMUM_TEMPLATE,
+                    ['maximum' => $maximum, 'given' => $float]
+                )
+            );
+        });
+    }
+
+    /**
+     * @deprecated use minimum
+     */
     public function gte(float $gte): static
     {
+        @trigger_error('Use minimum instead', E_USER_DEPRECATED);
+
         return $this->postParse(static function (float $float) use ($gte) {
-            if ($float < $gte) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_GTE_CODE,
-                        self::ERROR_GTE_TEMPLATE,
-                        ['gte' => $gte, 'given' => $float]
-                    )
-                );
+            if ($float >= $gte) {
+                return $float;
             }
 
-            return $float;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_GTE_CODE,
+                    self::ERROR_GTE_TEMPLATE,
+                    ['gte' => $gte, 'given' => $float]
+                )
+            );
         });
     }
 
+    /**
+     * @deprecated use exclusiveMinimum
+     */
+    public function gt(float $gt): static
+    {
+        @trigger_error('Use exclusiveMinimum instead', E_USER_DEPRECATED);
+
+        return $this->postParse(static function (float $float) use ($gt) {
+            if ($float > $gt) {
+                return $float;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_GT_CODE,
+                    self::ERROR_GT_TEMPLATE,
+                    ['gt' => $gt, 'given' => $float]
+                )
+            );
+        });
+    }
+
+    /**
+     * @deprecated use exclusiveMaximum
+     */
     public function lt(float $lt): static
     {
+        @trigger_error('Use exclusiveMaximum instead', E_USER_DEPRECATED);
+
         return $this->postParse(static function (float $float) use ($lt) {
-            if ($float >= $lt) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_LT_CODE,
-                        self::ERROR_LT_TEMPLATE,
-                        ['lt' => $lt, 'given' => $float]
-                    )
-                );
+            if ($float < $lt) {
+                return $float;
             }
 
-            return $float;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_LT_CODE,
+                    self::ERROR_LT_TEMPLATE,
+                    ['lt' => $lt, 'given' => $float]
+                )
+            );
         });
     }
 
+    /**
+     * @deprecated use maximum
+     */
     public function lte(float $lte): static
     {
+        @trigger_error('Use maximum instead', E_USER_DEPRECATED);
+
         return $this->postParse(static function (float $float) use ($lte) {
-            if ($float > $lte) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_LTE_CODE,
-                        self::ERROR_LTE_TEMPLATE,
-                        ['lte' => $lte, 'given' => $float]
-                    )
-                );
+            if ($float <= $lte) {
+                return $float;
             }
 
-            return $float;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_LTE_CODE,
+                    self::ERROR_LTE_TEMPLATE,
+                    ['lte' => $lte, 'given' => $float]
+                )
+            );
         });
     }
 
@@ -127,17 +227,17 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
 
             $intInput = (int) $input;
 
-            if ((float) $intInput !== $input) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_INT_CODE,
-                        self::ERROR_INT_TEMPLATE,
-                        ['given' => $input]
-                    )
-                );
+            if ((float) $intInput === $input) {
+                return $intInput;
             }
 
-            return $intInput;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_INT_CODE,
+                    self::ERROR_INT_TEMPLATE,
+                    ['given' => $input]
+                )
+            );
         })->nullable($this->nullable);
     }
 
@@ -153,16 +253,16 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
 
     protected function innerParse(mixed $input): mixed
     {
-        if (!\is_float($input)) {
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_TYPE_CODE,
-                    self::ERROR_TYPE_TEMPLATE,
-                    ['given' => $this->getDataType($input)]
-                )
-            );
+        if (\is_float($input)) {
+            return $input;
         }
 
-        return $input;
+        throw new ErrorsException(
+            new Error(
+                self::ERROR_TYPE_CODE,
+                self::ERROR_TYPE_TEMPLATE,
+                ['given' => $this->getDataType($input)]
+            )
+        );
     }
 }

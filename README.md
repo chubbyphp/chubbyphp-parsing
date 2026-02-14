@@ -35,7 +35,7 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-parsing][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-parsing "^2.4"
+composer require chubbyphp/chubbyphp-parsing "^2.5"
 ```
 
 ## Quick Start
@@ -49,7 +49,7 @@ $p = new Parser();
 $userSchema = $p->object([
     'name' => $p->string()->minLength(1)->maxLength(100),
     'email' => $p->string()->email(),
-    'age' => $p->int()->gte(0)->lte(150),
+    'age' => $p->int()->minimum(0)->maximum(150),
 ]);
 
 // Parse and validate data
@@ -93,7 +93,7 @@ $user = $userSchema->parse([
 
 | Schema | Description | Documentation |
 |--------|-------------|---------------|
-| `literal()` | Exact value matching | [LiteralSchema](doc/Schema/LiteralSchema.md) |
+| `const()` | Exact value matching | [ConstSchema](doc/Schema/ConstSchema.md) |
 | `backedEnum()` | PHP BackedEnum validation | [BackedEnumSchema](doc/Schema/BackedEnumSchema.md) |
 | `lazy()` | Recursive/self-referencing schemas | [LazySchema](doc/Schema/LazySchema.md) |
 | `respectValidation()` | Integration with Respect/Validation | [RespectValidationSchema](doc/Schema/RespectValidationSchema.md) |

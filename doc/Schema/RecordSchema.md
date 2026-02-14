@@ -71,8 +71,8 @@ $configSchema->parse([
 ```php
 $sortSchema = $p->record(
     $p->union([
-        $p->literal('asc'),
-        $p->literal('desc'),
+        $p->const('asc'),
+        $p->const('desc'),
     ])
 );
 

@@ -42,13 +42,13 @@ final class ParserTest extends TestCase
                     "timezone": "+00:00"
                 },
                 "discriminatedUnion": {
-                    "literal": "type1",
+                    "const": "type1",
                     "string": "test",
                     "default": "defaultOnClass"
                 },
                 "float": 1.5,
                 "int": 5,
-                "literal": 1337,
+                "const": 1337,
                 "object": {
                     "string": "test"
                 },
@@ -70,10 +70,10 @@ final class ParserTest extends TestCase
             'backedEnum' => 'D',
             'bool' => true,
             'dateTime' => new \DateTimeImmutable('2024-01-20T09:15:00+00:00'),
-            'discriminatedUnion' => ['literal' => 'type1', 'string' => 'test'],
+            'discriminatedUnion' => ['const' => 'type1', 'string' => 'test'],
             'float' => 1.5,
             'int' => 5,
-            'literal' => 1337,
+            'const' => 1337,
             'object' => ['string' => 'test'],
             'record' => ['key1' => 'value1', 'key2' => 'value2'],
             'string' => 'test',
@@ -163,9 +163,9 @@ final class ParserTest extends TestCase
                     ],
                 ],
                 [
-                    'path' => 'literal',
+                    'path' => 'const',
                     'error' => [
-                        'code' => 'literal.type',
+                        'code' => 'const.type',
                         'template' => 'Type should be "bool|float|int|string", {{given}} given',
                         'variables' => [
                             'given' => 'NULL',
@@ -239,7 +239,7 @@ final class ParserTest extends TestCase
     protected function getSchema(): SchemaInterface
     {
         $discriminatedUnion = new class {
-            public bool|float|int|string $literal;
+            public bool|float|int|string $const;
             public string $string;
             public string $default = 'defaultOnClass';
         };
@@ -252,7 +252,7 @@ final class ParserTest extends TestCase
             public object $discriminatedUnion;
             public float $float;
             public int $int;
-            public bool|float|int|string $literal;
+            public bool|float|int|string $const;
             public object $object;
             public array $record;
             public string $string;
@@ -268,11 +268,11 @@ final class ParserTest extends TestCase
             'bool' => $p->bool(),
             'dateTime' => $p->dateTime(),
             'discriminatedUnion' => $p->discriminatedUnion([
-                $p->object(['literal' => $p->literal('type1'), 'string' => $p->string()], $discriminatedUnion::class),
-            ], 'literal'),
+                $p->object(['const' => $p->const('type1'), 'string' => $p->string()], $discriminatedUnion::class),
+            ], 'const'),
             'float' => $p->float(),
             'int' => $p->int(),
-            'literal' => $p->literal(1337),
+            'const' => $p->const(1337),
             'object' => $p->object(['string' => $p->string()]),
             'record' => $p->record($p->string()),
             'string' => $p->string(),

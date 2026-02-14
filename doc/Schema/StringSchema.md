@@ -27,10 +27,10 @@ $schema->maxLength(100); // Maximum 100 characters
 ### Content Checks
 
 ```php
-$schema->includes('amp');    // Must contain 'amp'
+$schema->contains('amp');    // Must contain 'amp'
 $schema->startsWith('exa');  // Must start with 'exa'
 $schema->endsWith('ple');    // Must end with 'ple'
-$schema->regexp('/^[a-z]+$/i'); // Must match regex pattern
+$schema->pattern('/^[a-z]+$/i'); // Must match regex pattern
 ```
 
 ### Format Validations
@@ -38,12 +38,12 @@ $schema->regexp('/^[a-z]+$/i'); // Must match regex pattern
 ```php
 use Chubbyphp\Parsing\Enum\Uuid;
 
-$schema->domain();        // Valid domain
+$schema->hostname();      // Valid hostname
 $schema->email();         // Valid email address
 $schema->ipV4();          // Valid IPv4 address
 $schema->ipV6();          // Valid IPv6 address
 $schema->mac();           // Valid mac address
-$schema->url();           // Valid URL
+$schema->uri();           // Valid URI
 $schema->uuid();          // Valid UUID v4
 $schema->uuid(Uuid::v5);  // Valid UUID v5
 ```
@@ -110,7 +110,7 @@ $usernameSchema = $p->string()
     ->toLowerCase()
     ->minLength(3)
     ->maxLength(20)
-    ->regexp('/^[a-z0-9_]+$/');
+    ->pattern('/^[a-z0-9_]+$/');
 
 $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 ```
@@ -123,16 +123,16 @@ $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 | `string.length` | String length doesn't match exact length |
 | `string.minLength` | String is shorter than minimum |
 | `string.maxLength` | String is longer than maximum |
-| `string.includes` | String doesn't contain required substring |
+| `string.contains` | String doesn't contain required substring |
 | `string.startsWith` | String doesn't start with required prefix |
 | `string.endsWith` | String doesn't end with required suffix |
-| `string.domain` | Invalid domain format |
+| `string.hostname` | Invalid hostname format |
 | `string.email` | Invalid email format |
 | `string.ipV4` | Invalid IPv4 format |
 | `string.ipV6` | Invalid IPv6 format |
 | `string.mac` | Invalid mac format |
-| `string.regexp` | String doesn't match regex pattern |
-| `string.url` | Invalid URL format |
+| `string.pattern` | String doesn't match the pattern |
+| `string.uri` | Invalid URI format |
 | `string.uuidV4` | Invalid UUID v4 format |
 | `string.uuidV5` | Invalid UUID v5 format |
 | `string.bool` | Cannot convert string to bool (for `toBool()`) |

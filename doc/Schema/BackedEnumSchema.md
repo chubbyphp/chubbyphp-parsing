@@ -170,7 +170,7 @@ enum Rank: int
 {
     case Two = 2;
     case Three = 3;
-    // ... 
+    // ...
     case Jack = 11;
     case Queen = 12;
     case King = 13;
@@ -182,7 +182,7 @@ $cardSchema = $p->object([
     'rank' => $p->backedEnum(Rank::class),
 ]);
 
-$cardSchema->parse(['suit' => 'H', 'rank' => 14]); 
+$cardSchema->parse(['suit' => 'H', 'rank' => 14]);
 // Returns object with Suit::Hearts and Rank::Ace
 ```
 
@@ -204,14 +204,14 @@ $tagsSchema->parse(['featured', 'new', 'sale']);
 // Returns: [Tag::Featured, Tag::New, Tag::Sale]
 ```
 
-## BackedEnum vs Literal Union
+## BackedEnum vs Const Union
 
 Use **BackedEnumSchema** when:
 - You already have a PHP enum defined
 - You want type safety with enum instances
 - You need enum methods/functionality
 
-Use **Literal union** when:
+Use **Const union** when:
 - Values are ad-hoc or temporary
 - You don't need enum type safety
 - You're matching simple string/int values
@@ -222,8 +222,8 @@ enum Status: string { case Active = 'active'; case Inactive = 'inactive'; }
 $schema = $p->backedEnum(Status::class);
 // Returns Status enum instances
 
-// Literal union: simple string values
-$schema = $p->union([$p->literal('active'), $p->literal('inactive')]);
+// Const union: simple string values
+$schema = $p->union([$p->const('active'), $p->const('inactive')]);
 // Returns strings
 ```
 

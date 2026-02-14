@@ -19,15 +19,15 @@ $data = $schema->parse([1, 2, 3, 4, 5]); // Returns: [1, 2, 3, 4, 5]
 ### Length Constraints
 
 ```php
-$schema->length(5);     // Exact length of 5 items
-$schema->minLength(1);  // At least 1 item
-$schema->maxLength(10); // At most 10 items
+$schema->exactItems(5);  // Exact count of 5 items
+$schema->minItems(1);    // At least 1 item
+$schema->maxItems(10);   // At most 10 items
 ```
 
 ### Content Check
 
 ```php
-$schema->includes(5); // Array must contain value 5
+$schema->contains(5); // Array must contain value 5
 ```
 
 ## Transformations
@@ -89,14 +89,14 @@ $sumSchema->parse([1, 2, 3, 4, 5]); // Returns: 15
 ### Non-Empty Array
 
 ```php
-$nonEmptySchema = $p->array($p->string())->minLength(1);
+$nonEmptySchema = $p->array($p->string())->minItems(1);
 ```
 
 ### Unique Tags with Limit
 
 ```php
 $tagsSchema = $p->array($p->string()->trim()->minLength(1))
-    ->maxLength(10)
+    ->maxItems(10)
     ->map(static fn (string $tag) => strtolower($tag));
 ```
 
@@ -147,9 +147,9 @@ $matrixSchema->parse([
 | Code | Description |
 |------|-------------|
 | `array.type` | Value is not an array |
-| `array.length` | Array length doesn't match exact length |
-| `array.minLength` | Array has fewer items than minimum |
-| `array.maxLength` | Array has more items than maximum |
-| `array.includes` | Array doesn't contain required value |
+| `array.exactItems` | Array items count doesn't match exact count |
+| `array.minItems` | Array has fewer items than minimum |
+| `array.maxItems` | Array has more items than maximum |
+| `array.contains` | Array doesn't contain required value |
 
 Item-level errors will include the array index in the error path (e.g., `items.0`, `items.1`).

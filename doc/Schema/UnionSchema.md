@@ -46,7 +46,7 @@ While `nullable()` is preferred for simple null handling, unions can express mor
 ```php
 $schema = $p->union([
     $p->string()->minLength(1),
-    $p->literal(null),
+    $p->const(null),
 ]);
 
 $schema->parse('hello'); // Returns: 'hello'
@@ -70,12 +70,12 @@ $idSchema->parse('550e8400-e29b-41d4-a716-446655440000'); // Returns: UUID strin
 
 ```php
 $successSchema = $p->object([
-    'status' => $p->literal('success'),
+    'status' => $p->const('success'),
     'data' => $p->object([...]),
 ]);
 
 $errorSchema = $p->object([
-    'status' => $p->literal('error'),
+    'status' => $p->const('error'),
     'message' => $p->string(),
 ]);
 

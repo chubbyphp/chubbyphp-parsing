@@ -19,10 +19,10 @@ $data = $schema->parse(1337); // Returns: 1337
 ### Comparison Constraints
 
 ```php
-$schema->gt(5);   // Greater than 5
-$schema->gte(5);  // Greater than or equal to 5
-$schema->lt(10);  // Less than 10
-$schema->lte(10); // Less than or equal to 10
+$schema->minimum(5);  // Greater than or equal to 5
+$schema->exclusiveMinimum(5);   // Greater than 5
+$schema->exclusiveMaximum(10);  // Less than 10
+$schema->maximum(10); // Less than or equal to 10
 ```
 
 ### Sign Constraints
@@ -57,18 +57,18 @@ $positiveSchema->parse(-1);  // Throws: positive validation error
 ### Range Validation
 
 ```php
-$ageSchema = $p->int()->gte(0)->lte(150);
+$ageSchema = $p->int()->minimum(0)->maximum(150);
 
 $ageSchema->parse(25);  // Returns: 25
-$ageSchema->parse(-1);  // Throws: gte validation error
-$ageSchema->parse(200); // Throws: lte validation error
+$ageSchema->parse(-1);  // Throws: minimum validation error
+$ageSchema->parse(200); // Throws: maximum validation error
 ```
 
 ### Pagination
 
 ```php
 $offsetSchema = $p->int()->nonNegative();
-$limitSchema = $p->int()->positive()->lte(100);
+$limitSchema = $p->int()->positive()->maximum(100);
 
 $paginationSchema = $p->object([
     'offset' => $offsetSchema,
@@ -90,7 +90,7 @@ $date = $timestampSchema->parse(1705744500);
 | Code | Description |
 |------|-------------|
 | `int.type` | Value is not an integer |
-| `int.gt` | Value is not greater than threshold (used by `gt()` and `positive()`) |
-| `int.gte` | Value is not greater than or equal to threshold (used by `gte()` and `nonNegative()`) |
-| `int.lt` | Value is not less than threshold (used by `lt()` and `negative()`) |
-| `int.lte` | Value is not less than or equal to threshold (used by `lte()` and `nonPositive()`) |
+| `int.minimum` | Value is not greater than or equal to threshold (used by `minimum` and `nonNegative()`) |
+| `int.exclusiveMinimum` | Value is not greater than threshold (used by `exclusiveMinimum()` and `positive()`) |
+| `int.exclusiveMaximum` | Value is not less than threshold (used by `exclusiveMaximum()` and `negative()`) |
+| `int.maximum` | Value is not less than or equal to threshold (used by `maximum()` and `nonPositive()`) |
