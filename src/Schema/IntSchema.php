@@ -18,16 +18,28 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     public const string ERROR_MAXIMUM_CODE = 'int.maximum';
     public const string ERROR_MAXIMUM_TEMPLATE = 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MINIMUM_CODE */
     public const string ERROR_GTE_CODE = 'int.gte';
+
+    /** @deprecated: see ERROR_MINIMUM_TEMPLATE */
     public const string ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MINIMUM_CODE */
     public const string ERROR_GT_CODE = 'int.gt';
+
+    /** @deprecated: see ERROR_MINIMUM_TEMPLATE */
     public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MAXIMUM_CODE */
     public const string ERROR_LT_CODE = 'int.lt';
+
+    /** @deprecated: see ERROR_MAXIMUM_TEMPLATE */
     public const string ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MAXIMUM_CODE */
     public const string ERROR_LTE_CODE = 'int.lte';
+
+    /** @deprecated: see ERROR_MAXIMUM_TEMPLATE */
     public const string ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
     public function minimum(int $minimum, bool $exclusiveMinimum = false): static

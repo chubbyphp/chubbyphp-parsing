@@ -18,16 +18,28 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
     public const string ERROR_MAXIMUM_CODE = 'float.maximum';
     public const string ERROR_MAXIMUM_TEMPLATE = 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MINIMUM_CODE */
     public const string ERROR_GTE_CODE = 'float.gte';
+
+    /** @deprecated: see ERROR_MINIMUM_TEMPLATE */
     public const string ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MINIMUM_CODE */
     public const string ERROR_GT_CODE = 'float.gt';
+
+    /** @deprecated: see ERROR_MINIMUM_TEMPLATE */
     public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MAXIMUM_CODE */
     public const string ERROR_LT_CODE = 'float.lt';
+
+    /** @deprecated: see ERROR_MAXIMUM_TEMPLATE */
     public const string ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MAXIMUM_CODE */
     public const string ERROR_LTE_CODE = 'float.lte';
+
+    /** @deprecated: see ERROR_MAXIMUM_TEMPLATE */
     public const string ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
     public const string ERROR_INT_CODE = 'float.int';

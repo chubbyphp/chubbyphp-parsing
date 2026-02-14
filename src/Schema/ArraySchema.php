@@ -22,19 +22,31 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     public const string ERROR_MAX_ITEMS_CODE = 'array.maxItems';
     public const string ERROR_MAX_ITEMS_TEMPLATE = 'Max items {{maxItems}}, {{given}} given';
 
+    /** @deprecated: see ERROR_EXACT_ITEMS_CODE */
     public const string ERROR_LENGTH_CODE = 'array.length';
+
+    /** @deprecated: see ERROR_EXACT_ITEMS_TEMPLATE */
     public const string ERROR_LENGTH_TEMPLATE = 'Length {{length}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MIN_ITEMS_CODE */
     public const string ERROR_MIN_LENGTH_CODE = 'array.minLength';
+
+    /** @deprecated: see ERROR_MIN_ITEMS_TEMPLATE */
     public const string ERROR_MIN_LENGTH_TEMPLATE = 'Min length {{min}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MAX_ITEMS_CODE */
     public const string ERROR_MAX_LENGTH_CODE = 'array.maxLength';
+
+    /** @deprecated: see ERROR_MAX_ITEMS_TEMPLATE */
     public const string ERROR_MAX_LENGTH_TEMPLATE = 'Max length {{max}}, {{given}} given';
 
     public const string ERROR_CONTAINS_CODE = 'array.contains';
     public const string ERROR_CONTAINS_TEMPLATE = '{{given}} does not contain {{contains}}';
 
+    /** @deprecated: see ERROR_CONTAINS_CODE */
     public const string ERROR_INCLUDES_CODE = 'array.includes';
+
+    /** @deprecated: see ERROR_CONTAINS_TEMPLATE */
     public const string ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
 
     public function __construct(private SchemaInterface $itemSchema) {}

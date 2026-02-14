@@ -25,7 +25,10 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_CONTAINS_CODE = 'string.contains';
     public const string ERROR_CONTAINS_TEMPLATE = '{{given}} does not contain {{contains}}';
 
+    /** @deprecated: see ERROR_CONTAINS_CODE */
     public const string ERROR_INCLUDES_CODE = 'string.includes';
+
+    /** @deprecated: see ERROR_CONTAINS_TEMPLATE */
     public const string ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
 
     public const string ERROR_STARTSWITH_CODE = 'string.startsWith';
@@ -37,7 +40,10 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_HOSTNAME_CODE = 'string.hostname';
     public const string ERROR_HOSTNAME_TEMPLATE = 'Invalid hostname {{given}}';
 
+    /** @deprecated: see ERROR_HOSTNAME_CODE */
     public const string ERROR_DOMAIN_CODE = 'string.domain';
+
+    /** @deprecated: see ERROR_HOSTNAME_TEMPLATE */
     public const string ERROR_DOMAIN_TEMPLATE = 'Invalid domain {{given}}';
 
     public const string ERROR_EMAIL_CODE = 'string.email';
@@ -49,19 +55,28 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_MAC_CODE = 'string.mac';
     public const string ERROR_MAC_TEMPLATE = 'Invalid mac {{given}}';
 
+    /** @deprecated: see ERROR_PATTERN_CODE */
     public const string ERROR_MATCH_CODE = 'string.match';
+
+    /** @deprecated: see ERROR_PATTERN_TEMPLATE */
     public const string ERROR_MATCH_TEMPLATE = '{{given}} does not match {{match}}';
 
     public const string ERROR_PATTERN_CODE = 'string.pattern';
     public const string ERROR_PATTERN_TEMPLATE = '{{given}} does not pattern {{pattern}}';
 
+    /** @deprecated: see ERROR_PATTERN_CODE */
     public const string ERROR_REGEXP_CODE = 'string.regexp';
+
+    /** @deprecated: see ERROR_PATTERN_TEMPLATE */
     public const string ERROR_REGEXP_TEMPLATE = '{{given}} does not regexp {{regexp}}';
 
     public const string ERROR_URI_CODE = 'string.uri';
     public const string ERROR_URI_TEMPLATE = 'Invalid uri {{given}}';
 
+    /** @deprecated: see ERROR_URI_CODE */
     public const string ERROR_URL_CODE = 'string.url';
+
+    /** @deprecated: see ERROR_URI_TEMPLATE */
     public const string ERROR_URL_TEMPLATE = 'Invalid url {{given}}';
 
     public const string ERROR_UUID_CODE = 'string.uuid';
