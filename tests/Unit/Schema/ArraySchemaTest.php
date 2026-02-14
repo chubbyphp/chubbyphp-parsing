@@ -218,7 +218,7 @@ final class ArraySchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use exactItems instead', $lastError['message']);
+        self::assertSame('Use exactItems($length) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -300,7 +300,7 @@ final class ArraySchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minItems instead', $lastError['message']);
+        self::assertSame('Use minItems($minLength) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -382,7 +382,7 @@ final class ArraySchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use maxItems instead', $lastError['message']);
+        self::assertSame('Use maxItems($maxLength) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -562,7 +562,7 @@ final class ArraySchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use contains instead', $lastError['message']);
+        self::assertSame('Use contains($includes, $strict) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }

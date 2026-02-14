@@ -90,11 +90,11 @@ final class Parser implements ParserInterface
     }
 
     /**
-     * @deprecated use const
+     * @deprecated Use const($literal) instead
      */
     public function literal(bool|float|int|string $literal): LiteralSchema
     {
-        @trigger_error('Use const instead', E_USER_DEPRECATED);
+        @trigger_error('Use const($literal) instead', E_USER_DEPRECATED);
 
         return new LiteralSchema($literal);
     }

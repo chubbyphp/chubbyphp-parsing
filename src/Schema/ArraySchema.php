@@ -97,11 +97,11 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     }
 
     /**
-     * @deprecated use exactItems
+     * @deprecated Use exactItems($length) instead
      */
     public function length(int $length): static
     {
-        @trigger_error('Use exactItems instead', E_USER_DEPRECATED);
+        @trigger_error('Use exactItems($length) instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($length) {
             $arrayLength = \count($array);
@@ -121,11 +121,11 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     }
 
     /**
-     * @deprecated use minItems
+     * @deprecated Use minItems($minLength) instead
      */
     public function minLength(int $minLength): static
     {
-        @trigger_error('Use minItems instead', E_USER_DEPRECATED);
+        @trigger_error('Use minItems($minLength) instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($minLength) {
             $arrayLength = \count($array);
@@ -145,11 +145,11 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     }
 
     /**
-     * @deprecated use maxItems
+     * @deprecated Use maxItems($maxLength) instead
      */
     public function maxLength(int $maxLength): static
     {
-        @trigger_error('Use maxItems instead', E_USER_DEPRECATED);
+        @trigger_error('Use maxItems($maxLength) instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($maxLength) {
             $arrayLength = \count($array);
@@ -190,7 +190,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function includes(mixed $includes, bool $strict = true): static
     {
-        @trigger_error('Use contains instead', E_USER_DEPRECATED);
+        @trigger_error('Use contains($includes, $strict) instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($includes, $strict) {
             if (!\in_array($includes, $array, $strict)) {

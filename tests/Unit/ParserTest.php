@@ -154,7 +154,7 @@ final class ParserTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use const instead', $lastError['message']);
+        self::assertSame('Use const($literal) instead', $lastError['message']);
 
         self::assertInstanceOf(LiteralSchema::class, $literalSchema);
     }

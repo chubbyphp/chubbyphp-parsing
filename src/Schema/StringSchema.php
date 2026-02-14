@@ -156,11 +156,11 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     }
 
     /**
-     * @deprecated use contains
+     * @deprecated Use contains($includes) instea
      */
     public function includes(string $includes): static
     {
-        @trigger_error('Use contains instead', E_USER_DEPRECATED);
+        @trigger_error('Use contains($includes) instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (string $string) use ($includes) {
             if (str_contains($string, $includes)) {
@@ -229,11 +229,11 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     }
 
     /**
-     * @deprecated use hostname
+     * @deprecated Use hostname() instead
      */
     public function domain(): static
     {
-        @trigger_error('Use hostname instead', E_USER_DEPRECATED);
+        @trigger_error('Use hostname() instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (string $string) {
             if (filter_var($string, FILTER_VALIDATE_DOMAIN)) {
@@ -319,11 +319,11 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     }
 
     /**
-     * @deprecated: use pattern
+     * @deprecated: Use pattern($match) instead
      */
     public function match(string $match): static
     {
-        @trigger_error('Use pattern instead', E_USER_DEPRECATED);
+        @trigger_error('Use pattern($match) instead', E_USER_DEPRECATED);
 
         if (false === @preg_match($match, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid match "%s" given', $match));
@@ -370,11 +370,11 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     }
 
     /**
-     * @deprecated: use pattern
+     * @deprecated: Use pattern($regexp) instead
      */
     public function regexp(string $regexp): static
     {
-        @trigger_error('Use pattern instead', E_USER_DEPRECATED);
+        @trigger_error('Use pattern($regexp) instead', E_USER_DEPRECATED);
 
         if (false === @preg_match($regexp, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid regexp "%s" given', $regexp));
@@ -415,11 +415,11 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     }
 
     /**
-     * @deprecated use uri
+     * @deprecated Use uri() instead
      */
     public function url(): static
     {
-        @trigger_error('Use uri instead', E_USER_DEPRECATED);
+        @trigger_error('Use uri() instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (string $string) {
             if (filter_var($string, FILTER_VALIDATE_URL)) {
