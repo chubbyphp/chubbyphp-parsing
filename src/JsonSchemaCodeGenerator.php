@@ -38,8 +38,7 @@ final class JsonSchemaCodeGenerator
             throw new \InvalidArgumentException('$ref is not supported. Please dereference the schema first.');
         }
 
-        // Handle const/enum as literal
-        if (\array_key_exists('const', $schema)) {
+        if (isset($schema['const'])) {
             return $this->generateConst($schema);
         }
 
@@ -100,7 +99,7 @@ final class JsonSchemaCodeGenerator
      */
     private function generateConst(array $schema): string
     {
-        return '$p->literal('.$this->exportValue($schema['const']).')';
+        return '$p->const('.$this->exportValue($schema['const']).')';
     }
 
     /**
@@ -120,11 +119,11 @@ final class JsonSchemaCodeGenerator
         $nonNullValues = array_values(array_filter($values, static fn (mixed $v): bool => null !== $v));
 
         if (0 === \count($nonNullValues)) {
-            throw new \InvalidArgumentException('Enum must have at leas one non null value');
+            throw new \InvalidArgumentException('Enum must have at least one non null value');
         }
 
         if (1 === \count($nonNullValues)) {
-            $code = '$p->literal('.$this->exportValue($nonNullValues[0]).')';
+            $code = '$p->const('.$this->exportValue($nonNullValues[0]).')';
 
             if ($hasNull) {
                 $code .= '->nullable()';
@@ -135,7 +134,7 @@ final class JsonSchemaCodeGenerator
 
         // Multiple values: union of literals
         $literals = array_map(
-            fn (mixed $v): string => '$p->literal('.$this->exportValue($v).')',
+            fn (mixed $v): string => '$p->const('.$this->exportValue($v).')',
             $nonNullValues,
         );
 
@@ -375,7 +374,7 @@ final class JsonSchemaCodeGenerator
         }
 
         if (isset($schema['pattern']) && \is_string($schema['pattern'])) {
-            $code .= '->regexp('.$this->exportValue('/'.$schema['pattern'].'/').')';
+            $code .= '->pattern('.$this->exportValue('/'.$schema['pattern'].'/').')';
         }
 
         if (isset($schema['format']) && \is_string($schema['format'])) {
@@ -389,11 +388,11 @@ final class JsonSchemaCodeGenerator
     {
         return match ($format) {
             'email' => $code.'->email()',
-            'uri', 'url' => $code.'->url()',
+            'uri', 'url' => $code.'->uri()',
             'ipv4' => $code.'->ipV4()',
             'ipv6' => $code.'->ipV6()',
             'uuid' => $code.'->uuid()',
-            'hostname' => $code.'->domain()',
+            'hostname' => $code.'->hostname()',
             'date-time' => $code.'->toDateTime()',
             default => $code.' /* unsupported format: '.$format.' */',
         };
@@ -426,22 +425,22 @@ final class JsonSchemaCodeGenerator
     {
         if (isset($schema['minimum']) && (\is_int($schema['minimum']) || \is_float($schema['minimum']))) {
             $val = $isInt ? (int) $schema['minimum'] : (float) $schema['minimum'];
-            $code .= '->gte('.$this->exportValue($val).')';
+            $code .= '->minimum('.$this->exportValue($val).')';
         }
 
         if (isset($schema['maximum']) && (\is_int($schema['maximum']) || \is_float($schema['maximum']))) {
             $val = $isInt ? (int) $schema['maximum'] : (float) $schema['maximum'];
-            $code .= '->lte('.$this->exportValue($val).')';
+            $code .= '->maximum('.$this->exportValue($val).')';
         }
 
         if (isset($schema['exclusiveMinimum']) && (\is_int($schema['exclusiveMinimum']) || \is_float($schema['exclusiveMinimum']))) {
             $val = $isInt ? (int) $schema['exclusiveMinimum'] : (float) $schema['exclusiveMinimum'];
-            $code .= '->gt('.$this->exportValue($val).')';
+            $code .= '->exclusiveMinimum('.$this->exportValue($val).')';
         }
 
         if (isset($schema['exclusiveMaximum']) && (\is_int($schema['exclusiveMaximum']) || \is_float($schema['exclusiveMaximum']))) {
             $val = $isInt ? (int) $schema['exclusiveMaximum'] : (float) $schema['exclusiveMaximum'];
-            $code .= '->lt('.$this->exportValue($val).')';
+            $code .= '->exclusiveMaximum('.$this->exportValue($val).')';
         }
 
         return $code;
@@ -481,11 +480,11 @@ final class JsonSchemaCodeGenerator
         $code = '$p->array('.$itemCode.')';
 
         if (isset($schema['minItems']) && (\is_int($schema['minItems']) || \is_float($schema['minItems']))) {
-            $code .= '->minLength('.(int) $schema['minItems'].')';
+            $code .= '->minItems('.(int) $schema['minItems'].')';
         }
 
         if (isset($schema['maxItems']) && (\is_int($schema['maxItems']) || \is_float($schema['maxItems']))) {
-            $code .= '->maxLength('.(int) $schema['maxItems'].')';
+            $code .= '->maxItems('.(int) $schema['maxItems'].')';
         }
 
         return $code;

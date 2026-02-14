@@ -51,7 +51,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'string', 'pattern' => '^[a-z]+$']);
 
-        self::assertSame("\$p->string()->regexp('/^[a-z]+$/')", $code);
+        self::assertSame("\$p->string()->pattern('/^[a-z]+$/')", $code);
     }
 
     public function testStringWithEmailFormat(): void
@@ -67,7 +67,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'string', 'format' => 'uri']);
 
-        self::assertSame('$p->string()->url()', $code);
+        self::assertSame('$p->string()->uri()', $code);
     }
 
     public function testStringWithIpv4Format(): void
@@ -99,7 +99,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'string', 'format' => 'hostname']);
 
-        self::assertSame('$p->string()->domain()', $code);
+        self::assertSame('$p->string()->hostname()', $code);
     }
 
     public function testStringWithDateTimeFormat(): void
@@ -131,7 +131,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'integer', 'minimum' => 0]);
 
-        self::assertSame('$p->int()->gte(0)', $code);
+        self::assertSame('$p->int()->minimum(0)', $code);
     }
 
     public function testIntegerWithMaximum(): void
@@ -139,7 +139,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'integer', 'maximum' => 100]);
 
-        self::assertSame('$p->int()->lte(100)', $code);
+        self::assertSame('$p->int()->maximum(100)', $code);
     }
 
     public function testIntegerWithExclusiveMinimum(): void
@@ -147,7 +147,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'integer', 'exclusiveMinimum' => 0]);
 
-        self::assertSame('$p->int()->gt(0)', $code);
+        self::assertSame('$p->int()->exclusiveMinimum(0)', $code);
     }
 
     public function testIntegerWithExclusiveMaximum(): void
@@ -155,7 +155,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'integer', 'exclusiveMaximum' => 100]);
 
-        self::assertSame('$p->int()->lt(100)', $code);
+        self::assertSame('$p->int()->exclusiveMaximum(100)', $code);
     }
 
     public function testIntegerWithAllConstraints(): void
@@ -167,7 +167,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
             'maximum' => 99,
         ]);
 
-        self::assertSame('$p->int()->gte(1)->lte(99)', $code);
+        self::assertSame('$p->int()->minimum(1)->maximum(99)', $code);
     }
 
     public function testNumber(): void
@@ -183,7 +183,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'number', 'minimum' => 0.5]);
 
-        self::assertSame('$p->float()->gte(0.5)', $code);
+        self::assertSame('$p->float()->minimum(0.5)', $code);
     }
 
     public function testNumberWithMaximum(): void
@@ -191,7 +191,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'number', 'maximum' => 99.9]);
 
-        self::assertSame('$p->float()->lte(99.9)', $code);
+        self::assertSame('$p->float()->maximum(99.9)', $code);
     }
 
     public function testNumberWithExclusiveMinimum(): void
@@ -199,7 +199,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'number', 'exclusiveMinimum' => 0.0]);
 
-        self::assertSame('$p->float()->gt(0.0)', $code);
+        self::assertSame('$p->float()->exclusiveMinimum(0.0)', $code);
     }
 
     public function testNumberWithExclusiveMaximum(): void
@@ -207,7 +207,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'number', 'exclusiveMaximum' => 100.0]);
 
-        self::assertSame('$p->float()->lt(100.0)', $code);
+        self::assertSame('$p->float()->exclusiveMaximum(100.0)', $code);
     }
 
     public function testBoolean(): void
@@ -257,7 +257,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
             'minItems' => 1,
         ]);
 
-        self::assertSame('$p->array($p->string())->minLength(1)', $code);
+        self::assertSame('$p->array($p->string())->minItems(1)', $code);
     }
 
     public function testArrayWithMaxItems(): void
@@ -269,7 +269,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
             'maxItems' => 10,
         ]);
 
-        self::assertSame('$p->array($p->string())->maxLength(10)', $code);
+        self::assertSame('$p->array($p->string())->maxItems(10)', $code);
     }
 
     public function testArrayWithMinAndMaxItems(): void
@@ -282,7 +282,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
             'maxItems' => 10,
         ]);
 
-        self::assertSame('$p->array($p->string())->minLength(1)->maxLength(10)', $code);
+        self::assertSame('$p->array($p->string())->minItems(1)->maxItems(10)', $code);
     }
 
     public function testArrayWithNoItems(): void
@@ -422,9 +422,9 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
     {
         $generator = new JsonSchemaCodeGenerator();
 
-        self::assertSame("\$p->literal('active')", $generator->generate(['const' => 'active']));
-        self::assertSame('$p->literal(42)', $generator->generate(['const' => 42]));
-        self::assertSame('$p->literal(true)', $generator->generate(['const' => true]));
+        self::assertSame("\$p->const('active')", $generator->generate(['const' => 'active']));
+        self::assertSame('$p->const(42)', $generator->generate(['const' => 42]));
+        self::assertSame('$p->const(true)', $generator->generate(['const' => true]));
     }
 
     public function testEnumStrings(): void
@@ -433,7 +433,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $code = $generator->generate(['enum' => ['active', 'inactive', 'pending']]);
 
         self::assertSame(
-            "\$p->union([\$p->literal('active'), \$p->literal('inactive'), \$p->literal('pending')])",
+            "\$p->union([\$p->const('active'), \$p->const('inactive'), \$p->const('pending')])",
             $code,
         );
     }
@@ -443,7 +443,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['enum' => ['only']]);
 
-        self::assertSame("\$p->literal('only')", $code);
+        self::assertSame("\$p->const('only')", $code);
     }
 
     public function testEnumWithNull(): void
@@ -452,7 +452,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $code = $generator->generate(['enum' => ['active', 'inactive', null]]);
 
         self::assertSame(
-            "\$p->union([\$p->literal('active'), \$p->literal('inactive')])->nullable()",
+            "\$p->union([\$p->const('active'), \$p->const('inactive')])->nullable()",
             $code,
         );
     }
@@ -462,7 +462,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['enum' => [1, 2, 3]]);
 
-        self::assertSame('$p->union([$p->literal(1), $p->literal(2), $p->literal(3)])', $code);
+        self::assertSame('$p->union([$p->const(1), $p->const(2), $p->const(3)])', $code);
     }
 
     public function testOneOfSimple(): void
@@ -574,8 +574,8 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         ]);
 
         self::assertSame(
-            "\$p->discriminatedUnion([\$p->object(['type' => \$p->literal('email'), 'address' => \$p->string()]), "
-            ."\$p->object(['type' => \$p->literal('phone'), 'number' => \$p->string()])], 'type')",
+            "\$p->discriminatedUnion([\$p->object(['type' => \$p->const('email'), 'address' => \$p->string()]), "
+            ."\$p->object(['type' => \$p->const('phone'), 'number' => \$p->string()])], 'type')",
             $code,
         );
     }
@@ -654,9 +654,9 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         ]);
 
         self::assertSame(
-            "\$p->object(['id' => \$p->int()->gte(1), 'name' => \$p->string()->minLength(1)->maxLength(100), "
-            ."'email' => \$p->string()->email(), 'age' => \$p->int()->gte(0)->lte(150)->nullable(), "
-            ."'tags' => \$p->array(\$p->string())->minLength(1)->nullable(), 'metadata' => \$p->record(\$p->string())->nullable()])"
+            "\$p->object(['id' => \$p->int()->minimum(1), 'name' => \$p->string()->minLength(1)->maxLength(100), "
+            ."'email' => \$p->string()->email(), 'age' => \$p->int()->minimum(0)->maximum(150)->nullable(), "
+            ."'tags' => \$p->array(\$p->string())->minItems(1)->nullable(), 'metadata' => \$p->record(\$p->string())->nullable()])"
             ."->optional(['age', 'tags', 'metadata'])->strict()",
             $code,
         );
@@ -746,8 +746,8 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         ]);
 
         self::assertSame(
-            "\$p->discriminatedUnion([\$p->object(['kind' => \$p->literal('circle'), 'radius' => \$p->float()]), "
-            ."\$p->object(['kind' => \$p->literal('square'), 'side' => \$p->float()])], 'kind')",
+            "\$p->discriminatedUnion([\$p->object(['kind' => \$p->const('circle'), 'radius' => \$p->float()]), "
+            ."\$p->object(['kind' => \$p->const('square'), 'side' => \$p->float()])], 'kind')",
             $code,
         );
     }
@@ -768,7 +768,7 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'string', 'format' => 'url']);
 
-        self::assertSame('$p->string()->url()', $code);
+        self::assertSame('$p->string()->uri()', $code);
     }
 
     public function testAllOfWithOptionalFields(): void
@@ -850,6 +850,6 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $generator = new JsonSchemaCodeGenerator();
         $code = $generator->generate(['type' => 'number', 'minimum' => 0]);
 
-        self::assertSame('$p->float()->gte(0.0)', $code);
+        self::assertSame('$p->float()->minimum(0.0)', $code);
     }
 }
