@@ -18,7 +18,10 @@ final class LiteralSchema extends AbstractSchemaInnerParse
     public const string ERROR_EQUALS_CODE = 'literal.equals';
     public const string ERROR_EQUALS_TEMPLATE = 'Input should be {{expected}}, {{given}} given';
 
-    public function __construct(private bool|float|int|string $literal) {}
+    public function __construct(private bool|float|int|string $literal)
+    {
+        @trigger_error('Use '.ConstSchema::class.' instead', E_USER_DEPRECATED);
+    }
 
     protected function innerParse(mixed $input): mixed
     {

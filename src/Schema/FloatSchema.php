@@ -84,7 +84,7 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function gte(float $gte): static
     {
-        @trigger_error('Use minimum($gte) instead', E_USER_DEPRECATED);
+        @trigger_error('Use minimum('.$this->varExport($gte).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (float $float) use ($gte) {
             if ($float >= $gte) {
@@ -106,7 +106,7 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function gt(float $gt): static
     {
-        @trigger_error('Use minimum($gt, true) instead', E_USER_DEPRECATED);
+        @trigger_error('Use minimum('.$this->varExport($gt).', true) instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (float $float) use ($gt) {
             if ($float > $gt) {
@@ -128,7 +128,7 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function lt(float $lt): static
     {
-        @trigger_error('Use maximum($lt, true) instead', E_USER_DEPRECATED);
+        @trigger_error('Use maximum('.$this->varExport($lt).', true) instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (float $float) use ($lt) {
             if ($float < $lt) {
@@ -150,7 +150,7 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function lte(float $lte): static
     {
-        @trigger_error('Use maximum($lte) instead', E_USER_DEPRECATED);
+        @trigger_error('Use maximum('.$this->varExport($lte).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (float $float) use ($lte) {
             if ($float <= $lte) {
@@ -167,21 +167,33 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
         });
     }
 
-    public function positive(): static
-    {
-        return $this->gt(0.0);
-    }
-
+    /**
+     * @deprecated Use minimum(0.0) instead
+     */
     public function nonNegative(): static
     {
         return $this->gte(0.0);
     }
 
+    /**
+     * @deprecated Use minimum(0.0, true) instead
+     */
+    public function positive(): static
+    {
+        return $this->gt(0.0);
+    }
+
+    /**
+     * @deprecated Use maximum(0.0, true) instead
+     */
     public function negative(): static
     {
         return $this->lt(0.0);
     }
 
+    /**
+     * @deprecated Use maximum(0.0) instead
+     */
     public function nonPositive(): static
     {
         return $this->lte(0.0);

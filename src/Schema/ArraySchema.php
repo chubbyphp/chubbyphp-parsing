@@ -113,7 +113,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function length(int $length): static
     {
-        @trigger_error('Use exactItems($length) instead', E_USER_DEPRECATED);
+        @trigger_error('Use exactItems('.$this->varExport($length).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($length) {
             $arrayLength = \count($array);
@@ -137,7 +137,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function minLength(int $minLength): static
     {
-        @trigger_error('Use minItems($minLength) instead', E_USER_DEPRECATED);
+        @trigger_error('Use minItems('.$this->varExport($minLength).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($minLength) {
             $arrayLength = \count($array);
@@ -161,7 +161,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function maxLength(int $maxLength): static
     {
-        @trigger_error('Use maxItems($maxLength) instead', E_USER_DEPRECATED);
+        @trigger_error('Use maxItems('.$this->varExport($maxLength).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($maxLength) {
             $arrayLength = \count($array);
@@ -202,7 +202,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function includes(mixed $includes, bool $strict = true): static
     {
-        @trigger_error('Use contains($includes, $strict) instead', E_USER_DEPRECATED);
+        @trigger_error('Use contains('.$this->varExport($includes).', '.$this->varExport($strict).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($includes, $strict) {
             if (!\in_array($includes, $array, $strict)) {

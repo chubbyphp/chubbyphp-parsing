@@ -123,4 +123,33 @@ abstract class AbstractSchemaInnerParse implements SchemaInterface
     {
         return \is_object($input) ? $input::class : \gettype($input);
     }
+
+    protected function varExport(mixed $input): string
+    {
+        if ($input instanceof \DateTimeInterface) {
+            return 'new \DateTimeImmutable(\''.$input->format('c').'\')';
+        }
+
+        if ($input instanceof \BackedEnum) {
+            return '\\'.$input::class.'::from('.$this->varExport($input->value).')';
+        }
+
+        if ($input instanceof \stdClass) {
+            return '(object) '.$this->varExport((array) $input);
+        }
+
+        if (\is_array($input)) {
+            return '['.implode(', ', array_map(
+                fn (int|string $key, mixed $value) => $this->varExport($key).' => '.$this->varExport($value),
+                array_keys($input),
+                $input
+            )).']';
+        }
+
+        if (null === $input) {
+            return 'null';
+        }
+
+        return var_export($input, true);
+    }
 }

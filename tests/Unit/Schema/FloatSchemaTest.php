@@ -384,7 +384,7 @@ final class FloatSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minimum($gte) instead', $lastError['message']);
+        self::assertSame('Use minimum(4.1) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -432,7 +432,7 @@ final class FloatSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minimum($gt, true) instead', $lastError['message']);
+        self::assertSame('Use minimum(4.1, true) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -514,7 +514,7 @@ final class FloatSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use maximum($lt, true) instead', $lastError['message']);
+        self::assertSame('Use maximum(4.2, true) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -590,7 +590,7 @@ final class FloatSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use maximum($lte) instead', $lastError['message']);
+        self::assertSame('Use maximum(4.1) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
