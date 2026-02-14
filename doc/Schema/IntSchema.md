@@ -20,8 +20,8 @@ $data = $schema->parse(1337); // Returns: 1337
 
 ```php
 $schema->minimum(5);  // Greater than or equal to 5
-$schema->exclusiveMinimum(5);   // Greater than 5
-$schema->exclusiveMaximum(10);  // Less than 10
+$schema->minimum(5, true);   // Greater than 5
+$schema->maximum(10, true);  // Less than 10
 $schema->maximum(10); // Less than or equal to 10
 ```
 
@@ -90,7 +90,5 @@ $date = $timestampSchema->parse(1705744500);
 | Code | Description |
 |------|-------------|
 | `int.type` | Value is not an integer |
-| `int.minimum` | Value is not greater than or equal to threshold (used by `minimum` and `nonNegative()`) |
-| `int.exclusiveMinimum` | Value is not greater than threshold (used by `exclusiveMinimum()` and `positive()`) |
-| `int.exclusiveMaximum` | Value is not less than threshold (used by `exclusiveMaximum()` and `negative()`) |
-| `int.maximum` | Value is not less than or equal to threshold (used by `maximum()` and `nonPositive()`) |
+| `int.minimum` | Value is not greater than or equal to threshold |
+| `int.maximum` | Value is not less than or equal to threshold |

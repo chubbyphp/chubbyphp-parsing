@@ -1257,7 +1257,7 @@ final class StringSchemaTest extends TestCase
     {
         $input = '4.2';
 
-        $schema = (new StringSchema())->toFloat()->exclusiveMinimum(4.0);
+        $schema = (new StringSchema())->toFloat()->minimum(4.0, true);
 
         self::assertSame((float) $input, $schema->parse($input));
     }
@@ -1299,7 +1299,7 @@ final class StringSchemaTest extends TestCase
     {
         $input = '42';
 
-        $schema = (new StringSchema())->toInt()->exclusiveMinimum(40);
+        $schema = (new StringSchema())->toInt()->minimum(40, true);
 
         self::assertSame((int) $input, $schema->parse($input));
     }

@@ -175,9 +175,10 @@ final class IntSchemaTest extends TestCase
                     'path' => '',
                     'error' => [
                         'code' => 'int.minimum',
-                        'template' => 'Value should be greater than or equal {{minimum}}, {{given}} given',
+                        'template' => 'Value should be minimum {{minimum}} {{exclusiveMinimum}}, {{given}} given',
                         'variables' => [
                             'minimum' => $minimum,
+                            'exclusiveMinimum' => false,
                             'given' => $input,
                         ],
                     ],
@@ -189,9 +190,9 @@ final class IntSchemaTest extends TestCase
     public function testParseWithValidExclusiveMinimum(): void
     {
         $input = 5;
-        $exclusiveMinimum = 4;
+        $minimum = 4;
 
-        $schema = (new IntSchema())->exclusiveMinimum($exclusiveMinimum);
+        $schema = (new IntSchema())->minimum($minimum, true);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -199,9 +200,9 @@ final class IntSchemaTest extends TestCase
     public function testParseWithInvalidExclusiveMinimumEqual(): void
     {
         $input = 4;
-        $exclusiveMinimum = 4;
+        $minimum = 4;
 
-        $schema = (new IntSchema())->exclusiveMinimum($exclusiveMinimum);
+        $schema = (new IntSchema())->minimum($minimum, true);
 
         try {
             $schema->parse($input);
@@ -213,10 +214,11 @@ final class IntSchemaTest extends TestCase
                     [
                         'path' => '',
                         'error' => [
-                            'code' => 'int.exclusiveMinimum',
-                            'template' => 'Value should be greater than {{exclusiveMinimum}}, {{given}} given',
+                            'code' => 'int.minimum',
+                            'template' => 'Value should be minimum {{minimum}} {{exclusiveMinimum}}, {{given}} given',
                             'variables' => [
-                                'exclusiveMinimum' => $exclusiveMinimum,
+                                'minimum' => $minimum,
+                                'exclusiveMinimum' => true,
                                 'given' => $input,
                             ],
                         ],
@@ -230,9 +232,9 @@ final class IntSchemaTest extends TestCase
     public function testParseWithInvalidExclusiveMinimumLesser(): void
     {
         $input = 4;
-        $exclusiveMinimum = 5;
+        $minimum = 5;
 
-        $schema = (new IntSchema())->exclusiveMinimum($exclusiveMinimum);
+        $schema = (new IntSchema())->minimum($minimum, true);
 
         try {
             $schema->parse($input);
@@ -244,10 +246,11 @@ final class IntSchemaTest extends TestCase
                     [
                         'path' => '',
                         'error' => [
-                            'code' => 'int.exclusiveMinimum',
-                            'template' => 'Value should be greater than {{exclusiveMinimum}}, {{given}} given',
+                            'code' => 'int.minimum',
+                            'template' => 'Value should be minimum {{minimum}} {{exclusiveMinimum}}, {{given}} given',
                             'variables' => [
-                                'exclusiveMinimum' => $exclusiveMinimum,
+                                'minimum' => $minimum,
+                                'exclusiveMinimum' => true,
                                 'given' => $input,
                             ],
                         ],
@@ -261,9 +264,9 @@ final class IntSchemaTest extends TestCase
     public function testParseWithValidExclusiveMaximum(): void
     {
         $input = 4;
-        $exclusiveMaximum = 5;
+        $maximum = 5;
 
-        $schema = (new IntSchema())->exclusiveMaximum($exclusiveMaximum);
+        $schema = (new IntSchema())->maximum($maximum, true);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -271,9 +274,9 @@ final class IntSchemaTest extends TestCase
     public function testParseWithInvalidExclusiveMaximumEqual(): void
     {
         $input = 5;
-        $exclusiveMaximum = 5;
+        $maximum = 5;
 
-        $schema = (new IntSchema())->exclusiveMaximum($exclusiveMaximum);
+        $schema = (new IntSchema())->maximum($maximum, true);
 
         try {
             $schema->parse($input);
@@ -284,10 +287,11 @@ final class IntSchemaTest extends TestCase
                 [
                     'path' => '',
                     'error' => [
-                        'code' => 'int.exclusiveMaximum',
-                        'template' => 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given',
+                        'code' => 'int.maximum',
+                        'template' => 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given',
                         'variables' => [
-                            'exclusiveMaximum' => $exclusiveMaximum,
+                            'maximum' => $maximum,
+                            'exclusiveMaximum' => true,
                             'given' => $input,
                         ],
                     ],
@@ -299,9 +303,9 @@ final class IntSchemaTest extends TestCase
     public function testParseWithInvalidExclusiveMaximumLesser(): void
     {
         $input = 5;
-        $exclusiveMaximum = 4;
+        $maximum = 4;
 
-        $schema = (new IntSchema())->exclusiveMaximum($exclusiveMaximum);
+        $schema = (new IntSchema())->maximum($maximum, true);
 
         try {
             $schema->parse($input);
@@ -312,10 +316,11 @@ final class IntSchemaTest extends TestCase
                 [
                     'path' => '',
                     'error' => [
-                        'code' => 'int.exclusiveMaximum',
-                        'template' => 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given',
+                        'code' => 'int.maximum',
+                        'template' => 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given',
                         'variables' => [
-                            'exclusiveMaximum' => $exclusiveMaximum,
+                            'maximum' => $maximum,
+                            'exclusiveMaximum' => true,
                             'given' => $input,
                         ],
                     ],
@@ -351,9 +356,10 @@ final class IntSchemaTest extends TestCase
                     'path' => '',
                     'error' => [
                         'code' => 'int.maximum',
-                        'template' => 'Value should be lesser than or equal {{maximum}}, {{given}} given',
+                        'template' => 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given',
                         'variables' => [
                             'maximum' => $maximum,
+                            'exclusiveMaximum' => false,
                             'given' => $input,
                         ],
                     ],
@@ -377,7 +383,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minimum instead', $lastError['message']);
+        self::assertSame('Use minimum($gte) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -425,7 +431,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use exclusiveMinimum instead', $lastError['message']);
+        self::assertSame('Use minimum($gt, true) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -501,7 +507,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use exclusiveMaximum instead', $lastError['message']);
+        self::assertSame('Use maximum($lt, true) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -577,7 +583,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use maximum instead', $lastError['message']);
+        self::assertSame('Use maximum($lte) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }

@@ -267,7 +267,7 @@ Each schema type uses a consistent error code prefix:
 | Schema | Prefix | Example Codes |
 |--------|--------|---------------|
 | string | `string.` | `string.type`, `string.minLength`, `string.email` |
-| int | `int.` | `int.type`, `int.exclusiveMinimum`, `int.positive` |
+| int | `int.` | `int.type`, `int.minimum`, `int.positive` |
 | float | `float.` | `float.type`, `float.minimum`, `float.negative` |
 | bool | `bool.` | `bool.type` |
 | const | `const.` | `const.type` |
