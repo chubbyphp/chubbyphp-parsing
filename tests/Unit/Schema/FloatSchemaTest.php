@@ -25,6 +25,10 @@ final class FloatSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (float $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (float $output, ErrorsException $e) => $output));
+        self::assertNotSame($schema, $schema->minimum(0.0));
+        self::assertNotSame($schema, $schema->exclusiveMinimum(0.0));
+        self::assertNotSame($schema, $schema->exclusiveMaximum(0.0));
+        self::assertNotSame($schema, $schema->maximum(0.0));
     }
 
     public function testParseSuccess(): void
@@ -176,10 +180,9 @@ final class FloatSchemaTest extends TestCase
                     'path' => '',
                     'error' => [
                         'code' => 'float.minimum',
-                        'template' => 'Value should be minimum {{minimum}} {{exclusiveMinimum}}, {{given}} given',
+                        'template' => 'Value should be minimum {{minimum}}, {{given}} given',
                         'variables' => [
                             'minimum' => $minimum,
-                            'exclusiveMinimum' => false,
                             'given' => $input,
                         ],
                     ],
@@ -191,9 +194,9 @@ final class FloatSchemaTest extends TestCase
     public function testParseWithValidExclusiveMinimum(): void
     {
         $input = 4.2;
-        $minimum = 4.1;
+        $exclusiveMinimum = 4.1;
 
-        $schema = (new FloatSchema())->minimum($minimum, true);
+        $schema = (new FloatSchema())->exclusiveMinimum($exclusiveMinimum);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -201,9 +204,9 @@ final class FloatSchemaTest extends TestCase
     public function testParseWithInvalidExclusiveMinimumEqual(): void
     {
         $input = 4.1;
-        $minimum = 4.1;
+        $exclusiveMinimum = 4.1;
 
-        $schema = (new FloatSchema())->minimum($minimum, true);
+        $schema = (new FloatSchema())->exclusiveMinimum($exclusiveMinimum);
 
         try {
             $schema->parse($input);
@@ -215,11 +218,10 @@ final class FloatSchemaTest extends TestCase
                     [
                         'path' => '',
                         'error' => [
-                            'code' => 'float.minimum',
-                            'template' => 'Value should be minimum {{minimum}} {{exclusiveMinimum}}, {{given}} given',
+                            'code' => 'float.exclusiveMinimum',
+                            'template' => 'Value should be greater than {{exclusiveMinimum}}, {{given}} given',
                             'variables' => [
-                                'minimum' => $minimum,
-                                'exclusiveMinimum' => true,
+                                'exclusiveMinimum' => $exclusiveMinimum,
                                 'given' => $input,
                             ],
                         ],
@@ -233,9 +235,9 @@ final class FloatSchemaTest extends TestCase
     public function testParseWithInvalidExclusiveMinimumLesser(): void
     {
         $input = 4.1;
-        $minimum = 4.2;
+        $exclusiveMinimum = 4.2;
 
-        $schema = (new FloatSchema())->minimum($minimum, true);
+        $schema = (new FloatSchema())->exclusiveMinimum($exclusiveMinimum);
 
         try {
             $schema->parse($input);
@@ -247,11 +249,10 @@ final class FloatSchemaTest extends TestCase
                     [
                         'path' => '',
                         'error' => [
-                            'code' => 'float.minimum',
-                            'template' => 'Value should be minimum {{minimum}} {{exclusiveMinimum}}, {{given}} given',
+                            'code' => 'float.exclusiveMinimum',
+                            'template' => 'Value should be greater than {{exclusiveMinimum}}, {{given}} given',
                             'variables' => [
-                                'minimum' => $minimum,
-                                'exclusiveMinimum' => true,
+                                'exclusiveMinimum' => $exclusiveMinimum,
                                 'given' => $input,
                             ],
                         ],
@@ -265,9 +266,9 @@ final class FloatSchemaTest extends TestCase
     public function testParseWithValidExclusiveMaximum(): void
     {
         $input = 4.1;
-        $maximum = 4.2;
+        $exclusiveMaximum = 4.2;
 
-        $schema = (new FloatSchema())->maximum($maximum, true);
+        $schema = (new FloatSchema())->exclusiveMaximum($exclusiveMaximum);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -275,9 +276,9 @@ final class FloatSchemaTest extends TestCase
     public function testParseWithInvalidExclusiveMaximumEqual(): void
     {
         $input = 4.1;
-        $maximum = 4.1;
+        $exclusiveMaximum = 4.1;
 
-        $schema = (new FloatSchema())->maximum($maximum, true);
+        $schema = (new FloatSchema())->exclusiveMaximum($exclusiveMaximum);
 
         try {
             $schema->parse($input);
@@ -288,11 +289,10 @@ final class FloatSchemaTest extends TestCase
                 [
                     'path' => '',
                     'error' => [
-                        'code' => 'float.maximum',
-                        'template' => 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given',
+                        'code' => 'float.exclusiveMaximum',
+                        'template' => 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given',
                         'variables' => [
-                            'maximum' => $maximum,
-                            'exclusiveMaximum' => true,
+                            'exclusiveMaximum' => $exclusiveMaximum,
                             'given' => $input,
                         ],
                     ],
@@ -304,9 +304,9 @@ final class FloatSchemaTest extends TestCase
     public function testParseWithInvalidExclusiveMaximumLesser(): void
     {
         $input = 4.2;
-        $maximum = 4.1;
+        $exclusiveMaximum = 4.1;
 
-        $schema = (new FloatSchema())->maximum($maximum, true);
+        $schema = (new FloatSchema())->exclusiveMaximum($exclusiveMaximum);
 
         try {
             $schema->parse($input);
@@ -317,11 +317,10 @@ final class FloatSchemaTest extends TestCase
                 [
                     'path' => '',
                     'error' => [
-                        'code' => 'float.maximum',
-                        'template' => 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given',
+                        'code' => 'float.exclusiveMaximum',
+                        'template' => 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given',
                         'variables' => [
-                            'maximum' => $maximum,
-                            'exclusiveMaximum' => true,
+                            'exclusiveMaximum' => $exclusiveMaximum,
                             'given' => $input,
                         ],
                     ],
@@ -357,10 +356,9 @@ final class FloatSchemaTest extends TestCase
                     'path' => '',
                     'error' => [
                         'code' => 'float.maximum',
-                        'template' => 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given',
+                        'template' => 'Value should be maximum {{maximum}}, {{given}} given',
                         'variables' => [
                             'maximum' => $maximum,
-                            'exclusiveMaximum' => false,
                             'given' => $input,
                         ],
                     ],
@@ -432,7 +430,7 @@ final class FloatSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minimum(4.1, true) instead', $lastError['message']);
+        self::assertSame('Use exclusiveMinimum(4.1) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -514,7 +512,7 @@ final class FloatSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use maximum(4.2, true) instead', $lastError['message']);
+        self::assertSame('Use exclusiveMaximum(4.2) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }

@@ -13,10 +13,16 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "int", {{given}} given';
 
     public const string ERROR_MINIMUM_CODE = 'int.minimum';
-    public const string ERROR_MINIMUM_TEMPLATE = 'Value should be minimum {{minimum}} {{exclusiveMinimum}}, {{given}} given';
+    public const string ERROR_MINIMUM_TEMPLATE = 'Value should be minimum {{minimum}}, {{given}} given';
+
+    public const string ERROR_EXCLUSIVE_MINIMUM_CODE = 'int.exclusiveMinimum';
+    public const string ERROR_EXCLUSIVE_MINIMUM_TEMPLATE = 'Value should be greater than {{exclusiveMinimum}}, {{given}} given';
+
+    public const string ERROR_EXCLUSIVE_MAXIMUM_CODE = 'int.exclusiveMaximum';
+    public const string ERROR_EXCLUSIVE_MAXIMUM_TEMPLATE = 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given';
 
     public const string ERROR_MAXIMUM_CODE = 'int.maximum';
-    public const string ERROR_MAXIMUM_TEMPLATE = 'Value should be maximum {{maximum}} {{exclusiveMaximum}}, {{given}} given';
+    public const string ERROR_MAXIMUM_TEMPLATE = 'Value should be maximum {{maximum}}, {{given}} given';
 
     /** @deprecated: see ERROR_MINIMUM_CODE */
     public const string ERROR_GTE_CODE = 'int.gte';
@@ -24,16 +30,16 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     /** @deprecated: see ERROR_MINIMUM_TEMPLATE */
     public const string ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
 
-    /** @deprecated: see ERROR_MINIMUM_CODE */
+    /** @deprecated: see ERROR_EXCLUSIVE_MINIMUM_CODE */
     public const string ERROR_GT_CODE = 'int.gt';
 
-    /** @deprecated: see ERROR_MINIMUM_TEMPLATE */
+    /** @deprecated: see ERROR_EXCLUSIVE_MINIMUM_TEMPLATE */
     public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
 
-    /** @deprecated: see ERROR_MAXIMUM_CODE */
+    /** @deprecated: see ERROR_EXCLUSIVE_MAXIMUM_CODE */
     public const string ERROR_LT_CODE = 'int.lt';
 
-    /** @deprecated: see ERROR_MAXIMUM_TEMPLATE */
+    /** @deprecated: see ERROR_EXCLUSIVE_MAXIMUM_TEMPLATE */
     public const string ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
 
     /** @deprecated: see ERROR_MAXIMUM_CODE */
@@ -42,10 +48,10 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     /** @deprecated: see ERROR_MAXIMUM_TEMPLATE */
     public const string ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
-    public function minimum(int $minimum, bool $exclusiveMinimum = false): static
+    public function minimum(int $minimum): static
     {
-        return $this->postParse(static function (int $int) use ($minimum, $exclusiveMinimum) {
-            if ((!$exclusiveMinimum && $int >= $minimum) || ($exclusiveMinimum && $int > $minimum)) {
+        return $this->postParse(static function (int $int) use ($minimum) {
+            if ($int >= $minimum) {
                 return $int;
             }
 
@@ -53,16 +59,50 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
                 new Error(
                     self::ERROR_MINIMUM_CODE,
                     self::ERROR_MINIMUM_TEMPLATE,
-                    ['minimum' => $minimum, 'exclusiveMinimum' => $exclusiveMinimum, 'given' => $int]
+                    ['minimum' => $minimum, 'given' => $int]
                 )
             );
         });
     }
 
-    public function maximum(int $maximum, bool $exclusiveMaximum = false): static
+    public function exclusiveMinimum(int $exclusiveMinimum): static
     {
-        return $this->postParse(static function (int $int) use ($maximum, $exclusiveMaximum) {
-            if ((!$exclusiveMaximum && $int <= $maximum) || ($exclusiveMaximum && $int < $maximum)) {
+        return $this->postParse(static function (int $int) use ($exclusiveMinimum) {
+            if ($int > $exclusiveMinimum) {
+                return $int;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_EXCLUSIVE_MINIMUM_CODE,
+                    self::ERROR_EXCLUSIVE_MINIMUM_TEMPLATE,
+                    ['exclusiveMinimum' => $exclusiveMinimum, 'given' => $int]
+                )
+            );
+        });
+    }
+
+    public function exclusiveMaximum(int $exclusiveMaximum): static
+    {
+        return $this->postParse(static function (int $int) use ($exclusiveMaximum) {
+            if ($int < $exclusiveMaximum) {
+                return $int;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_EXCLUSIVE_MAXIMUM_CODE,
+                    self::ERROR_EXCLUSIVE_MAXIMUM_TEMPLATE,
+                    ['exclusiveMaximum' => $exclusiveMaximum, 'given' => $int]
+                )
+            );
+        });
+    }
+
+    public function maximum(int $maximum): static
+    {
+        return $this->postParse(static function (int $int) use ($maximum) {
+            if ($int <= $maximum) {
                 return $int;
             }
 
@@ -70,7 +110,7 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
                 new Error(
                     self::ERROR_MAXIMUM_CODE,
                     self::ERROR_MAXIMUM_TEMPLATE,
-                    ['maximum' => $maximum, 'exclusiveMaximum' => $exclusiveMaximum, 'given' => $int]
+                    ['maximum' => $maximum, 'given' => $int]
                 )
             );
         });
@@ -99,11 +139,11 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     }
 
     /**
-     * @deprecated Use minimum($gt, true) instead
+     * @deprecated Use exclusiveMinimum($gt) instead
      */
     public function gt(int $gt): static
     {
-        @trigger_error('Use minimum('.$this->varExport($gt).', true) instead', E_USER_DEPRECATED);
+        @trigger_error('Use exclusiveMinimum('.$this->varExport($gt).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (int $int) use ($gt) {
             if ($int > $gt) {
@@ -121,11 +161,11 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     }
 
     /**
-     * @deprecated Use maximum($lt, true) instead
+     * @deprecated Use exclusiveMaximum($lt) instead
      */
     public function lt(int $lt): static
     {
-        @trigger_error('Use maximum('.$this->varExport($lt).', true) instead', E_USER_DEPRECATED);
+        @trigger_error('Use exclusiveMaximum('.$this->varExport($lt).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (int $int) use ($lt) {
             if ($int < $lt) {
