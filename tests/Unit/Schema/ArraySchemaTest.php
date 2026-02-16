@@ -32,6 +32,10 @@ final class ArraySchemaTest extends TestCase
         self::assertNotSame($schema, $schema->minItems(1));
         self::assertNotSame($schema, $schema->maxItems(1));
         self::assertNotSame($schema, $schema->contains('test'));
+        self::assertNotSame($schema, $schema->filter(static fn (mixed $value) => true));
+        self::assertNotSame($schema, $schema->map(static fn (mixed $value) => $value));
+        self::assertNotSame($schema, $schema->sort());
+        self::assertNotSame($schema, $schema->reduce(static fn (mixed $existing, mixed $current) => $existing, null));
     }
 
     public function testParseSuccess(): void

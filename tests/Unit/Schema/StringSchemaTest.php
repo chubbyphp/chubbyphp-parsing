@@ -23,10 +23,29 @@ final class StringSchemaTest extends TestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->nullable(false));
-        self::assertNotSame($schema, $schema->default(42));
+        self::assertNotSame($schema, $schema->default('test'));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (string $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (string $output, ErrorsException $e) => $output));
+        self::assertNotSame($schema, $schema->length(1));
+        self::assertNotSame($schema, $schema->minLength(1));
+        self::assertNotSame($schema, $schema->maxLength(1));
+        self::assertNotSame($schema, $schema->contains('test'));
+        self::assertNotSame($schema, $schema->startsWith('test'));
+        self::assertNotSame($schema, $schema->endsWith('test'));
+        self::assertNotSame($schema, $schema->hostname());
+        self::assertNotSame($schema, $schema->email());
+        self::assertNotSame($schema, $schema->ipV4());
+        self::assertNotSame($schema, $schema->ipV6());
+        self::assertNotSame($schema, $schema->mac());
+        self::assertNotSame($schema, $schema->pattern('/.*/'));
+        self::assertNotSame($schema, $schema->uri());
+        self::assertNotSame($schema, $schema->uuid());
+        self::assertNotSame($schema, $schema->trim());
+        self::assertNotSame($schema, $schema->trimStart());
+        self::assertNotSame($schema, $schema->trimEnd());
+        self::assertNotSame($schema, $schema->toLowerCase());
+        self::assertNotSame($schema, $schema->toUpperCase());
     }
 
     public function testParseSuccess(): void
