@@ -170,6 +170,38 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         self::assertSame('$p->int()->minimum(1)->maximum(99)', $code);
     }
 
+    public function testIntegerWithMinimumAndExclusiveMinimumTrue(): void
+    {
+        $generator = new JsonSchemaCodeGenerator();
+        $code = $generator->generate(['type' => 'integer', 'minimum' => 0, 'exclusiveMinimum' => true]);
+
+        self::assertSame('$p->int()->exclusiveMinimum(0)', $code);
+    }
+
+    public function testIntegerWithMinimumAndExclusiveMinimumFalse(): void
+    {
+        $generator = new JsonSchemaCodeGenerator();
+        $code = $generator->generate(['type' => 'integer', 'minimum' => 0, 'exclusiveMinimum' => false]);
+
+        self::assertSame('$p->int()->minimum(0)', $code);
+    }
+
+    public function testIntegerWithMaximumAndExclusiveMaximumTrue(): void
+    {
+        $generator = new JsonSchemaCodeGenerator();
+        $code = $generator->generate(['type' => 'integer', 'maximum' => 100, 'exclusiveMaximum' => true]);
+
+        self::assertSame('$p->int()->exclusiveMaximum(100)', $code);
+    }
+
+    public function testIntegerWithMaximumAndExclusiveMaximumFalse(): void
+    {
+        $generator = new JsonSchemaCodeGenerator();
+        $code = $generator->generate(['type' => 'integer', 'maximum' => 100, 'exclusiveMaximum' => false]);
+
+        self::assertSame('$p->int()->maximum(100)', $code);
+    }
+
     public function testNumber(): void
     {
         $generator = new JsonSchemaCodeGenerator();
@@ -208,6 +240,38 @@ final class JsonSchemaCodeGeneratorTest extends TestCase
         $code = $generator->generate(['type' => 'number', 'exclusiveMaximum' => 100.0]);
 
         self::assertSame('$p->float()->exclusiveMaximum(100.0)', $code);
+    }
+
+    public function testNumberWithMinimumAndExclusiveMinimumTrue(): void
+    {
+        $generator = new JsonSchemaCodeGenerator();
+        $code = $generator->generate(['type' => 'number', 'minimum' => 0.5, 'exclusiveMinimum' => true]);
+
+        self::assertSame('$p->float()->exclusiveMinimum(0.5)', $code);
+    }
+
+    public function testNumberWithMinimumAndExclusiveMinimumFalse(): void
+    {
+        $generator = new JsonSchemaCodeGenerator();
+        $code = $generator->generate(['type' => 'number', 'minimum' => 0.5, 'exclusiveMinimum' => false]);
+
+        self::assertSame('$p->float()->minimum(0.5)', $code);
+    }
+
+    public function testNumberWithMaximumAndExclusiveMaximumTrue(): void
+    {
+        $generator = new JsonSchemaCodeGenerator();
+        $code = $generator->generate(['type' => 'number', 'maximum' => 99.9, 'exclusiveMaximum' => true]);
+
+        self::assertSame('$p->float()->exclusiveMaximum(99.9)', $code);
+    }
+
+    public function testNumberWithMaximumAndExclusiveMaximumFalse(): void
+    {
+        $generator = new JsonSchemaCodeGenerator();
+        $code = $generator->generate(['type' => 'number', 'maximum' => 99.9, 'exclusiveMaximum' => false]);
+
+        self::assertSame('$p->float()->maximum(99.9)', $code);
     }
 
     public function testBoolean(): void

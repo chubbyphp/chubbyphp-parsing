@@ -425,20 +425,24 @@ final class JsonSchemaCodeGenerator
     {
         if (isset($schema['minimum']) && (\is_int($schema['minimum']) || \is_float($schema['minimum']))) {
             $val = $isInt ? (int) $schema['minimum'] : (float) $schema['minimum'];
-            $code .= '->minimum('.$this->exportValue($val).')';
-        }
-
-        if (isset($schema['maximum']) && (\is_int($schema['maximum']) || \is_float($schema['maximum']))) {
-            $val = $isInt ? (int) $schema['maximum'] : (float) $schema['maximum'];
-            $code .= '->maximum('.$this->exportValue($val).')';
-        }
-
-        if (isset($schema['exclusiveMinimum']) && (\is_int($schema['exclusiveMinimum']) || \is_float($schema['exclusiveMinimum']))) {
+            if (isset($schema['exclusiveMinimum']) && true === $schema['exclusiveMinimum']) {
+                $code .= '->exclusiveMinimum('.$this->exportValue($val).')';
+            } else {
+                $code .= '->minimum('.$this->exportValue($val).')';
+            }
+        } elseif (isset($schema['exclusiveMinimum']) && (\is_int($schema['exclusiveMinimum']) || \is_float($schema['exclusiveMinimum']))) {
             $val = $isInt ? (int) $schema['exclusiveMinimum'] : (float) $schema['exclusiveMinimum'];
             $code .= '->exclusiveMinimum('.$this->exportValue($val).')';
         }
 
-        if (isset($schema['exclusiveMaximum']) && (\is_int($schema['exclusiveMaximum']) || \is_float($schema['exclusiveMaximum']))) {
+        if (isset($schema['maximum']) && (\is_int($schema['maximum']) || \is_float($schema['maximum']))) {
+            $val = $isInt ? (int) $schema['maximum'] : (float) $schema['maximum'];
+            if (isset($schema['exclusiveMaximum']) && true === $schema['exclusiveMaximum']) {
+                $code .= '->exclusiveMaximum('.$this->exportValue($val).')';
+            } else {
+                $code .= '->maximum('.$this->exportValue($val).')';
+            }
+        } elseif (isset($schema['exclusiveMaximum']) && (\is_int($schema['exclusiveMaximum']) || \is_float($schema['exclusiveMaximum']))) {
             $val = $isInt ? (int) $schema['exclusiveMaximum'] : (float) $schema['exclusiveMaximum'];
             $code .= '->exclusiveMaximum('.$this->exportValue($val).')';
         }
