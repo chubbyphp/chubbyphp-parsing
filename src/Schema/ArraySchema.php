@@ -7,6 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\Errors;
 use Chubbyphp\Parsing\ErrorsException;
+use Chubbyphp\Parsing\Variable;
 
 final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterface
 {
@@ -113,7 +114,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function length(int $length): static
     {
-        @trigger_error('Use exactItems('.$this->varExport($length).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use exactItems('.Variable::toCode($length).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($length) {
             $arrayLength = \count($array);
@@ -137,7 +138,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function minLength(int $minLength): static
     {
-        @trigger_error('Use minItems('.$this->varExport($minLength).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use minItems('.Variable::toCode($minLength).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($minLength) {
             $arrayLength = \count($array);
@@ -161,7 +162,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function maxLength(int $maxLength): static
     {
-        @trigger_error('Use maxItems('.$this->varExport($maxLength).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use maxItems('.Variable::toCode($maxLength).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($maxLength) {
             $arrayLength = \count($array);
@@ -202,7 +203,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function includes(mixed $includes, bool $strict = true): static
     {
-        @trigger_error('Use contains('.$this->varExport($includes).', '.$this->varExport($strict).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use contains('.Variable::toCode($includes).', '.Variable::toCode($strict).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (array $array) use ($includes, $strict) {
             if (!\in_array($includes, $array, $strict)) {

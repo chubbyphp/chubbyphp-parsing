@@ -7,6 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Enum\Uuid;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
+use Chubbyphp\Parsing\Variable;
 
 final class StringSchema extends AbstractSchemaInnerParse implements SchemaInterface
 {
@@ -175,7 +176,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
      */
     public function includes(string $includes): static
     {
-        @trigger_error('Use contains('.$this->varExport($includes).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use contains('.Variable::toCode($includes).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (string $string) use ($includes) {
             if (str_contains($string, $includes)) {
@@ -338,7 +339,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
      */
     public function match(string $match): static
     {
-        @trigger_error('Use pattern('.$this->varExport($match).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use pattern('.Variable::toCode($match).') instead', E_USER_DEPRECATED);
 
         if (false === @preg_match($match, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid match "%s" given', $match));
@@ -389,7 +390,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
      */
     public function regexp(string $regexp): static
     {
-        @@trigger_error('Use pattern('.$this->varExport($regexp).') instead', E_USER_DEPRECATED);
+        @@trigger_error('Use pattern('.Variable::toCode($regexp).') instead', E_USER_DEPRECATED);
 
         if (false === @preg_match($regexp, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid regexp "%s" given', $regexp));

@@ -6,6 +6,7 @@ namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
+use Chubbyphp\Parsing\Variable;
 
 final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterface
 {
@@ -124,7 +125,7 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function gte(float $gte): static
     {
-        @trigger_error('Use minimum('.$this->varExport($gte).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use minimum('.Variable::toCode($gte).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (float $float) use ($gte) {
             if ($float >= $gte) {
@@ -146,7 +147,7 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function gt(float $gt): static
     {
-        @trigger_error('Use exclusiveMinimum('.$this->varExport($gt).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use exclusiveMinimum('.Variable::toCode($gt).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (float $float) use ($gt) {
             if ($float > $gt) {
@@ -168,7 +169,7 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function lt(float $lt): static
     {
-        @trigger_error('Use exclusiveMaximum('.$this->varExport($lt).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use exclusiveMaximum('.Variable::toCode($lt).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (float $float) use ($lt) {
             if ($float < $lt) {
@@ -190,7 +191,7 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     public function lte(float $lte): static
     {
-        @trigger_error('Use maximum('.$this->varExport($lte).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use maximum('.Variable::toCode($lte).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (float $float) use ($lte) {
             if ($float <= $lte) {

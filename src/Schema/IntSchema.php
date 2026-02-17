@@ -6,6 +6,7 @@ namespace Chubbyphp\Parsing\Schema;
 
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
+use Chubbyphp\Parsing\Variable;
 
 final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterface
 {
@@ -121,7 +122,7 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
      */
     public function gte(int $gte): static
     {
-        @trigger_error('Use minimum('.$this->varExport($gte).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use minimum('.Variable::toCode($gte).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (int $int) use ($gte) {
             if ($int >= $gte) {
@@ -143,7 +144,7 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
      */
     public function gt(int $gt): static
     {
-        @trigger_error('Use exclusiveMinimum('.$this->varExport($gt).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use exclusiveMinimum('.Variable::toCode($gt).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (int $int) use ($gt) {
             if ($int > $gt) {
@@ -165,7 +166,7 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
      */
     public function lt(int $lt): static
     {
-        @trigger_error('Use exclusiveMaximum('.$this->varExport($lt).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use exclusiveMaximum('.Variable::toCode($lt).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (int $int) use ($lt) {
             if ($int < $lt) {
@@ -187,7 +188,7 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
      */
     public function lte(int $lte): static
     {
-        @trigger_error('Use maximum('.$this->varExport($lte).') instead', E_USER_DEPRECATED);
+        @trigger_error('Use maximum('.Variable::toCode($lte).') instead', E_USER_DEPRECATED);
 
         return $this->postParse(static function (int $int) use ($lte) {
             if ($int <= $lte) {
