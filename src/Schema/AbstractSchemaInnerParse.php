@@ -124,7 +124,7 @@ abstract class AbstractSchemaInnerParse implements SchemaInterface
         return \is_object($input) ? $input::class : \gettype($input);
     }
 
-    protected function varExport(mixed $input): string
+    final protected function varExport(mixed $input): string
     {
         if ($input instanceof \DateTimeInterface) {
             return 'new \DateTimeImmutable(\''.$input->format('c').'\')';
