@@ -127,7 +127,7 @@ abstract class AbstractSchemaInnerParse implements SchemaInterface
     final protected function varExport(mixed $input): string
     {
         if ($input instanceof \DateTimeInterface) {
-            return 'new \DateTimeImmutable(\''.$input->format('c').'\')';
+            return 'new \\'.$input::class.'(\''.$input->format('c').'\')';
         }
 
         if ($input instanceof \BackedEnum) {
