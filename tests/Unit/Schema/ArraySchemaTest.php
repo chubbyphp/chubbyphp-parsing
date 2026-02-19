@@ -32,6 +32,7 @@ final class ArraySchemaTest extends TestCase
         self::assertNotSame($schema, $schema->minItems(1));
         self::assertNotSame($schema, $schema->maxItems(1));
         self::assertNotSame($schema, $schema->contains('test'));
+        self::assertNotSame($schema, $schema->uniqueItems());
         self::assertNotSame($schema, $schema->filter(static fn (mixed $value) => true));
         self::assertNotSame($schema, $schema->map(static fn (mixed $value) => $value));
         self::assertNotSame($schema, $schema->sort());
@@ -651,6 +652,100 @@ final class ArraySchemaTest extends TestCase
                 ],
                 $errorsException->errors->jsonSerialize()
             );
+        }
+    }
+
+    public function testParseWithValidUniqueItems(): void
+    {
+        $input = [1, 2, 3];
+
+        $schema = (new ArraySchema(new IntSchema()))->uniqueItems();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseIntItemsWithInvalidUniqueItems(): void
+    {
+        $input = [5, 7, 7, 12, 3, 9, 5, 14, 2, 9, 6, 3, 18, 4, 14, 10, 2, 11, 6, 13, 8, 12, 15, 16, 8, 17, 19, 20, 21, 15];
+
+        $schema = (new ArraySchema(new IntSchema()))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [2, 6, 9, 11, 14, 16, 18, 21, 24, 29],
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseIStringItemsWithInvalidUniqueItems(): void
+    {
+        $input = [
+            'apple',
+            'pear',
+            'pear',
+            'plum',
+            'kiwi',
+            'mango',
+            'apple',
+            'peach',
+            'lime',
+            'mango',
+            'fig',
+            'kiwi',
+            'grape',
+            'melon',
+            'peach',
+            'berry',
+            'lime',
+            'coconut',
+            'fig',
+            'papaya',
+            'date',
+            'plum',
+            'lemon',
+            'orange',
+            'date',
+            'guava',
+            'nectarine',
+            'apricot',
+            'banana',
+            'lemon',
+        ];
+
+        $schema = (new ArraySchema(new StringSchema()))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [2, 6, 9, 11, 14, 16, 18, 21, 24, 29],
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 

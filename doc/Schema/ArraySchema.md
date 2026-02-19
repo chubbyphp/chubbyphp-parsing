@@ -28,6 +28,7 @@ $schema->maxItems(10);   // At most 10 items
 
 ```php
 $schema->contains(5); // Array must contain value 5
+$schema->uniqueItems(); // Array must contain unique items
 ```
 
 ## Transformations

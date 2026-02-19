@@ -49,6 +49,9 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     /** @deprecated: see ERROR_CONTAINS_TEMPLATE */
     public const string ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
 
+    public const string ERROR_UNIQUE_ITEMS_CODE = 'array.uniqueItems';
+    public const string ERROR_UNIQUE_ITEMS_TEMPLATE = 'Duplicate keys {{duplicateKeys}}, {{given}} given';
+
     public function __construct(private SchemaInterface $itemSchema) {}
 
     public function exactItems(int $exactItems): static
@@ -216,6 +219,32 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
             }
 
             return $array;
+        });
+    }
+
+    public function uniqueItems(): static
+    {
+        return $this->postParse(static function (array $array) {
+            $uniqueArray = array_unique($array);
+
+            if (\count($uniqueArray) === \count($array)) {
+                return $array;
+            }
+
+            $duplicateKeys = array_values(
+                array_diff(
+                    array_keys($array),
+                    array_keys($uniqueArray)
+                )
+            );
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_UNIQUE_ITEMS_CODE,
+                    self::ERROR_UNIQUE_ITEMS_TEMPLATE,
+                    ['duplicateKeys' => $duplicateKeys, 'given' => $array]
+                )
+            );
         });
     }
 
