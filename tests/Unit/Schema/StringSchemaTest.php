@@ -327,7 +327,7 @@ final class StringSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use contains(\'amp\') instead', $lastError['message']);
+        self::assertSame('Use contains($contains) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -678,7 +678,7 @@ final class StringSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use pattern(\'/^[a-z]+$/i\') instead', $lastError['message']);
+        self::assertSame('Use pattern($pattern) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -782,7 +782,7 @@ final class StringSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use pattern(\'/^[a-z]+$/i\') instead', $lastError['message']);
+        self::assertSame('Use pattern($pattern) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }

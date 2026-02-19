@@ -222,7 +222,7 @@ final class ArraySchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use exactItems(4) instead', $lastError['message']);
+        self::assertSame('Use exactItems($exactItems) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -304,7 +304,7 @@ final class ArraySchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minItems(4) instead', $lastError['message']);
+        self::assertSame('Use minItems($minItems) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -386,7 +386,7 @@ final class ArraySchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use maxItems(4) instead', $lastError['message']);
+        self::assertSame('Use maxItems($maxItems) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -566,7 +566,7 @@ final class ArraySchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame("Use contains(new \\DateTimeImmutable('2024-01-21T09:15:00+00:00'), true) instead", $lastError['message']);
+        self::assertSame('Use contains($contains, $strict) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }

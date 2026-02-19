@@ -381,7 +381,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minimum(5) instead', $lastError['message']);
+        self::assertSame('Use minimum($minimum) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -429,7 +429,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use exclusiveMinimum(4) instead', $lastError['message']);
+        self::assertSame('Use exclusiveMinimum($exclusiveMinimum) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -505,7 +505,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use exclusiveMaximum(5) instead', $lastError['message']);
+        self::assertSame('Use exclusiveMaximum($exclusiveMaximum) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -581,7 +581,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use maximum(5) instead', $lastError['message']);
+        self::assertSame('Use maximum($maximum) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -628,7 +628,7 @@ final class IntSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minimum(0) instead', $lastError['message']);
+        self::assertSame('Use minimum($minimum) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
