@@ -9,22 +9,22 @@ use Chubbyphp\Parsing\Result;
 
 abstract class AbstractSchemaInnerParse implements SchemaInterface
 {
-    final protected bool $nullable = false;
+    protected bool $nullable = false;
 
     /**
      * @var array<\Closure(mixed): mixed>
      */
-    final protected array $preParses = [];
+    protected array $preParses = [];
 
     /**
      * @var array<\Closure>
      */
-    final protected array $postParses = [];
+    protected array $postParses = [];
 
     /**
      * @var \Closure(mixed, ErrorsException): mixed
      */
-    final protected ?\Closure $catch = null;
+    protected ?\Closure $catch = null;
 
     final public function nullable(bool $nullable = true): static
     {
