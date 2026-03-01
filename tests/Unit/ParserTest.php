@@ -33,6 +33,30 @@ enum BackedSuit: string
     case Spades = 'S';
 }
 
+final class ObjectDemo implements \JsonSerializable
+{
+    public string $field1;
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'field1' => $this->field1,
+        ];
+    }
+}
+
+final readonly class ObjectConstructDemo implements \JsonSerializable
+{
+    public function __construct(public string $field1) {}
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'field1' => $this->field1,
+        ];
+    }
+}
+
 /**
  * @covers \Chubbyphp\Parsing\Parser
  *
@@ -159,13 +183,51 @@ final class ParserTest extends TestCase
         self::assertInstanceOf(LiteralSchema::class, $literalSchema);
     }
 
-    public function testObject(): void
+    public function testObjectStdClass(): void
     {
         $p = new Parser();
 
         $objectSchema = $p->object([
             'field' => $p->string(),
         ]);
+
+        self::assertInstanceOf(ObjectSchema::class, $objectSchema);
+    }
+
+    public function testObjectWithObject(): void
+    {
+        $p = new Parser();
+
+        $objectSchema = $p->object([
+            'field' => $p->string(),
+        ], ObjectDemo::class, );
+
+        $classnameReflection = new \ReflectionProperty(ObjectSchema::class, 'classname');
+
+        self::assertSame(ObjectDemo::class, $classnameReflection->getValue($objectSchema));
+
+        $constructReflection = new \ReflectionProperty(ObjectSchema::class, 'construct');
+
+        self::assertFalse($constructReflection->getValue($objectSchema));
+
+        self::assertInstanceOf(ObjectSchema::class, $objectSchema);
+    }
+
+    public function testObjectWithObjectConstruct(): void
+    {
+        $p = new Parser();
+
+        $objectSchema = $p->object([
+            'field' => $p->string(),
+        ], ObjectConstructDemo::class, true);
+
+        $classnameReflection = new \ReflectionProperty(ObjectSchema::class, 'classname');
+
+        self::assertSame(ObjectConstructDemo::class, $classnameReflection->getValue($objectSchema));
+
+        $constructReflection = new \ReflectionProperty(ObjectSchema::class, 'construct');
+
+        self::assertTrue($constructReflection->getValue($objectSchema));
 
         self::assertInstanceOf(ObjectSchema::class, $objectSchema);
     }

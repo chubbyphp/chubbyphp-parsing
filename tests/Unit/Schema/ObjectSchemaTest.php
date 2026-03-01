@@ -16,12 +16,28 @@ final class ObjectDemo implements \JsonSerializable
 {
     public string $field1;
     public int $field2;
+    public ?float $field3;
 
     public function jsonSerialize(): array
     {
         return [
             'field1' => $this->field1,
             'field2' => $this->field2,
+            'field3' => $this->field3,
+        ];
+    }
+}
+
+final readonly class ObjectConstructDemo implements \JsonSerializable
+{
+    public function __construct(public string $field1, public int $field2, public ?float $field3) {}
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'field1' => $this->field1,
+            'field2' => $this->field2,
+            'field3' => $this->field3,
         ];
     }
 }
@@ -35,7 +51,11 @@ final class ObjectSchemaTest extends TestCase
 {
     public function testImmutability(): void
     {
-        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+        $schema = new ObjectSchema([
+            'field1' => new StringSchema(),
+            'field2' => new IntSchema(),
+            'field3' => new FloatSchema(),
+        ]);
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->nullable(false));
@@ -78,11 +98,15 @@ final class ObjectSchemaTest extends TestCase
 
     public function testParseSuccess(): void
     {
-        $input = ['field1' => 'test', 'field2' => 1];
+        $input = ['field1' => 'test', 'field2' => 1, 'field3' => 3.14159];
 
-        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+        $schema = new ObjectSchema([
+            'field1' => new StringSchema(),
+            'field2' => new IntSchema(),
+            'field3' => new FloatSchema(),
+        ]);
 
-        $output = $schema->parse([...$input, 'field3' => 1.5]);
+        $output = $schema->parse($input);
 
         self::assertInstanceOf(\stdClass::class, $output);
 
@@ -91,13 +115,34 @@ final class ObjectSchemaTest extends TestCase
 
     public function testParseSuccessWithClass(): void
     {
-        $input = ['field1' => 'test', 'field2' => 1];
+        $input = ['field1' => 'test', 'field2' => 1, 'field3' => 3.14159];
 
-        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()], ObjectDemo::class);
+        $schema = new ObjectSchema([
+            'field1' => new StringSchema(),
+            'field2' => new IntSchema(),
+            'field3' => new FloatSchema(),
+        ], ObjectDemo::class);
 
         $output = $schema->parse($input);
 
         self::assertInstanceOf(ObjectDemo::class, $output);
+
+        self::assertSame($input, (array) $output);
+    }
+
+    public function testParseSuccessWithConstructClass(): void
+    {
+        $input = ['field1' => 'test', 'field2' => 1, 'field3' => 3.14159];
+
+        $schema = new ObjectSchema([
+            'field1' => new StringSchema(),
+            'field2' => new IntSchema(),
+            'field3' => new FloatSchema(),
+        ], ObjectConstructDemo::class, true);
+
+        $output = $schema->parse($input);
+
+        self::assertInstanceOf(ObjectConstructDemo::class, $output);
 
         self::assertSame($input, (array) $output);
     }
@@ -107,8 +152,13 @@ final class ObjectSchemaTest extends TestCase
         $input = new \stdClass();
         $input->field1 = 'test';
         $input->field2 = 1;
+        $input->field3 = 3.14159;
 
-        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+        $schema = new ObjectSchema([
+            'field1' => new StringSchema(),
+            'field2' => new IntSchema(),
+            'field3' => new FloatSchema(),
+        ]);
 
         $output = $schema->parse($input);
 
@@ -119,9 +169,13 @@ final class ObjectSchemaTest extends TestCase
 
     public function testParseSuccessWithIteratorInput(): void
     {
-        $input = new \ArrayIterator(['field1' => 'test', 'field2' => 1]);
+        $input = new \ArrayIterator(['field1' => 'test', 'field2' => 1, 'field3' => 3.14159]);
 
-        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+        $schema = new ObjectSchema([
+            'field1' => new StringSchema(),
+            'field2' => new IntSchema(),
+            'field3' => new FloatSchema(),
+        ]);
 
         $output = $schema->parse($input);
 
@@ -135,8 +189,13 @@ final class ObjectSchemaTest extends TestCase
         $input = new ObjectDemo();
         $input->field1 = 'test';
         $input->field2 = 1;
+        $input->field3 = 3.14159;
 
-        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+        $schema = new ObjectSchema([
+            'field1' => new StringSchema(),
+            'field2' => new IntSchema(),
+            'field3' => new FloatSchema(),
+        ]);
 
         $output = $schema->parse($input);
 

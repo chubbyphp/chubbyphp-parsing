@@ -39,6 +39,22 @@ $user = $schema->parse(['name' => 'John', 'age' => 30]);
 // Returns: User instance with populated properties
 ```
 
+```php
+readonly class User
+{
+    public function __construct(public string $name, public int $age)
+    {}
+}
+
+$schema = $p->object([
+    'name' => $p->string(),
+    'age' => $p->int(),
+], User::class, true);
+
+$user = $schema->parse(['name' => 'John', 'age' => 30]);
+// Returns: User instance with populated properties
+```
+
 ## Supported Input Types
 
 The `ObjectSchema` accepts multiple input formats:

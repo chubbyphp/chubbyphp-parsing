@@ -101,9 +101,9 @@ final class Parser implements ParserInterface
      * @param array<string, SchemaInterface> $fieldNameToSchema
      * @param class-string                   $classname
      */
-    public function object(array $fieldNameToSchema, string $classname = \stdClass::class): ObjectSchema
+    public function object(array $fieldNameToSchema, string $classname = \stdClass::class, bool $construct = false): ObjectSchema
     {
-        return new ObjectSchema($fieldNameToSchema, $classname);
+        return new ObjectSchema($fieldNameToSchema, $classname, $construct);
     }
 
     public function record(SchemaInterface $fieldSchema): RecordSchema
