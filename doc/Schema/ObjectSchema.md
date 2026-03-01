@@ -182,8 +182,8 @@ $petSchema = $p->object([
 
 $listRequestSchema = $p->object([
     'offset' => $p->int()->nonNegative(),
-    'sort' => $p->record($p->literal('asc')),
     'limit' => $p->int()->positive()->maximum(100),
+    'sort' => $p->record($p->const('asc')),
     'items' => $p->array($petSchema),
 ]);
 ```

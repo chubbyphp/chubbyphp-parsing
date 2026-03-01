@@ -1,6 +1,8 @@
-# LiteralSchema
+# ConstSchema
 
-The `LiteralSchema` validates that a value matches an exact literal value. It supports string, integer, float, and boolean literals.
+> **Deprecated**: Use [ConstSchema](ConstSchema.md) instead. The `ConstSchema` and `const()` method are deprecated and will be removed in a future version.
+
+The `ConstSchema` validates that a value matches an exact const value. It supports string, integer, float, and boolean consts.
 
 ## Basic Usage
 
@@ -9,27 +11,27 @@ use Chubbyphp\Parsing\Parser;
 
 $p = new Parser();
 
-// String literal
-$schema = $p->literal('email');
+// String const
+$schema = $p->const('email');
 $data = $schema->parse('email'); // Returns: 'email'
 
-// Integer literal
-$schema = $p->literal(42);
+// Integer const
+$schema = $p->const(42);
 $data = $schema->parse(42); // Returns: 42
 
-// Boolean literal
-$schema = $p->literal(true);
+// Boolean const
+$schema = $p->const(true);
 $data = $schema->parse(true); // Returns: true
 ```
 
 ## Supported Types
 
 ```php
-$p->literal('string');  // String literal
-$p->literal(42);        // Integer literal
-$p->literal(3.14);      // Float literal
-$p->literal(true);      // Boolean literal
-$p->literal(false);     // Boolean literal
+$p->const('string');  // String const
+$p->const(42);        // Integer const
+$p->const(3.14);      // Float const
+$p->const(true);      // Boolean const
+$p->const(false);     // Boolean const
 ```
 
 ## Common Patterns
@@ -41,11 +43,11 @@ Used with `DiscriminatedUnionSchema` to identify object types:
 ```php
 $contactSchema = $p->discriminatedUnion([
     $p->object([
-        'type' => $p->literal('email'),
+        'type' => $p->const('email'),
         'address' => $p->string()->email(),
     ]),
     $p->object([
-        'type' => $p->literal('phone'),
+        'type' => $p->const('phone'),
         'number' => $p->string(),
     ]),
 ], 'type');
@@ -55,9 +57,9 @@ $contactSchema = $p->discriminatedUnion([
 
 ```php
 $statusSchema = $p->union([
-    $p->literal('pending'),
-    $p->literal('approved'),
-    $p->literal('rejected'),
+    $p->const('pending'),
+    $p->const('approved'),
+    $p->const('rejected'),
 ]);
 
 $statusSchema->parse('approved'); // Returns: 'approved'
@@ -67,16 +69,16 @@ $statusSchema->parse('invalid');  // Throws error
 ### Magic Numbers
 
 ```php
-$httpOkSchema = $p->literal(200);
-$httpNotFoundSchema = $p->literal(404);
+$httpOkSchema = $p->const(200);
+$httpNotFoundSchema = $p->const(404);
 
 $responseSchema = $p->object([
     'status' => $p->union([
-        $p->literal(200),
-        $p->literal(201),
-        $p->literal(400),
-        $p->literal(404),
-        $p->literal(500),
+        $p->const(200),
+        $p->const(201),
+        $p->const(400),
+        $p->const(404),
+        $p->const(500),
     ]),
     'body' => $p->string(),
 ]);
@@ -85,12 +87,12 @@ $responseSchema = $p->object([
 ### Boolean Flags
 
 ```php
-$enabledSchema = $p->literal(true);
-$disabledSchema = $p->literal(false);
+$enabledSchema = $p->const(true);
+$disabledSchema = $p->const(false);
 
 // Only accept explicitly true
 $mustBeEnabled = $p->object([
-    'feature' => $p->literal(true),
+    'feature' => $p->const(true),
 ]);
 ```
 
@@ -99,8 +101,8 @@ $mustBeEnabled = $p->object([
 ```php
 $sortSchema = $p->record(
     $p->union([
-        $p->literal('asc'),
-        $p->literal('desc'),
+        $p->const('asc'),
+        $p->const('desc'),
     ])
 );
 
@@ -114,29 +116,29 @@ $sortSchema->parse([
 
 ```php
 $requestSchema = $p->object([
-    'version' => $p->literal('2.0'),
+    'version' => $p->const('2.0'),
     'method' => $p->string(),
     'params' => $p->record($p->string()),
 ]);
 ```
 
-### Null Literal
+### Null Const
 
-While `nullable()` is preferred for optional null values, you can use literal for explicit null:
+While `nullable()` is preferred for optional null values, you can use const for explicit null:
 
 ```php
-$nullSchema = $p->literal(null);
+$nullSchema = $p->const(null);
 
 // Useful in unions where null has specific meaning
 $valueOrNotSet = $p->union([
     $p->string(),
-    $p->literal(null),
+    $p->const(null),
 ]);
 ```
 
-## Literal vs Enum
+## Const vs Enum
 
-Use **LiteralSchema** when:
+Use **ConstSchema** when:
 - You have a single specific value
 - You're building discriminators for unions
 - You need to match magic numbers or specific strings
@@ -147,9 +149,9 @@ Use **BackedEnumSchema** when:
 - The values represent a closed set of options
 
 ```php
-// Literal: single value or ad-hoc unions
-$type = $p->literal('user');
-$direction = $p->union([$p->literal('asc'), $p->literal('desc')]);
+// Const: single value or ad-hoc unions
+$type = $p->const('user');
+$direction = $p->union([$p->const('asc'), $p->const('desc')]);
 
 // BackedEnum: related values with type safety
 enum Direction: string {
@@ -163,6 +165,6 @@ $direction = $p->backedEnum(Direction::class);
 
 | Code | Description |
 |------|-------------|
-| `literal.type` | Value doesn't match the expected literal |
+| `const.type` | Value doesn't match the expected const |
 
-The error will include the expected literal value and the actual value received.
+The error will include the expected const value and the actual value received.

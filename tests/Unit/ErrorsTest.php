@@ -88,7 +88,7 @@ final class ErrorsTest extends TestCase
             4 => [
                 'path' => 'sort.name',
                 'error' => [
-                    'code' => 'literal.type',
+                    'code' => 'const.type',
                     'template' => 'Type should be "bool|float|int|string", {{given}} given',
                     'variables' => [
                         'given' => 'null',
@@ -168,7 +168,7 @@ final class ErrorsTest extends TestCase
             12 => [
                 'path' => '_type',
                 'error' => [
-                    'code' => 'literal.type',
+                    'code' => 'const.type',
                     'template' => 'Type should be "bool|float|int|string", {{given}} given',
                     'variables' => [
                         'given' => 'null',
@@ -358,7 +358,7 @@ final class ErrorsTest extends TestCase
             )
             ->add(
                 (new Errors())
-                    ->add(new Error('literal.type', 'Type should be "bool|float|int|string", {{given}} given', ['given' => 'null']), 'name'),
+                    ->add(new Error('const.type', 'Type should be "bool|float|int|string", {{given}} given', ['given' => 'null']), 'name'),
                 'sort'
             )
             ->add(
@@ -388,7 +388,7 @@ final class ErrorsTest extends TestCase
                     ),
                 'items'
             )
-            ->add(new Error('literal.type', 'Type should be "bool|float|int|string", {{given}} given', ['given' => 'null']), '_type')
+            ->add(new Error('const.type', 'Type should be "bool|float|int|string", {{given}} given', ['given' => 'null']), '_type')
         ;
     }
 }

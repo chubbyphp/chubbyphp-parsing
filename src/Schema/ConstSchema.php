@@ -7,21 +7,15 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 
-/**
- * @deprecated use ConstSchema instead
- */
-final class LiteralSchema extends AbstractSchemaInnerParse
+final class ConstSchema extends AbstractSchemaInnerParse
 {
-    public const string ERROR_TYPE_CODE = 'literal.type';
+    public const string ERROR_TYPE_CODE = 'const.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "bool|float|int|string", {{given}} given';
 
-    public const string ERROR_EQUALS_CODE = 'literal.equals';
+    public const string ERROR_EQUALS_CODE = 'const.equals';
     public const string ERROR_EQUALS_TEMPLATE = 'Input should be {{expected}}, {{given}} given';
 
-    public function __construct(private bool|float|int|string $literal)
-    {
-        @trigger_error('Use '.ConstSchema::class.' instead', E_USER_DEPRECATED);
-    }
+    public function __construct(private bool|float|int|string $const) {}
 
     protected function innerParse(mixed $input): mixed
     {
@@ -35,7 +29,7 @@ final class LiteralSchema extends AbstractSchemaInnerParse
             );
         }
 
-        if ($input === $this->literal) {
+        if ($input === $this->const) {
             return $input;
         }
 
@@ -43,7 +37,7 @@ final class LiteralSchema extends AbstractSchemaInnerParse
             new Error(
                 self::ERROR_EQUALS_CODE,
                 self::ERROR_EQUALS_TEMPLATE,
-                ['expected' => $this->literal, 'given' => $input]
+                ['expected' => $this->const, 'given' => $input]
             )
         );
     }

@@ -123,14 +123,14 @@ $commentSchema->parse([
 
 ```php
 $fileSchema = $p->object([
-    'type' => $p->literal('file'),
+    'type' => $p->const('file'),
     'name' => $p->string(),
     'size' => $p->int()->nonNegative(),
 ]);
 
 $folderSchema = $p->lazy(static function () use ($p, &$folderSchema, $fileSchema) {
     return $p->object([
-        'type' => $p->literal('folder'),
+        'type' => $p->const('folder'),
         'name' => $p->string(),
         'children' => $p->array(
             $p->union([$fileSchema, $folderSchema])
@@ -192,19 +192,19 @@ $employeeSchema->parse([
 $jsonSchemaType = $p->lazy(static function () use ($p, &$jsonSchemaType) {
     return $p->discriminatedUnion([
         $p->object([
-            'type' => $p->literal('string'),
+            'type' => $p->const('string'),
             'minLength' => $p->int()->nonNegative(),
         ])->optional(['minLength']),
         $p->object([
-            'type' => $p->literal('number'),
+            'type' => $p->const('number'),
             'minimum' => $p->float(),
         ])->optional(['minimum']),
         $p->object([
-            'type' => $p->literal('object'),
+            'type' => $p->const('object'),
             'properties' => $p->record($jsonSchemaType),
         ]),
         $p->object([
-            'type' => $p->literal('array'),
+            'type' => $p->const('array'),
             'items' => $jsonSchemaType,
         ]),
     ], 'type');

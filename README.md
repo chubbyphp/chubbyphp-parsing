@@ -93,7 +93,7 @@ $user = $userSchema->parse([
 
 | Schema | Description | Documentation |
 |--------|-------------|---------------|
-| `literal()` | Exact value matching | [LiteralSchema](doc/Schema/LiteralSchema.md) |
+| `const()` | Exact value matching | [ConstSchema](doc/Schema/ConstSchema.md) |
 | `backedEnum()` | PHP BackedEnum validation | [BackedEnumSchema](doc/Schema/BackedEnumSchema.md) |
 | `lazy()` | Recursive/self-referencing schemas | [LazySchema](doc/Schema/LazySchema.md) |
 | `respectValidation()` | Integration with Respect/Validation | [RespectValidationSchema](doc/Schema/RespectValidationSchema.md) |
