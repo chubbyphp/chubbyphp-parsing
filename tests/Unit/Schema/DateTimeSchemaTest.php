@@ -25,6 +25,8 @@ final class DateTimeSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (\DateTimeInterface $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (\DateTimeInterface $output, ErrorsException $e) => $output));
+        self::assertNotSame($schema, $schema->from(new \DateTimeImmutable('2024-01-20T09:15:00+00:00')));
+        self::assertNotSame($schema, $schema->to(new \DateTimeImmutable('2024-01-20T09:15:00+00:00')));
     }
 
     public function testParseSuccess(): void

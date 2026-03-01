@@ -44,16 +44,16 @@ final class BoolSchema extends AbstractSchemaInnerParse implements SchemaInterfa
 
     protected function innerParse(mixed $input): mixed
     {
-        if (!\is_bool($input)) {
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_TYPE_CODE,
-                    self::ERROR_TYPE_TEMPLATE,
-                    ['given' => $this->getDataType($input)]
-                )
-            );
+        if (\is_bool($input)) {
+            return $input;
         }
 
-        return $input;
+        throw new ErrorsException(
+            new Error(
+                self::ERROR_TYPE_CODE,
+                self::ERROR_TYPE_TEMPLATE,
+                ['given' => $this->getDataType($input)]
+            )
+        );
     }
 }

@@ -21,34 +21,34 @@ final class DateTimeSchema extends AbstractSchemaInnerParse implements SchemaInt
     public function from(\DateTimeImmutable $from): static
     {
         return $this->postParse(static function (\DateTimeImmutable $datetime) use ($from) {
-            if ($datetime < $from) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_FROM_CODE,
-                        self::ERROR_FROM_TEMPLATE,
-                        ['from' => $from->format('c'), 'given' => $datetime->format('c')]
-                    )
-                );
+            if ($datetime >= $from) {
+                return $datetime;
             }
 
-            return $datetime;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_FROM_CODE,
+                    self::ERROR_FROM_TEMPLATE,
+                    ['from' => $from->format('c'), 'given' => $datetime->format('c')]
+                )
+            );
         });
     }
 
     public function to(\DateTimeImmutable $to): static
     {
         return $this->postParse(static function (\DateTimeImmutable $datetime) use ($to) {
-            if ($datetime > $to) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_TO_CODE,
-                        self::ERROR_TO_TEMPLATE,
-                        ['to' => $to->format('c'), 'given' => $datetime->format('c')]
-                    )
-                );
+            if ($datetime <= $to) {
+                return $datetime;
             }
 
-            return $datetime;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TO_CODE,
+                    self::ERROR_TO_TEMPLATE,
+                    ['to' => $to->format('c'), 'given' => $datetime->format('c')]
+                )
+            );
         });
     }
 
@@ -74,16 +74,16 @@ final class DateTimeSchema extends AbstractSchemaInnerParse implements SchemaInt
 
     protected function innerParse(mixed $input): mixed
     {
-        if (!$input instanceof \DateTimeInterface) {
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_TYPE_CODE,
-                    self::ERROR_TYPE_TEMPLATE,
-                    ['given' => $this->getDataType($input)]
-                )
-            );
+        if ($input instanceof \DateTimeInterface) {
+            return $input;
         }
 
-        return $input;
+        throw new ErrorsException(
+            new Error(
+                self::ERROR_TYPE_CODE,
+                self::ERROR_TYPE_TEMPLATE,
+                ['given' => $this->getDataType($input)]
+            )
+        );
     }
 }
