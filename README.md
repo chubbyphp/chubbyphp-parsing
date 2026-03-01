@@ -49,7 +49,7 @@ $p = new Parser();
 $userSchema = $p->object([
     'name' => $p->string()->minLength(1)->maxLength(100),
     'email' => $p->string()->email(),
-    'age' => $p->int()->gte(0)->lte(150),
+    'age' => $p->int()->minimum(0)->maximum(150),
 ]);
 
 // Parse and validate data

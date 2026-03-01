@@ -226,7 +226,7 @@ $p = new Parser();
 $requestSchema = $p->object([
     'name' => $p->string()->trim()->minLength(1)->maxLength(100),
     'email' => $p->string()->trim()->toLowerCase()->email(),
-    'age' => $p->int()->gte(0)->lte(150),
+    'age' => $p->int()->minimum(0)->maximum(150),
 ])->strict();
 
 function handleRequest(array $input): array
@@ -267,8 +267,8 @@ Each schema type uses a consistent error code prefix:
 | Schema | Prefix | Example Codes |
 |--------|--------|---------------|
 | string | `string.` | `string.type`, `string.minLength`, `string.email` |
-| int | `int.` | `int.type`, `int.gt`, `int.positive` |
-| float | `float.` | `float.type`, `float.gte`, `float.negative` |
+| int | `int.` | `int.type`, `int.minimum`, `int.positive` |
+| float | `float.` | `float.type`, `float.minimum`, `float.negative` |
 | bool | `bool.` | `bool.type` |
 | array | `array.` | `array.type`, `array.minLength` |
 | assoc | `assoc.` | `assoc.type`, `assoc.unknownField` |

@@ -153,7 +153,7 @@ final class BoolSchemaTest extends TestCase
     {
         $input = true;
 
-        $schema = (new BoolSchema())->toFloat()->gte(1.0);
+        $schema = (new BoolSchema())->toFloat()->minimum(1.0);
 
         self::assertSame((float) $input, $schema->parse($input));
     }
@@ -169,7 +169,7 @@ final class BoolSchemaTest extends TestCase
     {
         $input = true;
 
-        $schema = (new BoolSchema())->toInt()->gte(1);
+        $schema = (new BoolSchema())->toInt()->minimum(1);
 
         self::assertSame((int) $input, $schema->parse($input));
     }

@@ -12,101 +12,225 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     public const string ERROR_TYPE_CODE = 'int.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "int", {{given}} given';
 
-    public const string ERROR_GT_CODE = 'int.gt';
-    public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
+    public const string ERROR_MINIMUM_CODE = 'int.minimum';
+    public const string ERROR_MINIMUM_TEMPLATE = 'Value should be minimum {{minimum}}, {{given}} given';
 
+    public const string ERROR_EXCLUSIVE_MINIMUM_CODE = 'int.exclusiveMinimum';
+    public const string ERROR_EXCLUSIVE_MINIMUM_TEMPLATE = 'Value should be greater than {{exclusiveMinimum}}, {{given}} given';
+
+    public const string ERROR_EXCLUSIVE_MAXIMUM_CODE = 'int.exclusiveMaximum';
+    public const string ERROR_EXCLUSIVE_MAXIMUM_TEMPLATE = 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given';
+
+    public const string ERROR_MAXIMUM_CODE = 'int.maximum';
+    public const string ERROR_MAXIMUM_TEMPLATE = 'Value should be maximum {{maximum}}, {{given}} given';
+
+    /** @deprecated: see ERROR_MINIMUM_CODE */
     public const string ERROR_GTE_CODE = 'int.gte';
+
+    /** @deprecated: see ERROR_MINIMUM_TEMPLATE */
     public const string ERROR_GTE_TEMPLATE = 'Value should be greater than or equal {{gte}}, {{given}} given';
 
+    /** @deprecated: see ERROR_EXCLUSIVE_MINIMUM_CODE */
+    public const string ERROR_GT_CODE = 'int.gt';
+
+    /** @deprecated: see ERROR_EXCLUSIVE_MINIMUM_TEMPLATE */
+    public const string ERROR_GT_TEMPLATE = 'Value should be greater than {{gt}}, {{given}} given';
+
+    /** @deprecated: see ERROR_EXCLUSIVE_MAXIMUM_CODE */
     public const string ERROR_LT_CODE = 'int.lt';
+
+    /** @deprecated: see ERROR_EXCLUSIVE_MAXIMUM_TEMPLATE */
     public const string ERROR_LT_TEMPLATE = 'Value should be lesser than {{lt}}, {{given}} given';
 
+    /** @deprecated: see ERROR_MAXIMUM_CODE */
     public const string ERROR_LTE_CODE = 'int.lte';
+
+    /** @deprecated: see ERROR_MAXIMUM_TEMPLATE */
     public const string ERROR_LTE_TEMPLATE = 'Value should be lesser than or equal {{lte}}, {{given}} given';
 
-    public function gt(int $gt): static
+    public function minimum(int $minimum): static
     {
-        return $this->postParse(static function (int $int) use ($gt) {
-            if ($int <= $gt) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_GT_CODE,
-                        self::ERROR_GT_TEMPLATE,
-                        ['gt' => $gt, 'given' => $int]
-                    )
-                );
+        return $this->postParse(static function (int $int) use ($minimum) {
+            if ($int >= $minimum) {
+                return $int;
             }
 
-            return $int;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MINIMUM_CODE,
+                    self::ERROR_MINIMUM_TEMPLATE,
+                    ['minimum' => $minimum, 'given' => $int]
+                )
+            );
         });
     }
 
+    public function exclusiveMinimum(int $exclusiveMinimum): static
+    {
+        return $this->postParse(static function (int $int) use ($exclusiveMinimum) {
+            if ($int > $exclusiveMinimum) {
+                return $int;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_EXCLUSIVE_MINIMUM_CODE,
+                    self::ERROR_EXCLUSIVE_MINIMUM_TEMPLATE,
+                    ['exclusiveMinimum' => $exclusiveMinimum, 'given' => $int]
+                )
+            );
+        });
+    }
+
+    public function exclusiveMaximum(int $exclusiveMaximum): static
+    {
+        return $this->postParse(static function (int $int) use ($exclusiveMaximum) {
+            if ($int < $exclusiveMaximum) {
+                return $int;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_EXCLUSIVE_MAXIMUM_CODE,
+                    self::ERROR_EXCLUSIVE_MAXIMUM_TEMPLATE,
+                    ['exclusiveMaximum' => $exclusiveMaximum, 'given' => $int]
+                )
+            );
+        });
+    }
+
+    public function maximum(int $maximum): static
+    {
+        return $this->postParse(static function (int $int) use ($maximum) {
+            if ($int <= $maximum) {
+                return $int;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MAXIMUM_CODE,
+                    self::ERROR_MAXIMUM_TEMPLATE,
+                    ['maximum' => $maximum, 'given' => $int]
+                )
+            );
+        });
+    }
+
+    /**
+     * @deprecated Use minimum($minimum) instead
+     */
     public function gte(int $gte): static
     {
+        @trigger_error('Use minimum($minimum) instead', E_USER_DEPRECATED);
+
         return $this->postParse(static function (int $int) use ($gte) {
-            if ($int < $gte) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_GTE_CODE,
-                        self::ERROR_GTE_TEMPLATE,
-                        ['gte' => $gte, 'given' => $int]
-                    )
-                );
+            if ($int >= $gte) {
+                return $int;
             }
 
-            return $int;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_GTE_CODE,
+                    self::ERROR_GTE_TEMPLATE,
+                    ['gte' => $gte, 'given' => $int]
+                )
+            );
         });
     }
 
+    /**
+     * @deprecated Use exclusiveMinimum($exclusiveMinimum) instead
+     */
+    public function gt(int $gt): static
+    {
+        @trigger_error('Use exclusiveMinimum($exclusiveMinimum) instead', E_USER_DEPRECATED);
+
+        return $this->postParse(static function (int $int) use ($gt) {
+            if ($int > $gt) {
+                return $int;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_GT_CODE,
+                    self::ERROR_GT_TEMPLATE,
+                    ['gt' => $gt, 'given' => $int]
+                )
+            );
+        });
+    }
+
+    /**
+     * @deprecated Use exclusiveMaximum($exclusiveMaximum) instead
+     */
     public function lt(int $lt): static
     {
+        @trigger_error('Use exclusiveMaximum($exclusiveMaximum) instead', E_USER_DEPRECATED);
+
         return $this->postParse(static function (int $int) use ($lt) {
-            if ($int >= $lt) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_LT_CODE,
-                        self::ERROR_LT_TEMPLATE,
-                        ['lt' => $lt, 'given' => $int]
-                    )
-                );
+            if ($int < $lt) {
+                return $int;
             }
 
-            return $int;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_LT_CODE,
+                    self::ERROR_LT_TEMPLATE,
+                    ['lt' => $lt, 'given' => $int]
+                )
+            );
         });
     }
 
+    /**
+     * @deprecated Use maximum($maximum) instead
+     */
     public function lte(int $lte): static
     {
+        @trigger_error('Use maximum($maximum) instead', E_USER_DEPRECATED);
+
         return $this->postParse(static function (int $int) use ($lte) {
-            if ($int > $lte) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_LTE_CODE,
-                        self::ERROR_LTE_TEMPLATE,
-                        ['lte' => $lte, 'given' => $int]
-                    )
-                );
+            if ($int <= $lte) {
+                return $int;
             }
 
-            return $int;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_LTE_CODE,
+                    self::ERROR_LTE_TEMPLATE,
+                    ['lte' => $lte, 'given' => $int]
+                )
+            );
         });
     }
 
-    public function positive(): static
-    {
-        return $this->gt(0);
-    }
-
+    /**
+     * @deprecated Use minimum(0) instead
+     */
     public function nonNegative(): static
     {
         return $this->gte(0);
     }
 
+    /**
+     * @deprecated Use minimum(0, true) instead
+     */
+    public function positive(): static
+    {
+        return $this->gt(0);
+    }
+
+    /**
+     * @deprecated Use maximum(0, true) instead
+     */
     public function negative(): static
     {
         return $this->lt(0);
     }
 
+    /**
+     * @deprecated Use maximum(0) instead
+     */
     public function nonPositive(): static
     {
         return $this->lte(0);
@@ -145,16 +269,16 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
 
     protected function innerParse(mixed $input): mixed
     {
-        if (!\is_int($input)) {
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_TYPE_CODE,
-                    self::ERROR_TYPE_TEMPLATE,
-                    ['given' => $this->getDataType($input)]
-                )
-            );
+        if (\is_int($input)) {
+            return $input;
         }
 
-        return $input;
+        throw new ErrorsException(
+            new Error(
+                self::ERROR_TYPE_CODE,
+                self::ERROR_TYPE_TEMPLATE,
+                ['given' => $this->getDataType($input)]
+            )
+        );
     }
 }

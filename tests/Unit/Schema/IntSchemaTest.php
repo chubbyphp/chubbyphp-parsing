@@ -25,6 +25,10 @@ final class IntSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (int $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (int $output, ErrorsException $e) => $output));
+        self::assertNotSame($schema, $schema->minimum(0));
+        self::assertNotSame($schema, $schema->exclusiveMinimum(0));
+        self::assertNotSame($schema, $schema->exclusiveMaximum(0));
+        self::assertNotSame($schema, $schema->maximum(0));
     }
 
     public function testParseSuccess(): void
@@ -148,12 +152,284 @@ final class IntSchemaTest extends TestCase
         ], $schema->safeParse(null)->exception->errors->jsonSerialize());
     }
 
+    public function testParseWithValidMinimum(): void
+    {
+        $input = 4;
+        $minimum = 4;
+
+        $schema = (new IntSchema())->minimum($minimum);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMinimum(): void
+    {
+        $input = 4;
+        $minimum = 5;
+
+        $schema = (new IntSchema())->minimum($minimum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.minimum',
+                        'template' => 'Value should be minimum {{minimum}}, {{given}} given',
+                        'variables' => [
+                            'minimum' => $minimum,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidExclusiveMinimum(): void
+    {
+        $input = 5;
+        $exclusiveMinimum = 4;
+
+        $schema = (new IntSchema())->exclusiveMinimum($exclusiveMinimum);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidExclusiveMinimumEqual(): void
+    {
+        $input = 4;
+        $exclusiveMinimum = 4;
+
+        $schema = (new IntSchema())->exclusiveMinimum($exclusiveMinimum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'int.exclusiveMinimum',
+                            'template' => 'Value should be greater than {{exclusiveMinimum}}, {{given}} given',
+                            'variables' => [
+                                'exclusiveMinimum' => $exclusiveMinimum,
+                                'given' => $input,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithInvalidExclusiveMinimumLesser(): void
+    {
+        $input = 4;
+        $exclusiveMinimum = 5;
+
+        $schema = (new IntSchema())->exclusiveMinimum($exclusiveMinimum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'int.exclusiveMinimum',
+                            'template' => 'Value should be greater than {{exclusiveMinimum}}, {{given}} given',
+                            'variables' => [
+                                'exclusiveMinimum' => $exclusiveMinimum,
+                                'given' => $input,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithValidExclusiveMaximum(): void
+    {
+        $input = 4;
+        $exclusiveMaximum = 5;
+
+        $schema = (new IntSchema())->exclusiveMaximum($exclusiveMaximum);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidExclusiveMaximumEqual(): void
+    {
+        $input = 5;
+        $exclusiveMaximum = 5;
+
+        $schema = (new IntSchema())->exclusiveMaximum($exclusiveMaximum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.exclusiveMaximum',
+                        'template' => 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given',
+                        'variables' => [
+                            'exclusiveMaximum' => $exclusiveMaximum,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidExclusiveMaximumLesser(): void
+    {
+        $input = 5;
+        $exclusiveMaximum = 4;
+
+        $schema = (new IntSchema())->exclusiveMaximum($exclusiveMaximum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.exclusiveMaximum',
+                        'template' => 'Value should be lesser than {{exclusiveMaximum}}, {{given}} given',
+                        'variables' => [
+                            'exclusiveMaximum' => $exclusiveMaximum,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidMaximum(): void
+    {
+        $input = 5;
+        $maximum = 5;
+
+        $schema = (new IntSchema())->maximum($maximum);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMaximum(): void
+    {
+        $input = 5;
+        $maximum = 4;
+
+        $schema = (new IntSchema())->maximum($maximum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.maximum',
+                        'template' => 'Value should be maximum {{maximum}}, {{given}} given',
+                        'variables' => [
+                            'maximum' => $maximum,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidGte(): void
+    {
+        $input = 5;
+        $gte = 5;
+
+        error_clear_last();
+
+        $schema = (new IntSchema())->gte($gte);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use minimum($minimum) instead', $lastError['message']);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidGte(): void
+    {
+        $input = 4;
+        $gte = 5;
+
+        $schema = (new IntSchema())->gte($gte);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.gte',
+                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                        'variables' => [
+                            'gte' => $gte,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseWithValidGt(): void
     {
         $input = 5;
         $gt = 4;
 
+        error_clear_last();
+
         $schema = (new IntSchema())->gt($gt);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use exclusiveMinimum($exclusiveMinimum) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -214,50 +490,22 @@ final class IntSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidGte(): void
-    {
-        $input = 5;
-        $gte = 5;
-
-        $schema = (new IntSchema())->gte($gte);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidGte(): void
-    {
-        $input = 4;
-        $gte = 5;
-
-        $schema = (new IntSchema())->gte($gte);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'int.gte',
-                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
-                        'variables' => [
-                            'gte' => $gte,
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
     public function testParseWithValidLt(): void
     {
         $input = 4;
         $lt = 5;
 
+        error_clear_last();
+
         $schema = (new IntSchema())->lt($lt);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use exclusiveMaximum($exclusiveMaximum) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -323,7 +571,17 @@ final class IntSchemaTest extends TestCase
         $input = 5;
         $lte = 5;
 
+        error_clear_last();
+
         $schema = (new IntSchema())->lte($lte);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use maximum($maximum) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -348,6 +606,52 @@ final class IntSchemaTest extends TestCase
                         'template' => 'Value should be lesser than or equal {{lte}}, {{given}} given',
                         'variables' => [
                             'lte' => $lte,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidNonNegative(): void
+    {
+        $input = 0;
+
+        error_clear_last();
+
+        $schema = (new IntSchema())->nonNegative();
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use minimum($minimum) instead', $lastError['message']);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidNonNegative(): void
+    {
+        $input = -1;
+
+        $schema = (new IntSchema())->nonNegative();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.gte',
+                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
+                        'variables' => [
+                            'gte' => 0,
                             'given' => $input,
                         ],
                     ],
@@ -384,42 +688,6 @@ final class IntSchemaTest extends TestCase
                         'template' => 'Value should be greater than {{gt}}, {{given}} given',
                         'variables' => [
                             'gt' => 0,
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
-    public function testParseWithValidNonNegative(): void
-    {
-        $input = 0;
-
-        $schema = (new IntSchema())->nonNegative();
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidNonNegative(): void
-    {
-        $input = -1;
-
-        $schema = (new IntSchema())->nonNegative();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'int.gte',
-                        'template' => 'Value should be greater than or equal {{gte}}, {{given}} given',
-                        'variables' => [
-                            'gte' => 0,
                             'given' => $input,
                         ],
                     ],

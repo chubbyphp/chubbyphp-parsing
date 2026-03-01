@@ -30,8 +30,8 @@ A tuple schema:
 
 ```php
 $coordinatesSchema = $p->tuple([
-    $p->float()->gte(-90)->lte(90),   // Latitude
-    $p->float()->gte(-180)->lte(180), // Longitude
+    $p->float()->minimum(-90)->maximum(90),   // Latitude
+    $p->float()->minimum(-180)->maximum(180), // Longitude
 ]);
 
 $coordinatesSchema->parse([47.3769, 8.5417]); // Zurich coordinates
@@ -41,9 +41,9 @@ $coordinatesSchema->parse([47.3769, 8.5417]); // Zurich coordinates
 
 ```php
 $rgbSchema = $p->tuple([
-    $p->int()->gte(0)->lte(255), // Red
-    $p->int()->gte(0)->lte(255), // Green
-    $p->int()->gte(0)->lte(255), // Blue
+    $p->int()->minimum(0)->maximum(255), // Red
+    $p->int()->minimum(0)->maximum(255), // Green
+    $p->int()->minimum(0)->maximum(255), // Blue
 ]);
 
 $rgbSchema->parse([255, 128, 0]); // Orange color
@@ -53,10 +53,10 @@ $rgbSchema->parse([255, 128, 0]); // Orange color
 
 ```php
 $rgbaSchema = $p->tuple([
-    $p->int()->gte(0)->lte(255),   // Red
-    $p->int()->gte(0)->lte(255),   // Green
-    $p->int()->gte(0)->lte(255),   // Blue
-    $p->float()->gte(0)->lte(1),   // Alpha
+    $p->int()->minimum(0)->maximum(255),   // Red
+    $p->int()->minimum(0)->maximum(255),   // Green
+    $p->int()->minimum(0)->maximum(255),   // Blue
+    $p->float()->minimum(0)->maximum(1),   // Alpha
 ]);
 
 $rgbaSchema->parse([255, 128, 0, 0.5]); // Semi-transparent orange
@@ -107,9 +107,9 @@ $point3dSchema->parse([1.5, 2.5, 3.5]);
 
 ```php
 $datePartsSchema = $p->tuple([
-    $p->int()->gte(1)->lte(9999), // Year
-    $p->int()->gte(1)->lte(12),   // Month
-    $p->int()->gte(1)->lte(31),   // Day
+    $p->int()->minimum(1)->maximum(9999), // Year
+    $p->int()->minimum(1)->maximum(12),   // Month
+    $p->int()->minimum(1)->maximum(31),   // Day
 ]);
 
 $datePartsSchema->parse([2024, 1, 20]);
