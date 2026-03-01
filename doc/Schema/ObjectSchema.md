@@ -133,7 +133,7 @@ $createUserSchema = $p->object([
 $addressSchema = $p->object([
     'street' => $p->string(),
     'city' => $p->string(),
-    'zipCode' => $p->string()->regexp('/^\d{5}$/'),
+    'zipCode' => $p->string()->pattern('/^\d{5}$/'),
 ]);
 
 $personSchema = $p->object([

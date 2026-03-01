@@ -23,10 +23,29 @@ final class StringSchemaTest extends TestCase
 
         self::assertNotSame($schema, $schema->nullable());
         self::assertNotSame($schema, $schema->nullable(false));
-        self::assertNotSame($schema, $schema->default(42));
+        self::assertNotSame($schema, $schema->default('test'));
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (string $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (string $output, ErrorsException $e) => $output));
+        self::assertNotSame($schema, $schema->length(1));
+        self::assertNotSame($schema, $schema->minLength(1));
+        self::assertNotSame($schema, $schema->maxLength(1));
+        self::assertNotSame($schema, $schema->contains('test'));
+        self::assertNotSame($schema, $schema->startsWith('test'));
+        self::assertNotSame($schema, $schema->endsWith('test'));
+        self::assertNotSame($schema, $schema->hostname());
+        self::assertNotSame($schema, $schema->email());
+        self::assertNotSame($schema, $schema->ipV4());
+        self::assertNotSame($schema, $schema->ipV6());
+        self::assertNotSame($schema, $schema->mac());
+        self::assertNotSame($schema, $schema->pattern('/.*/'));
+        self::assertNotSame($schema, $schema->uri());
+        self::assertNotSame($schema, $schema->uuid());
+        self::assertNotSame($schema, $schema->trim());
+        self::assertNotSame($schema, $schema->trimStart());
+        self::assertNotSame($schema, $schema->trimEnd());
+        self::assertNotSame($schema, $schema->toLowerCase());
+        self::assertNotSame($schema, $schema->toUpperCase());
     }
 
     public function testParseSuccess(): void
@@ -258,11 +277,57 @@ final class StringSchemaTest extends TestCase
         }
     }
 
+    public function testParseWithValidContains(): void
+    {
+        $input = 'example';
+
+        $schema = (new StringSchema())->contains('amp');
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidContains(): void
+    {
+        $input = 'example';
+
+        $schema = (new StringSchema())->contains('lee');
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.contains',
+                        'template' => '{{given}} does not contain {{contains}}',
+                        'variables' => [
+                            'contains' => 'lee',
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseWithValidIncludes(): void
     {
         $input = 'example';
 
+        error_clear_last();
+
         $schema = (new StringSchema())->includes('amp');
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use contains($contains) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -366,11 +431,56 @@ final class StringSchemaTest extends TestCase
         }
     }
 
+    public function testParseWithValidHostname(): void
+    {
+        $input = 'example.com';
+
+        $schema = (new StringSchema())->hostname();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidHostname(): void
+    {
+        $input = 'example..com';
+
+        $schema = (new StringSchema())->hostname();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.hostname',
+                        'template' => 'Invalid hostname {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseWithValidDomain(): void
     {
         $input = 'example.com';
 
+        error_clear_last();
+
         $schema = (new StringSchema())->domain();
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use hostname() instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -556,13 +666,11 @@ final class StringSchemaTest extends TestCase
 
     public function testParseWithValidMatch(): void
     {
-        error_clear_last();
-
         $input = 'aBcDeFg';
 
-        $schema = (new StringSchema())->match('/^[a-z]+$/i');
+        error_clear_last();
 
-        self::assertSame($input, $schema->parse($input));
+        $schema = (new StringSchema())->match('/^[a-z]+$/i');
 
         $lastError = error_get_last();
 
@@ -570,7 +678,9 @@ final class StringSchemaTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_DEPRECATED, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use regexp instead', $lastError['message']);
+        self::assertSame('Use pattern($pattern) instead', $lastError['message']);
+
+        self::assertSame($input, $schema->parse($input));
     }
 
     public function testParseWithInvalidMatch(): void
@@ -600,6 +710,53 @@ final class StringSchemaTest extends TestCase
         }
     }
 
+    public function testParseWithPatternWithInvalidPattern(): void
+    {
+        try {
+            (new StringSchema())->pattern('test');
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid pattern "test" given', $e->getMessage());
+        }
+    }
+
+    public function testParseWithValidPattern(): void
+    {
+        $input = 'aBcDeFg';
+
+        $schema = (new StringSchema())->pattern('/^[a-z]+$/i');
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidPattern(): void
+    {
+        $input = 'a1B2C3d4';
+
+        $schema = (new StringSchema())->pattern('/^[a-z]+$/i');
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.pattern',
+                        'template' => '{{given}} does not pattern {{pattern}}',
+                        'variables' => [
+                            'pattern' => '/^[a-z]+$/i',
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseWithRegexpWithInvalidPattern(): void
     {
         try {
@@ -615,7 +772,17 @@ final class StringSchemaTest extends TestCase
     {
         $input = 'aBcDeFg';
 
+        error_clear_last();
+
         $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use pattern($pattern) instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -647,11 +814,56 @@ final class StringSchemaTest extends TestCase
         }
     }
 
+    public function testParseWithValidUri(): void
+    {
+        $input = 'https://localhost';
+
+        $schema = (new StringSchema())->uri();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUri(): void
+    {
+        $input = 'test';
+
+        $schema = (new StringSchema())->uri();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.uri',
+                        'template' => 'Invalid uri {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseWithValidUrl(): void
     {
         $input = 'https://localhost';
 
+        error_clear_last();
+
         $schema = (new StringSchema())->url();
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use uri() instead', $lastError['message']);
 
         self::assertSame($input, $schema->parse($input));
     }

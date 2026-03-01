@@ -62,8 +62,8 @@ $contactSchema = $p->discriminatedUnion([
         'verified' => $p->bool(),
     ]),
     $p->object([
-        'number' => $p->string()->regexp('/^\+\d{10,15}$/'),
         '_type' => $p->const('phone'),
+        'number' => $p->string()->pattern('/^\+\d{10,15}$/'),
         'country' => $p->string()->length(2),
     ]),
     $p->object([
@@ -123,10 +123,10 @@ $eventSchema = $p->discriminatedUnion([
 ```php
 $paymentSchema = $p->discriminatedUnion([
     $p->object([
-        'cardNumber' => $p->string()->regexp('/^\d{16}$/'),
-        'expiry' => $p->string()->regexp('/^\d{2}\/\d{2}$/'),
-        'cvv' => $p->string()->regexp('/^\d{3,4}$/'),
         'method' => $p->const('credit_card'),
+        'cardNumber' => $p->string()->pattern('/^\d{16}$/'),
+        'expiry' => $p->string()->pattern('/^\d{2}\/\d{2}$/'),
+        'cvv' => $p->string()->pattern('/^\d{3,4}$/'),
     ]),
     $p->object([
         'method' => $p->const('bank_transfer'),
