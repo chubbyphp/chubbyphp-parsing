@@ -389,7 +389,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
      */
     public function regexp(string $regexp): static
     {
-        @@trigger_error('Use pattern($pattern) instead', E_USER_DEPRECATED);
+        @trigger_error('Use pattern($pattern) instead', E_USER_DEPRECATED);
 
         if (false === @preg_match($regexp, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid regexp "%s" given', $regexp));
