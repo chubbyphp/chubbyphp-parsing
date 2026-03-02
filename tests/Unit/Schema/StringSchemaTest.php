@@ -730,6 +730,15 @@ final class StringSchemaTest extends TestCase
         self::assertSame($input, $schema->parse($input));
     }
 
+    public function testParseWithValidPatternMatchingZeroString(): void
+    {
+        $input = '0';
+
+        $schema = (new StringSchema())->pattern('/^0$/');
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
     public function testParseWithInvalidPattern(): void
     {
         $input = 'a1B2C3d4';

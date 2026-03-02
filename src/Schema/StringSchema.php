@@ -345,7 +345,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         }
 
         return $this->postParse(static function (string $string) use ($match) {
-            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $match]]);
+            $doesMatch = 1 === preg_match($match, $string);
 
             if ($doesMatch) {
                 return $string;
@@ -368,7 +368,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         }
 
         return $this->postParse(static function (string $string) use ($pattern) {
-            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $pattern]]);
+            $doesMatch = 1 === preg_match($pattern, $string);
 
             if ($doesMatch) {
                 return $string;
@@ -396,7 +396,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         }
 
         return $this->postParse(static function (string $string) use ($regexp) {
-            $doesMatch = filter_var($string, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $regexp]]);
+            $doesMatch = 1 === preg_match($regexp, $string);
 
             if ($doesMatch) {
                 return $string;
