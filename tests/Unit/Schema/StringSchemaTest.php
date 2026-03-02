@@ -466,6 +466,32 @@ final class StringSchemaTest extends TestCase
         }
     }
 
+    public function testParseWithInvalidHostnameWithInvalidLabelCharacters(): void
+    {
+        $input = 'exa_mple.com';
+
+        $schema = (new StringSchema())->hostname();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.hostname',
+                        'template' => 'Invalid hostname {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseWithValidDomain(): void
     {
         $input = 'example.com';

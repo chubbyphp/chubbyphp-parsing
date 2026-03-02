@@ -229,7 +229,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public function hostname(): static
     {
         return $this->postParse(static function (string $string) {
-            if (filter_var($string, FILTER_VALIDATE_DOMAIN)) {
+            if (filter_var($string, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
                 return $string;
             }
 
