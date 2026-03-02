@@ -29,6 +29,7 @@ final class IntSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->exclusiveMinimum(0));
         self::assertNotSame($schema, $schema->exclusiveMaximum(0));
         self::assertNotSame($schema, $schema->maximum(0));
+        self::assertNotSame($schema, $schema->multipleOf(1));
     }
 
     public function testParseSuccess(): void
@@ -364,6 +365,52 @@ final class IntSchemaTest extends TestCase
                 ],
             ], $errorsException->errors->jsonSerialize());
         }
+    }
+
+    public function testParseWithValidMultipleOf(): void
+    {
+        $input = 6;
+        $multipleOf = 3;
+
+        $schema = (new IntSchema())->multipleOf($multipleOf);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMultipleOf(): void
+    {
+        $input = 5;
+        $multipleOf = 3;
+
+        $schema = (new IntSchema())->multipleOf($multipleOf);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.multipleOf',
+                        'template' => 'Value should be multiple of {{multipleOf}}, {{given}} given',
+                        'variables' => [
+                            'multipleOf' => $multipleOf,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testMultipleOfWithInvalidMultipleOf(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument #1 ($multipleOf) must be greater than 0, 0 given');
+
+        (new IntSchema())->multipleOf(0);
     }
 
     public function testParseWithValidGte(): void

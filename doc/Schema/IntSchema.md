@@ -23,6 +23,7 @@ $schema->minimum(5);  // Greater than or equal to 5
 $schema->exclusiveMinimum(5);   // Greater than 5
 $schema->exclusiveMaximum(10);  // Less than 10
 $schema->maximum(10); // Less than or equal to 10
+$schema->multipleOf(5); // Multiple of 5
 ```
 
 ### Sign Constraints
@@ -94,3 +95,4 @@ $date = $timestampSchema->parse(1705744500);
 | `int.exclusiveMinimum` | Value is not greater than to threshold |
 | `int.exclusiveMaximum` | Value is not less than to threshold |
 | `int.maximum` | Value is not less than or equal to threshold |
+| `int.multipleOf` | Value is not a multiple of threshold |

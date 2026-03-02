@@ -24,6 +24,9 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     public const string ERROR_MAXIMUM_CODE = 'int.maximum';
     public const string ERROR_MAXIMUM_TEMPLATE = 'Value should be maximum {{maximum}}, {{given}} given';
 
+    public const string ERROR_MULTIPLE_OF_CODE = 'int.multipleOf';
+    public const string ERROR_MULTIPLE_OF_TEMPLATE = 'Value should be multiple of {{multipleOf}}, {{given}} given';
+
     /** @deprecated: see ERROR_MINIMUM_CODE */
     public const string ERROR_GTE_CODE = 'int.gte';
 
@@ -111,6 +114,29 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
                     self::ERROR_MAXIMUM_CODE,
                     self::ERROR_MAXIMUM_TEMPLATE,
                     ['maximum' => $maximum, 'given' => $int]
+                )
+            );
+        });
+    }
+
+    public function multipleOf(int $multipleOf): static
+    {
+        if ($multipleOf <= 0) {
+            throw new \InvalidArgumentException(
+                \sprintf('Argument #1 ($multipleOf) must be greater than 0, %s given', $multipleOf)
+            );
+        }
+
+        return $this->postParse(static function (int $int) use ($multipleOf) {
+            if (0 === $int % $multipleOf) {
+                return $int;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MULTIPLE_OF_CODE,
+                    self::ERROR_MULTIPLE_OF_TEMPLATE,
+                    ['multipleOf' => $multipleOf, 'given' => $int]
                 )
             );
         });
