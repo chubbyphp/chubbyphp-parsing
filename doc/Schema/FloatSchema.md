@@ -23,6 +23,7 @@ $schema->minimum(5.0);  // Greater than or equal to 5.0
 $schema->exclusiveMinimum(5.0);   // Greater than 5.0
 $schema->exclusiveMaximum(10.0);  // Less than 10.0
 $schema->maximum(10.0); // Less than or equal to 10.0
+$schema->multipleOf(0.5); // Multiple of 0.5
 ```
 
 ### Sign Constraints
@@ -86,4 +87,5 @@ $coordinatesSchema->parse(['lat' => 47.1, 'lng' => 8.2]);
 | `float.exclusiveMinimum` | Value is not greater than to threshold |
 | `float.exclusiveMaximum` | Value is not less than to threshold |
 | `float.maximum` | Value is not less than or equal to threshold |
+| `float.multipleOf` | Value is not a multiple of threshold |
 | `float.int` | Cannot convert float to int without precision loss (for `toInt()`) |

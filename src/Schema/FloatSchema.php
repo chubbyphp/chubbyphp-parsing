@@ -24,6 +24,9 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
     public const string ERROR_MAXIMUM_CODE = 'float.maximum';
     public const string ERROR_MAXIMUM_TEMPLATE = 'Value should be maximum {{maximum}}, {{given}} given';
 
+    public const string ERROR_MULTIPLE_OF_CODE = 'float.multipleOf';
+    public const string ERROR_MULTIPLE_OF_TEMPLATE = 'Value should be multiple of {{multipleOf}}, {{given}} given';
+
     /** @deprecated: see ERROR_MINIMUM_CODE */
     public const string ERROR_GTE_CODE = 'float.gte';
 
@@ -114,6 +117,33 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
                     self::ERROR_MAXIMUM_CODE,
                     self::ERROR_MAXIMUM_TEMPLATE,
                     ['maximum' => $maximum, 'given' => $float]
+                )
+            );
+        });
+    }
+
+    public function multipleOf(float $multipleOf): static
+    {
+        if ($multipleOf <= 0.0) {
+            throw new \InvalidArgumentException(
+                \sprintf('Argument #1 ($multipleOf) must be greater than 0, %s given', $multipleOf)
+            );
+        }
+
+        return $this->postParse(static function (float $float) use ($multipleOf) {
+            $quotient = $float / $multipleOf;
+            $roundedQuotient = round($quotient);
+            $epsilon = 10 * PHP_FLOAT_EPSILON * max(1.0, abs($quotient));
+
+            if (abs($quotient - $roundedQuotient) <= $epsilon) {
+                return $float;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MULTIPLE_OF_CODE,
+                    self::ERROR_MULTIPLE_OF_TEMPLATE,
+                    ['multipleOf' => $multipleOf, 'given' => $float]
                 )
             );
         });
