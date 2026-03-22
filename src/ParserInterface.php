@@ -23,9 +23,9 @@ use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
 
 /**
- * @method AssocSchema assoc(array<string, SchemaInterface> $fieldNameToSchema)
- * @method ConstSchema const(bool|float|int|string $const)
- * @method ObjectSchema object(array<string, SchemaInterface> $fieldNameToSchema, class-string $classname = \stdClass::class, bool $construct = false)
+ * @method AssocSchema  assoc(array<string, SchemaInterface> $fieldNameToSchema)
+ * @method ConstSchema  const(bool|float|int|string $const)
+ * @method ObjectSchema object(array<string, SchemaInterface> $fieldNameToSchema, class-string $classname = 'stdClass', bool $construct = false)
  */
 interface ParserInterface
 {
