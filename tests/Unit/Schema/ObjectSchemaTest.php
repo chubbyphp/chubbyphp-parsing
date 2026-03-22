@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
+use Chubbyphp\Parsing\Errors;
 use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\BoolSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
@@ -346,6 +347,29 @@ final class ObjectSchemaTest extends TestCase
                 ],
             ], $errorsException->errors->jsonSerialize());
         }
+    }
+
+    public function testParseFieldsReturnsNullWithChildrenErrors(): void
+    {
+        $schema = new ObjectSchema(['field1' => new StringSchema(), 'field2' => new IntSchema()]);
+        $childrenErrors = new Errors();
+
+        $parseFields = new \ReflectionMethod(ObjectSchema::class, 'parseFields');
+        $parseFields->setAccessible(true);
+
+        self::assertNull($parseFields->invoke($schema, ['field1' => 'test', 'field2' => 'invalid'], $childrenErrors));
+        self::assertSame([
+            [
+                'path' => 'field2',
+                'error' => [
+                    'code' => 'int.type',
+                    'template' => 'Type should be "int", {{given}} given',
+                    'variables' => [
+                        'given' => 'string',
+                    ],
+                ],
+            ],
+        ], $childrenErrors->jsonSerialize());
     }
 
     public function testParseFailedWithOptionalButStillNotProvidedEnoughFields(): void

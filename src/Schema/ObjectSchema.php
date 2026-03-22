@@ -16,15 +16,18 @@ final class ObjectSchema extends AbstractObjectSchema implements ObjectSchemaInt
      * @param array<mixed, mixed> $fieldToSchema
      * @param class-string        $classname
      */
-    public function __construct(array $fieldToSchema, private string $classname = \stdClass::class, private bool $construct = false)
-    {
+    public function __construct(
+        array $fieldToSchema,
+        private string $classname = \stdClass::class,
+        private bool $construct = false
+    ) {
         parent::__construct($fieldToSchema);
     }
 
     /**
      * @param array<string, mixed> $input
      */
-    protected function parseFields(array $input, Errors $childrenErrors): object
+    protected function parseFields(array $input, Errors $childrenErrors): ?object
     {
         $fields = [];
         foreach ($this->getFieldToSchema() as $fieldName => $fieldSchema) {
@@ -37,6 +40,10 @@ final class ObjectSchema extends AbstractObjectSchema implements ObjectSchemaInt
             } catch (ErrorsException $e) {
                 $childrenErrors->add($e->errors, $fieldName);
             }
+        }
+
+        if ($childrenErrors->has()) {
+            return null;
         }
 
         if (!$this->construct) {

@@ -15,11 +15,11 @@ final class AssocSchema extends AbstractObjectSchema implements ObjectSchemaInte
     /**
      * @param array<string, mixed> $input
      *
-     * @return array<string, mixed>
+     * @return null|array<string, mixed>
      */
-    protected function parseFields(array $input, Errors $childrenErrors): array
+    protected function parseFields(array $input, Errors $childrenErrors): ?array
     {
-        $output = [];
+        $fields = [];
 
         foreach ($this->getFieldToSchema() as $fieldName => $fieldSchema) {
             try {
@@ -27,12 +27,16 @@ final class AssocSchema extends AbstractObjectSchema implements ObjectSchemaInte
                     continue;
                 }
 
-                $output[$fieldName] = $fieldSchema->parse($input[$fieldName] ?? null);
+                $fields[$fieldName] = $fieldSchema->parse($input[$fieldName] ?? null);
             } catch (ErrorsException $e) {
                 $childrenErrors->add($e->errors, $fieldName);
             }
         }
 
-        return $output;
+        if ($childrenErrors->has()) {
+            return null;
+        }
+
+        return $fields;
     }
 }
