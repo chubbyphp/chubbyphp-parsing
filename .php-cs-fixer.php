@@ -15,6 +15,8 @@ $config = require __DIR__ . '/vendor/chubbyphp/chubbyphp-dev-helper/phpcs.php';
 // rules is buggy
 unset($config['rules']['simplified_null_return']);
 
+$config['rules']['strict_comparison'] = false;
+
 return (new PhpCsFixer\Config)
     ->setUnsupportedPhpVersionAllowed(true)
     ->setIndent($config['indent'])

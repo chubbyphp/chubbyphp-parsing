@@ -32,6 +32,8 @@ final class ArraySchemaTest extends TestCase
         self::assertNotSame($schema, $schema->minItems(1));
         self::assertNotSame($schema, $schema->maxItems(1));
         self::assertNotSame($schema, $schema->contains('test'));
+        self::assertNotSame($schema, $schema->minContains('test', 1));
+        self::assertNotSame($schema, $schema->maxContains('test', 1));
         self::assertNotSame($schema, $schema->uniqueItems());
         self::assertNotSame($schema, $schema->filter(static fn (mixed $value) => true));
         self::assertNotSame($schema, $schema->map(static fn (mixed $value) => $value));
@@ -541,6 +543,246 @@ final class ArraySchemaTest extends TestCase
                             'variables' => [
                                 'contains' => json_decode(json_encode($dateTime3), true),
                                 'given' => json_decode(json_encode($input), true),
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithValidMinContains(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime2];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->minContains($dateTime2, 2);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidMinContainsWithEqualButNotSame(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime2Equal];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->minContains($dateTime2Equal, 2, false);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMinContainsWithEqualButNotSameAndStrictFalse(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $dateTime2Equal2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime2Equal2];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->minContains($dateTime2Equal, 2, false);
+
+        try {
+            (new ArraySchema(new DateTimeSchema()))->minContains($dateTime2Equal, 2)->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.minContains',
+                            'template' => '{{given}} contains {{contains}} {{containsCount}} times, min {{minContains}} required',
+                            'variables' => [
+                                'contains' => json_decode(json_encode($dateTime2Equal), true),
+                                'containsCount' => 0,
+                                'given' => json_decode(json_encode($input), true),
+                                'minContains' => 2,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMinContainsWithStrictFalseAndNonMatchingValues(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+        $dateTime3 = new \DateTimeImmutable('2024-01-22T09:15:00+00:00');
+
+        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime3];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->minContains($dateTime2Equal, 2, false);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.minContains',
+                            'template' => '{{given}} contains {{contains}} {{containsCount}} times, min {{minContains}} required',
+                            'variables' => [
+                                'contains' => json_decode(json_encode($dateTime2Equal), true),
+                                'containsCount' => 1,
+                                'given' => json_decode(json_encode($input), true),
+                                'minContains' => 2,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithInvalidMinContains(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime1];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->minContains($dateTime2, 2);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.minContains',
+                            'template' => '{{given}} contains {{contains}} {{containsCount}} times, min {{minContains}} required',
+                            'variables' => [
+                                'contains' => json_decode(json_encode($dateTime2), true),
+                                'containsCount' => 1,
+                                'given' => json_decode(json_encode($input), true),
+                                'minContains' => 2,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithValidMaxContains(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime2];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->maxContains($dateTime2, 2);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidMaxContainsWithEqualButNotSame(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime2Equal];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->maxContains($dateTime2Equal, 2, false);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMaxContainsWithEqualButNotSameAndStrictFalse(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime2Equal];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->maxContains($dateTime2Equal, 1, false);
+
+        self::assertSame($input, (new ArraySchema(new DateTimeSchema()))->maxContains($dateTime2Equal, 1)->parse($input));
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.maxContains',
+                            'template' => '{{given}} contains {{contains}} {{containsCount}} times, max {{maxContains}} allowed',
+                            'variables' => [
+                                'contains' => json_decode(json_encode($dateTime2Equal), true),
+                                'containsCount' => 2,
+                                'given' => json_decode(json_encode($input), true),
+                                'maxContains' => 1,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithInvalidMaxContains(): void
+    {
+        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
+        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
+
+        $input = [$dateTime1, $dateTime2, $dateTime2, $dateTime2, $dateTime2];
+
+        $schema = (new ArraySchema(new DateTimeSchema()))->maxContains($dateTime2, 2);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.maxContains',
+                            'template' => '{{given}} contains {{contains}} {{containsCount}} times, max {{maxContains}} allowed',
+                            'variables' => [
+                                'contains' => json_decode(json_encode($dateTime2), true),
+                                'containsCount' => 4,
+                                'given' => json_decode(json_encode($input), true),
+                                'maxContains' => 2,
                             ],
                         ],
                     ],

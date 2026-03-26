@@ -28,6 +28,8 @@ $schema->maxItems(10);   // At most 10 items
 
 ```php
 $schema->contains(5); // Array must contain value 5
+$schema->minContains(5, 2); // Value 5 must appear at least twice
+$schema->maxContains(5, 2); // Value 5 may appear at most twice
 $schema->uniqueItems(); // Array must contain unique items
 ```
 
@@ -152,5 +154,7 @@ $matrixSchema->parse([
 | `array.minItems` | Array has fewer items than minimum |
 | `array.maxItems` | Array has more items than maximum |
 | `array.contains` | Array doesn't contain required value |
+| `array.minContains` | Array contains a value less often than required |
+| `array.maxContains` | Array contains a value more often than allowed |
 
 Item-level errors will include the array index in the error path (e.g., `items.0`, `items.1`).

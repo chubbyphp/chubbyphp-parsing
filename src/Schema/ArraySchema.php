@@ -43,6 +43,12 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     public const string ERROR_CONTAINS_CODE = 'array.contains';
     public const string ERROR_CONTAINS_TEMPLATE = '{{given}} does not contain {{contains}}';
 
+    public const string ERROR_MIN_CONTAINS_CODE = 'array.minContains';
+    public const string ERROR_MIN_CONTAINS_TEMPLATE = '{{given}} contains {{contains}} {{containsCount}} times, min {{minContains}} required';
+
+    public const string ERROR_MAX_CONTAINS_CODE = 'array.maxContains';
+    public const string ERROR_MAX_CONTAINS_TEMPLATE = '{{given}} contains {{contains}} {{containsCount}} times, max {{maxContains}} allowed';
+
     /** @deprecated: see ERROR_CONTAINS_CODE */
     public const string ERROR_INCLUDES_CODE = 'array.includes';
 
@@ -192,6 +198,66 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
                         self::ERROR_CONTAINS_CODE,
                         self::ERROR_CONTAINS_TEMPLATE,
                         ['contains' => $contains, 'given' => $array]
+                    )
+                );
+            }
+
+            return $array;
+        });
+    }
+
+    public function minContains(mixed $contains, int $minContains, bool $strict = true): static
+    {
+        return $this->postParse(static function (array $array) use ($contains, $minContains, $strict) {
+            $containsCount = 0;
+
+            foreach ($array as $value) {
+                if (($strict && $value === $contains) || (!$strict && $value == $contains)) {
+                    ++$containsCount;
+                }
+            }
+
+            if ($containsCount < $minContains) {
+                throw new ErrorsException(
+                    new Error(
+                        self::ERROR_MIN_CONTAINS_CODE,
+                        self::ERROR_MIN_CONTAINS_TEMPLATE,
+                        [
+                            'contains' => $contains,
+                            'containsCount' => $containsCount,
+                            'given' => $array,
+                            'minContains' => $minContains,
+                        ]
+                    )
+                );
+            }
+
+            return $array;
+        });
+    }
+
+    public function maxContains(mixed $contains, int $maxContains, bool $strict = true): static
+    {
+        return $this->postParse(static function (array $array) use ($contains, $maxContains, $strict) {
+            $containsCount = 0;
+
+            foreach ($array as $value) {
+                if (($strict && $value === $contains) || (!$strict && $value == $contains)) {
+                    ++$containsCount;
+                }
+            }
+
+            if ($containsCount > $maxContains) {
+                throw new ErrorsException(
+                    new Error(
+                        self::ERROR_MAX_CONTAINS_CODE,
+                        self::ERROR_MAX_CONTAINS_TEMPLATE,
+                        [
+                            'contains' => $contains,
+                            'containsCount' => $containsCount,
+                            'given' => $array,
+                            'maxContains' => $maxContains,
+                        ]
                     )
                 );
             }
