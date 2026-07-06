@@ -47,6 +47,9 @@ final class AssocSchemaTest extends TestCase
 
         self::assertNotSame($schema, $schema->strict());
         self::assertNotSame($schema, $schema->optional([]));
+
+        self::assertNotSame($schema, $schema->minProperties(1));
+        self::assertNotSame($schema, $schema->maxProperties(1));
     }
 
     public function testConstructWithoutFieldName(): void
@@ -435,5 +438,69 @@ final class AssocSchemaTest extends TestCase
         $schema = new AssocSchema(['field1' => new StringSchema()]);
 
         self::assertNull($schema->getFieldSchema('field2'));
+    }
+
+    public function testParseSuccessWithMinAndMaxProperties(): void
+    {
+        $schema = (new AssocSchema([
+            'field1' => new StringSchema(),
+            'field2' => new StringSchema(),
+        ]))->optional(['field2'])->minProperties(1)->maxProperties(2);
+
+        self::assertSame(['field1' => 'test'], $schema->parse(['field1' => 'test']));
+        self::assertSame(
+            ['field1' => 'test', 'field2' => 'test'],
+            $schema->parse(['field1' => 'test', 'field2' => 'test'])
+        );
+    }
+
+    public function testParseFailedWithMinProperties(): void
+    {
+        $schema = (new AssocSchema(['field1' => new StringSchema()]))->optional(['field1'])->minProperties(1);
+
+        try {
+            $schema->parse([]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'assoc.minProperties',
+                        'template' => 'Properties should be minimum {{minProperties}}, {{given}} given',
+                        'variables' => [
+                            'minProperties' => 1,
+                            'given' => 0,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithMaxProperties(): void
+    {
+        $schema = (new AssocSchema(['field1' => new StringSchema()]))->maxProperties(1);
+
+        try {
+            $schema->parse(['field1' => 'test', 'field2' => 1]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'assoc.maxProperties',
+                        'template' => 'Properties should be maximum {{maxProperties}}, {{given}} given',
+                        'variables' => [
+                            'maxProperties' => 1,
+                            'given' => 2,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
     }
 }

@@ -13,6 +13,16 @@ final class RecordSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_TYPE_CODE = 'record.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "array|\stdClass|\Traversable", {{given}} given';
 
+    public const string ERROR_MIN_PROPERTIES_CODE = 'record.minProperties';
+    public const string ERROR_MIN_PROPERTIES_TEMPLATE = 'Properties should be minimum {{minProperties}}, {{given}} given';
+
+    public const string ERROR_MAX_PROPERTIES_CODE = 'record.maxProperties';
+    public const string ERROR_MAX_PROPERTIES_TEMPLATE = 'Properties should be maximum {{maxProperties}}, {{given}} given';
+
+    private ?int $minProperties = null;
+
+    private ?int $maxProperties = null;
+
     public function __construct(private SchemaInterface $fieldSchema)
     {
         $this->preParses[] = static function (mixed $input) {
@@ -28,6 +38,22 @@ final class RecordSchema extends AbstractSchemaInnerParse implements SchemaInter
         };
     }
 
+    public function minProperties(int $minProperties): static
+    {
+        $clone = clone $this;
+        $clone->minProperties = $minProperties;
+
+        return $clone;
+    }
+
+    public function maxProperties(int $maxProperties): static
+    {
+        $clone = clone $this;
+        $clone->maxProperties = $maxProperties;
+
+        return $clone;
+    }
+
     protected function innerParse(mixed $input): mixed
     {
         if (!\is_array($input)) {
@@ -39,6 +65,8 @@ final class RecordSchema extends AbstractSchemaInnerParse implements SchemaInter
                 )
             );
         }
+
+        $this->propertiesCount($input);
 
         $output = [];
 
@@ -57,5 +85,33 @@ final class RecordSchema extends AbstractSchemaInnerParse implements SchemaInter
         }
 
         return $output;
+    }
+
+    /**
+     * @param array<mixed> $input
+     */
+    private function propertiesCount(array $input): void
+    {
+        $propertiesCount = \count($input);
+
+        if (null !== $this->minProperties && $propertiesCount < $this->minProperties) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MIN_PROPERTIES_CODE,
+                    self::ERROR_MIN_PROPERTIES_TEMPLATE,
+                    ['minProperties' => $this->minProperties, 'given' => $propertiesCount]
+                )
+            );
+        }
+
+        if (null !== $this->maxProperties && $propertiesCount > $this->maxProperties) {
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MAX_PROPERTIES_CODE,
+                    self::ERROR_MAX_PROPERTIES_TEMPLATE,
+                    ['maxProperties' => $this->maxProperties, 'given' => $propertiesCount]
+                )
+            );
+        }
     }
 }

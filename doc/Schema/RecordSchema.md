@@ -147,6 +147,14 @@ $nestedSchema->parse([
 ]);
 ```
 
+## Property Count
+
+Constrain the number of input properties with `minProperties()` / `maxProperties()`:
+
+```php
+$schema = $p->record($p->string())->minProperties(1)->maxProperties(10);
+```
+
 ## Record vs Object vs Assoc
 
 Use **RecordSchema** when:
@@ -190,5 +198,7 @@ $userData = $p->assoc([
 | Code | Description |
 |------|-------------|
 | `record.type` | Value is not a valid record type |
+| `record.minProperties` | Fewer properties than allowed |
+| `record.maxProperties` | More properties than allowed |
 
 Value-specific errors include the key in the error path (e.g., `key1`, `settings.debug`).

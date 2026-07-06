@@ -40,6 +40,9 @@ final class RecordSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (array $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (array $output, ErrorsException $e) => $output));
+
+        self::assertNotSame($schema, $schema->minProperties(1));
+        self::assertNotSame($schema, $schema->maxProperties(1));
     }
 
     public function testParseSuccess(): void
@@ -231,5 +234,66 @@ final class RecordSchemaTest extends TestCase
                 ],
             ],
         ], $schema->safeParse(null)->exception->errors->jsonSerialize());
+    }
+
+    public function testParseSuccessWithMinAndMaxProperties(): void
+    {
+        $schema = (new RecordSchema(new StringSchema()))->minProperties(1)->maxProperties(2);
+
+        self::assertSame(['field1' => 'test'], $schema->parse(['field1' => 'test']));
+        self::assertSame(
+            ['field1' => 'test', 'field2' => 'test'],
+            $schema->parse(['field1' => 'test', 'field2' => 'test'])
+        );
+    }
+
+    public function testParseFailedWithMinProperties(): void
+    {
+        $schema = (new RecordSchema(new StringSchema()))->minProperties(1);
+
+        try {
+            $schema->parse([]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'record.minProperties',
+                        'template' => 'Properties should be minimum {{minProperties}}, {{given}} given',
+                        'variables' => [
+                            'minProperties' => 1,
+                            'given' => 0,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithMaxProperties(): void
+    {
+        $schema = (new RecordSchema(new StringSchema()))->maxProperties(1);
+
+        try {
+            $schema->parse(['field1' => 'test', 'field2' => 'test']);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'record.maxProperties',
+                        'template' => 'Properties should be maximum {{maxProperties}}, {{given}} given',
+                        'variables' => [
+                            'maxProperties' => 1,
+                            'given' => 2,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
     }
 }

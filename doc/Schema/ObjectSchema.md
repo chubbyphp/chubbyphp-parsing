@@ -102,6 +102,18 @@ $schema->parse(['name' => 'John']);
 // Returns: stdClass { name: 'John' } - no nickname property
 ```
 
+### Property Count
+
+Constrain the number of input properties with `minProperties()` / `maxProperties()`:
+
+```php
+$schema = $p->object(['name' => $p->string()])->minProperties(1)->maxProperties(2);
+
+$schema->parse(['name' => 'John']);              // OK
+$schema->parse([]);                              // Throws error (minProperties)
+$schema->parse(['name' => 'John', 'a' => 1, 'b' => 2]); // Throws error (maxProperties)
+```
+
 ## Schema Utilities
 
 ### Get Field Schema
@@ -210,5 +222,7 @@ $listRequestSchema = $p->object([
 |------|-------------|
 | `object.type` | Value is not a valid object type |
 | `object.strict` | Unknown field found in strict mode |
+| `object.minProperties` | Fewer properties than allowed |
+| `object.maxProperties` | More properties than allowed |
 
 Field-level errors include the field name in the error path (e.g., `name`, `address.city`).

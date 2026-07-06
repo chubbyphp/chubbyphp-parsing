@@ -115,6 +115,14 @@ $userSchema = $p->assoc([
 ]);
 ```
 
+### Property Count
+
+Constrain the number of input properties with `minProperties()` / `maxProperties()`:
+
+```php
+$schema = $p->assoc(['name' => $p->string()])->minProperties(1)->maxProperties(2);
+```
+
 ## Common Patterns
 
 ### API Response Parsing
@@ -238,5 +246,7 @@ $result = $schema->parse(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 3
 |------|-------------|
 | `assoc.type` | Value is not a valid input type |
 | `assoc.unknownField` | Unknown field found in strict mode |
+| `assoc.minProperties` | Fewer properties than allowed |
+| `assoc.maxProperties` | More properties than allowed |
 
 Field-level errors include the field name in the error path (e.g., `name`, `address.city`).
