@@ -1,7 +1,5 @@
 # ConstSchema
 
-> **Deprecated**: Use [ConstSchema](ConstSchema.md) instead. The `ConstSchema` and `const()` method are deprecated and will be removed in a future version.
-
 The `ConstSchema` validates that a value matches an exact const value. It supports string, integer, float, and boolean consts.
 
 ## Basic Usage
