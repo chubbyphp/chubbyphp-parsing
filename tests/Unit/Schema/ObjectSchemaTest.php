@@ -355,7 +355,6 @@ final class ObjectSchemaTest extends TestCase
         $childrenErrors = new Errors();
 
         $parseFields = new \ReflectionMethod(ObjectSchema::class, 'parseFields');
-        $parseFields->setAccessible(true);
 
         self::assertNull($parseFields->invoke($schema, ['field1' => 'test', 'field2' => 'invalid'], $childrenErrors));
         self::assertSame([

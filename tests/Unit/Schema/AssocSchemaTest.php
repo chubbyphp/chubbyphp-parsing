@@ -296,7 +296,6 @@ final class AssocSchemaTest extends TestCase
         $childrenErrors = new Errors();
 
         $parseFields = new \ReflectionMethod(AssocSchema::class, 'parseFields');
-        $parseFields->setAccessible(true);
 
         self::assertNull($parseFields->invoke($schema, ['field1' => 'test', 'field2' => 'invalid'], $childrenErrors));
         self::assertSame([
