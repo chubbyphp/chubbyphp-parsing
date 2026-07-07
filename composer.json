@@ -30,6 +30,7 @@
         "respect/validation": "^2.4.12"
     },
     "suggest": {
+        "ext-intl": "If your interested in using idnEmail() or idnHostname() of the StringSchema, please install the intl extension",
         "respect/validation": "If your interested in using the respect/validation, please install it with ^2.4.12"
     },
     "autoload": {
@@ -51,7 +52,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     },
     "scripts": {

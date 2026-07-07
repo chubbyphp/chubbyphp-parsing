@@ -37,6 +37,24 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_ENDSWITH_CODE = 'string.endsWith';
     public const string ERROR_ENDSWITH_TEMPLATE = '{{given}} does not ends with {{endsWith}}';
 
+    public const string ERROR_DATE_TIME_CODE = 'string.dateTime';
+    public const string ERROR_DATE_TIME_TEMPLATE = 'Invalid date-time {{given}}';
+
+    public const string ERROR_DATE_CODE = 'string.date';
+    public const string ERROR_DATE_TEMPLATE = 'Invalid date {{given}}';
+
+    public const string ERROR_TIME_CODE = 'string.time';
+    public const string ERROR_TIME_TEMPLATE = 'Invalid time {{given}}';
+
+    public const string ERROR_DURATION_CODE = 'string.duration';
+    public const string ERROR_DURATION_TEMPLATE = 'Invalid duration {{given}}';
+
+    public const string ERROR_IDN_EMAIL_CODE = 'string.idnEmail';
+    public const string ERROR_IDN_EMAIL_TEMPLATE = 'Invalid idn-email {{given}}';
+
+    public const string ERROR_IDN_HOSTNAME_CODE = 'string.idnHostname';
+    public const string ERROR_IDN_HOSTNAME_TEMPLATE = 'Invalid idn-hostname {{given}}';
+
     public const string ERROR_HOSTNAME_CODE = 'string.hostname';
     public const string ERROR_HOSTNAME_TEMPLATE = 'Invalid hostname {{given}}';
 
@@ -95,6 +113,14 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_DATETIME_TEMPLATE = 'Cannot convert {{given}} to datetime';
 
     private const string UUID_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-(\d{1})[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
+
+    private const string DATE_TIME_PATTERN = '/^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})[Tt](?:[01]\d|2[0-3]):[0-5]\d:(?:[0-5]\d|60)(?:\.\d+)?(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/';
+
+    private const string DATE_PATTERN = '/^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$/';
+
+    private const string TIME_PATTERN = '/^(?:[01]\d|2[0-3]):[0-5]\d:(?:[0-5]\d|60)(?:\.\d+)?(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/';
+
+    private const string DURATION_PATTERN = '/^P(?:(?:\d+D|\d+M(?:\d+D)?|\d+Y(?:\d+M(?:\d+D)?)?)(?:T(?:\d+H(?:\d+M(?:\d+S)?)?|\d+M(?:\d+S)?|\d+S))?|T(?:\d+H(?:\d+M(?:\d+S)?)?|\d+M(?:\d+S)?|\d+S)|\d+W)$/';
 
     public function length(int $length): static
     {
@@ -226,6 +252,78 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
+    public function dateTime(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::DATE_TIME_PATTERN, $string, $matches)
+                && checkdate((int) $matches['month'], (int) $matches['day'], (int) $matches['year'])
+            ) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_DATE_TIME_CODE,
+                    self::ERROR_DATE_TIME_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function date(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::DATE_PATTERN, $string, $matches)
+                && checkdate((int) $matches['month'], (int) $matches['day'], (int) $matches['year'])
+            ) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_DATE_CODE,
+                    self::ERROR_DATE_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function time(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::TIME_PATTERN, $string)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_TIME_CODE,
+                    self::ERROR_TIME_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function duration(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::DURATION_PATTERN, $string)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_DURATION_CODE,
+                    self::ERROR_DURATION_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
     public function hostname(): static
     {
         return $this->postParse(static function (string $string) {
@@ -265,6 +363,25 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
+    public function idnHostname(): static
+    {
+        return $this->postParse(static function (string $string) {
+            $hostname = idn_to_ascii($string, IDNA_NONTRANSITIONAL_TO_ASCII);
+
+            if (false !== $hostname && filter_var($hostname, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_IDN_HOSTNAME_CODE,
+                    self::ERROR_IDN_HOSTNAME_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
     public function email(): static
     {
         return $this->postParse(static function (string $string) {
@@ -276,6 +393,31 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
                 new Error(
                     self::ERROR_EMAIL_CODE,
                     self::ERROR_EMAIL_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function idnEmail(): static
+    {
+        return $this->postParse(static function (string $string) {
+            $atPosition = strrpos($string, '@');
+
+            if (false !== $atPosition) {
+                $hostname = idn_to_ascii(substr($string, $atPosition + 1), IDNA_NONTRANSITIONAL_TO_ASCII);
+
+                if (false !== $hostname
+                    && filter_var(substr($string, 0, $atPosition).'@'.$hostname, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE)
+                ) {
+                    return $string;
+                }
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_IDN_EMAIL_CODE,
+                    self::ERROR_IDN_EMAIL_TEMPLATE,
                     ['given' => $string]
                 )
             );

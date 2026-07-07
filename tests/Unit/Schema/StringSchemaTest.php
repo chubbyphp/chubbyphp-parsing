@@ -33,8 +33,14 @@ final class StringSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->contains('test'));
         self::assertNotSame($schema, $schema->startsWith('test'));
         self::assertNotSame($schema, $schema->endsWith('test'));
+        self::assertNotSame($schema, $schema->dateTime());
+        self::assertNotSame($schema, $schema->date());
+        self::assertNotSame($schema, $schema->time());
+        self::assertNotSame($schema, $schema->duration());
         self::assertNotSame($schema, $schema->hostname());
+        self::assertNotSame($schema, $schema->idnHostname());
         self::assertNotSame($schema, $schema->email());
+        self::assertNotSame($schema, $schema->idnEmail());
         self::assertNotSame($schema, $schema->ipV4());
         self::assertNotSame($schema, $schema->ipV6());
         self::assertNotSame($schema, $schema->mac());
@@ -563,6 +569,322 @@ final class StringSchemaTest extends TestCase
                     'error' => [
                         'code' => 'string.email',
                         'template' => 'Invalid email {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidDateTime(): void
+    {
+        $input = '2024-01-15T12:34:56Z';
+
+        $schema = (new StringSchema())->dateTime();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidDateTimeWithFractionAndOffset(): void
+    {
+        $input = '2024-01-15t12:34:56.789+01:00';
+
+        $schema = (new StringSchema())->dateTime();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidDateTimeWithLeapDay(): void
+    {
+        $input = '2024-02-29T12:34:56Z';
+
+        $schema = (new StringSchema())->dateTime();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidDateTime(): void
+    {
+        $input = '2024-01-15 12:34:56';
+
+        $schema = (new StringSchema())->dateTime();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.dateTime',
+                        'template' => 'Invalid date-time {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidDateTimeWithInvalidCalendarDate(): void
+    {
+        $input = '2024-02-30T12:34:56Z';
+
+        $schema = (new StringSchema())->dateTime();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.dateTime',
+                        'template' => 'Invalid date-time {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidDate(): void
+    {
+        $input = '2024-01-15';
+
+        $schema = (new StringSchema())->date();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidDateWithLeapDay(): void
+    {
+        $input = '2024-02-29';
+
+        $schema = (new StringSchema())->date();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidDate(): void
+    {
+        $input = '2024-02-30';
+
+        $schema = (new StringSchema())->date();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.date',
+                        'template' => 'Invalid date {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidTime(): void
+    {
+        $input = '12:34:56Z';
+
+        $schema = (new StringSchema())->time();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidTimeWithOffset(): void
+    {
+        $input = '23:59:60+01:00';
+
+        $schema = (new StringSchema())->time();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidTime(): void
+    {
+        $input = '24:00:00Z';
+
+        $schema = (new StringSchema())->time();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.time',
+                        'template' => 'Invalid time {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidDuration(): void
+    {
+        $input = 'P1Y2M3DT4H5M6S';
+
+        $schema = (new StringSchema())->duration();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidDurationWithWeeks(): void
+    {
+        $input = 'P4W';
+
+        $schema = (new StringSchema())->duration();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidDuration(): void
+    {
+        $input = 'P';
+
+        $schema = (new StringSchema())->duration();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.duration',
+                        'template' => 'Invalid duration {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidIdnEmail(): void
+    {
+        $input = 'john.doe@bücher.example';
+
+        $schema = (new StringSchema())->idnEmail();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidIdnEmailWithSingleCharacterDomainLabel(): void
+    {
+        $input = 'john.doe@a.bücher.example';
+
+        $schema = (new StringSchema())->idnEmail();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidIdnEmailWithInvalidLocalPart(): void
+    {
+        $input = 'john doe@example.com';
+
+        $schema = (new StringSchema())->idnEmail();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.idnEmail',
+                        'template' => 'Invalid idn-email {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidIdnEmail(): void
+    {
+        $input = 'john.doe';
+
+        $schema = (new StringSchema())->idnEmail();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.idnEmail',
+                        'template' => 'Invalid idn-email {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidIdnHostname(): void
+    {
+        $input = 'bücher.example';
+
+        $schema = (new StringSchema())->idnHostname();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidIdnHostname(): void
+    {
+        $input = 'exa_mple.com';
+
+        $schema = (new StringSchema())->idnHostname();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.idnHostname',
+                        'template' => 'Invalid idn-hostname {{given}}',
                         'variables' => [
                             'given' => $input,
                         ],
