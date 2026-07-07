@@ -97,6 +97,24 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     /** @deprecated: see ERROR_URI_TEMPLATE */
     public const string ERROR_URL_TEMPLATE = 'Invalid url {{given}}';
 
+    public const string ERROR_URI_REFERENCE_CODE = 'string.uriReference';
+    public const string ERROR_URI_REFERENCE_TEMPLATE = 'Invalid uri-reference {{given}}';
+
+    public const string ERROR_IRI_CODE = 'string.iri';
+    public const string ERROR_IRI_TEMPLATE = 'Invalid iri {{given}}';
+
+    public const string ERROR_IRI_REFERENCE_CODE = 'string.iriReference';
+    public const string ERROR_IRI_REFERENCE_TEMPLATE = 'Invalid iri-reference {{given}}';
+
+    public const string ERROR_URI_TEMPLATE_CODE = 'string.uriTemplate';
+    public const string ERROR_URI_TEMPLATE_TEMPLATE = 'Invalid uri-template {{given}}';
+
+    public const string ERROR_JSON_POINTER_CODE = 'string.jsonPointer';
+    public const string ERROR_JSON_POINTER_TEMPLATE = 'Invalid json-pointer {{given}}';
+
+    public const string ERROR_RELATIVE_JSON_POINTER_CODE = 'string.relativeJsonPointer';
+    public const string ERROR_RELATIVE_JSON_POINTER_TEMPLATE = 'Invalid relative-json-pointer {{given}}';
+
     public const string ERROR_UUID_CODE = 'string.uuid';
     public const string ERROR_UUID_TEMPLATE = 'Invalid uuid {{version}} {{given}}';
 
@@ -121,6 +139,67 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     private const string TIME_PATTERN = '/^(?:[01]\d|2[0-3]):[0-5]\d:(?:[0-5]\d|60)(?:\.\d+)?(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/';
 
     private const string DURATION_PATTERN = '/^P(?:(?:\d+D|\d+M(?:\d+D)?|\d+Y(?:\d+M(?:\d+D)?)?)(?:T(?:\d+H(?:\d+M(?:\d+S)?)?|\d+M(?:\d+S)?|\d+S))?|T(?:\d+H(?:\d+M(?:\d+S)?)?|\d+M(?:\d+S)?|\d+S)|\d+W)$/';
+
+    // RFC 3986 grammar
+    private const string URI_PCT_ENCODED = '%[0-9A-Fa-f]{2}';
+
+    private const string URI_H16 = '[0-9A-Fa-f]{1,4}';
+
+    private const string URI_DEC_OCTET = '(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)';
+
+    private const string URI_IPV4 = self::URI_DEC_OCTET.'(?:\.'.self::URI_DEC_OCTET.'){3}';
+
+    private const string URI_LS32 = '(?:'.self::URI_H16.':'.self::URI_H16.'|'.self::URI_IPV4.')';
+
+    private const string URI_IPV6 = '(?:(?:'.self::URI_H16.':){6}'.self::URI_LS32
+        .'|::(?:'.self::URI_H16.':){5}'.self::URI_LS32
+        .'|'.self::URI_H16.'?::(?:'.self::URI_H16.':){4}'.self::URI_LS32
+        .'|(?:(?:'.self::URI_H16.':)?'.self::URI_H16.')?::(?:'.self::URI_H16.':){3}'.self::URI_LS32
+        .'|(?:(?:'.self::URI_H16.':){0,2}'.self::URI_H16.')?::(?:'.self::URI_H16.':){2}'.self::URI_LS32
+        .'|(?:(?:'.self::URI_H16.':){0,3}'.self::URI_H16.')?::'.self::URI_H16.':'.self::URI_LS32
+        .'|(?:(?:'.self::URI_H16.':){0,4}'.self::URI_H16.')?::'.self::URI_LS32
+        .'|(?:(?:'.self::URI_H16.':){0,5}'.self::URI_H16.')?::'.self::URI_H16
+        .'|(?:(?:'.self::URI_H16.':){0,6}'.self::URI_H16.')?::)';
+
+    private const string URI_IP_FUTURE = 'v[0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&\'()*+,;=:]+';
+
+    private const string URI_HOST = '(?:\[(?:'.self::URI_IPV6.'|'.self::URI_IP_FUTURE.')\]|'.self::URI_IPV4.'|(?:[A-Za-z0-9\-._~!$&\'()*+,;=]|'.self::URI_PCT_ENCODED.')*)';
+
+    private const string URI_AUTHORITY = '(?:(?:[A-Za-z0-9\-._~!$&\'()*+,;=:]|'.self::URI_PCT_ENCODED.')*@)?'.self::URI_HOST.'(?::\d*)?';
+
+    private const string URI_PCHAR = '(?:[A-Za-z0-9\-._~!$&\'()*+,;=:@]|'.self::URI_PCT_ENCODED.')';
+
+    private const string URI_SEGMENT_NZ_NC = '(?:[A-Za-z0-9\-._~!$&\'()*+,;=@]|'.self::URI_PCT_ENCODED.')+';
+
+    private const string URI_PATH_ABEMPTY = '(?:\/'.self::URI_PCHAR.'*)*';
+
+    private const string URI_PATH_ABSOLUTE = '\/(?:'.self::URI_PCHAR.'+(?:\/'.self::URI_PCHAR.'*)*)?';
+
+    private const string URI_PATH_ROOTLESS = self::URI_PCHAR.'+(?:\/'.self::URI_PCHAR.'*)*';
+
+    private const string URI_PATH_NOSCHEME = self::URI_SEGMENT_NZ_NC.'(?:\/'.self::URI_PCHAR.'*)*';
+
+    private const string URI_QUERY_OR_FRAGMENT = '(?:'.self::URI_PCHAR.'|[\/?])*';
+
+    private const string URI_HIER_PART = '(?:\/\/'.self::URI_AUTHORITY.self::URI_PATH_ABEMPTY.'|'.self::URI_PATH_ABSOLUTE.'|'.self::URI_PATH_ROOTLESS.')?';
+
+    private const string URI_RELATIVE_PART = '(?:\/\/'.self::URI_AUTHORITY.self::URI_PATH_ABEMPTY.'|'.self::URI_PATH_ABSOLUTE.'|'.self::URI_PATH_NOSCHEME.')?';
+
+    private const string URI_SUFFIX = '(?:\?'.self::URI_QUERY_OR_FRAGMENT.')?(?:#'.self::URI_QUERY_OR_FRAGMENT.')?';
+
+    private const string URI_PATTERN = '/^[A-Za-z][A-Za-z0-9+\-.]*:'.self::URI_HIER_PART.self::URI_SUFFIX.'$/';
+
+    private const string URI_REFERENCE_PATTERN = '/^(?:[A-Za-z][A-Za-z0-9+\-.]*:'.self::URI_HIER_PART.'|'.self::URI_RELATIVE_PART.')'.self::URI_SUFFIX.'$/';
+
+    // RFC 6570 grammar
+    private const string URI_TEMPLATE_VARSPEC = '(?:[A-Za-z0-9_]|'.self::URI_PCT_ENCODED.')(?:\.?(?:[A-Za-z0-9_]|'.self::URI_PCT_ENCODED.'))*(?::[1-9]\d{0,3}|\*)?';
+
+    private const string URI_TEMPLATE_PATTERN = '/^(?:[^\x00-\x20"\'%<>\\\^`{|}\x7F]|'.self::URI_PCT_ENCODED.'|\{[+#.\/;?&=,!@|]?'.self::URI_TEMPLATE_VARSPEC.'(?:,'.self::URI_TEMPLATE_VARSPEC.')*\})*$/u';
+
+    // RFC 6901 grammar
+    private const string JSON_POINTER_PATTERN = '/^(?:\/(?:[^\/~]|~[01])*)*$/u';
+
+    private const string RELATIVE_JSON_POINTER_PATTERN = '/^(?:0|[1-9]\d*)(?:#|(?:\/(?:[^\/~]|~[01])*)*)$/u';
 
     public function length(int $length): static
     {
@@ -593,6 +672,112 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
+    public function uriReference(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::URI_REFERENCE_PATTERN, $string)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_URI_REFERENCE_CODE,
+                    self::ERROR_URI_REFERENCE_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function iri(): static
+    {
+        return $this->postParse(static function (string $string) {
+            $uri = self::iriToUri($string);
+
+            if (null !== $uri && 1 === preg_match(self::URI_PATTERN, $uri)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_IRI_CODE,
+                    self::ERROR_IRI_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function iriReference(): static
+    {
+        return $this->postParse(static function (string $string) {
+            $uri = self::iriToUri($string);
+
+            if (null !== $uri && 1 === preg_match(self::URI_REFERENCE_PATTERN, $uri)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_IRI_REFERENCE_CODE,
+                    self::ERROR_IRI_REFERENCE_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function uriTemplate(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::URI_TEMPLATE_PATTERN, $string)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_URI_TEMPLATE_CODE,
+                    self::ERROR_URI_TEMPLATE_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function jsonPointer(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::JSON_POINTER_PATTERN, $string)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_JSON_POINTER_CODE,
+                    self::ERROR_JSON_POINTER_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
+    public function relativeJsonPointer(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (1 === preg_match(self::RELATIVE_JSON_POINTER_PATTERN, $string)) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_RELATIVE_JSON_POINTER_CODE,
+                    self::ERROR_RELATIVE_JSON_POINTER_TEMPLATE,
+                    ['given' => $string]
+                )
+            );
+        });
+    }
+
     public function uuid(Uuid $version = Uuid::v4): static
     {
         return $this->postParse(static function (string $string) use ($version) {
@@ -776,6 +961,19 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
                 self::ERROR_TYPE_TEMPLATE,
                 ['given' => $this->getDataType($input)]
             )
+        );
+    }
+
+    /**
+     * Maps an IRI to a URI by percent-encoding all non-ASCII characters (RFC 3987 section 3.1).
+     * Returns null for invalid UTF-8.
+     */
+    private static function iriToUri(string $string): ?string
+    {
+        return preg_replace_callback(
+            '/[^\x00-\x7F]/u',
+            static fn (array $matches) => rawurlencode($matches[0]),
+            $string
         );
     }
 }

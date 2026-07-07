@@ -46,6 +46,12 @@ final class StringSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->mac());
         self::assertNotSame($schema, $schema->pattern('/.*/'));
         self::assertNotSame($schema, $schema->uri());
+        self::assertNotSame($schema, $schema->uriReference());
+        self::assertNotSame($schema, $schema->iri());
+        self::assertNotSame($schema, $schema->iriReference());
+        self::assertNotSame($schema, $schema->uriTemplate());
+        self::assertNotSame($schema, $schema->jsonPointer());
+        self::assertNotSame($schema, $schema->relativeJsonPointer());
         self::assertNotSame($schema, $schema->uuid());
         self::assertNotSame($schema, $schema->trim());
         self::assertNotSame($schema, $schema->trimStart());
@@ -1242,6 +1248,330 @@ final class StringSchemaTest extends TestCase
                     'error' => [
                         'code' => 'string.url',
                         'template' => 'Invalid url {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidUriReference(): void
+    {
+        $input = 'https://example.com/path?q=1#frag';
+
+        $schema = (new StringSchema())->uriReference();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidUriReferenceWithRelativePath(): void
+    {
+        $input = 'relative/path#fragment';
+
+        $schema = (new StringSchema())->uriReference();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUriReference(): void
+    {
+        $input = '/path with space';
+
+        $schema = (new StringSchema())->uriReference();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.uriReference',
+                        'template' => 'Invalid uri-reference {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidIri(): void
+    {
+        $input = 'https://bücher.example/päth?q=münchen#frägment';
+
+        $schema = (new StringSchema())->iri();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidIriWithRelativeReference(): void
+    {
+        $input = '/relative/only';
+
+        $schema = (new StringSchema())->iri();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.iri',
+                        'template' => 'Invalid iri {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidIriWithInvalidUtf8(): void
+    {
+        $input = "https://example.com/\xC3\x28";
+
+        $schema = (new StringSchema())->iri();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.iri',
+                        'template' => 'Invalid iri {{given}}',
+                        'variables' => [
+                            'given' => "https://example.com/\u{FFFD}(",
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidIriReference(): void
+    {
+        $input = '/päth/to/bücher';
+
+        $schema = (new StringSchema())->iriReference();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidIriReference(): void
+    {
+        $input = 'häl lo';
+
+        $schema = (new StringSchema())->iriReference();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.iriReference',
+                        'template' => 'Invalid iri-reference {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidUriTemplate(): void
+    {
+        $input = 'http://example.com/dictionary/{term:1}/{term}';
+
+        $schema = (new StringSchema())->uriTemplate();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidUriTemplateWithOperatorAndExplode(): void
+    {
+        $input = '{/id*}{?fields,first_name,last.name,token}';
+
+        $schema = (new StringSchema())->uriTemplate();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUriTemplate(): void
+    {
+        $input = '/users/{id';
+
+        $schema = (new StringSchema())->uriTemplate();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.uriTemplate',
+                        'template' => 'Invalid uri-template {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidJsonPointer(): void
+    {
+        $input = '/foo/0/a~1b/a~0c';
+
+        $schema = (new StringSchema())->jsonPointer();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidJsonPointerWithEmptyString(): void
+    {
+        $input = '';
+
+        $schema = (new StringSchema())->jsonPointer();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidJsonPointer(): void
+    {
+        $input = 'foo';
+
+        $schema = (new StringSchema())->jsonPointer();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.jsonPointer',
+                        'template' => 'Invalid json-pointer {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidJsonPointerWithInvalidEscape(): void
+    {
+        $input = '/foo/~2';
+
+        $schema = (new StringSchema())->jsonPointer();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.jsonPointer',
+                        'template' => 'Invalid json-pointer {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidRelativeJsonPointer(): void
+    {
+        $input = '1/foo/bar';
+
+        $schema = (new StringSchema())->relativeJsonPointer();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidRelativeJsonPointerWithHash(): void
+    {
+        $input = '2#';
+
+        $schema = (new StringSchema())->relativeJsonPointer();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidRelativeJsonPointer(): void
+    {
+        $input = '#';
+
+        $schema = (new StringSchema())->relativeJsonPointer();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.relativeJsonPointer',
+                        'template' => 'Invalid relative-json-pointer {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidRelativeJsonPointerWithLeadingZero(): void
+    {
+        $input = '01#';
+
+        $schema = (new StringSchema())->relativeJsonPointer();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.relativeJsonPointer',
+                        'template' => 'Invalid relative-json-pointer {{given}}',
                         'variables' => [
                             'given' => $input,
                         ],

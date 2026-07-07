@@ -45,6 +45,25 @@ final class ErrorTest extends TestCase
         ], $error->jsonSerialize());
     }
 
+    public function testJsonSerializeWithInvalidUtf8(): void
+    {
+        $code = 'some.error';
+        $template = 'Invalid value {{given}}';
+        $variables = [
+            'given' => "test\xC3\x28",
+        ];
+
+        $error = new Error($code, $template, $variables);
+
+        self::assertSame([
+            'code' => 'some.error',
+            'template' => 'Invalid value {{given}}',
+            'variables' => [
+                'given' => "test\u{FFFD}(",
+            ],
+        ], $error->jsonSerialize());
+    }
+
     public function testToStringWithError(): void
     {
         $resource = fopen('php://memory', 'r');
