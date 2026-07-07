@@ -57,6 +57,11 @@ final class JsonSchemaToCodeTest extends TestCase
             '$schema = $p->string()->pattern(\'/^[a-z][a-z0-9-]*$/\');',
         ];
 
+        yield 'string: pattern with slashes' => [
+            '{"type":"string","pattern":"^/api/[a-z]+$"}',
+            '$schema = $p->string()->pattern(\'/^\/api\/[a-z]+$/\');',
+        ];
+
         yield 'string: format date' => [
             '{"type":"string","format":"date"}',
             '$schema = $p->string()->date();',
@@ -107,14 +112,44 @@ final class JsonSchemaToCodeTest extends TestCase
             '$schema = $p->string()->ipV6();',
         ];
 
+        yield 'string: format iri' => [
+            '{"type":"string","format":"iri"}',
+            '$schema = $p->string()->iri();',
+        ];
+
+        yield 'string: format iri-reference' => [
+            '{"type":"string","format":"iri-reference"}',
+            '$schema = $p->string()->iriReference();',
+        ];
+
+        yield 'string: format json-pointer' => [
+            '{"type":"string","format":"json-pointer"}',
+            '$schema = $p->string()->jsonPointer();',
+        ];
+
         yield 'string: format mac' => [
             '{"type":"string","format":"mac"}',
             '$schema = $p->string()->mac();',
         ];
 
+        yield 'string: format relative-json-pointer' => [
+            '{"type":"string","format":"relative-json-pointer"}',
+            '$schema = $p->string()->relativeJsonPointer();',
+        ];
+
         yield 'string: format uri' => [
             '{"type":"string","format":"uri"}',
             '$schema = $p->string()->uri();',
+        ];
+
+        yield 'string: format uri-reference' => [
+            '{"type":"string","format":"uri-reference"}',
+            '$schema = $p->string()->uriReference();',
+        ];
+
+        yield 'string: format uri-template' => [
+            '{"type":"string","format":"uri-template"}',
+            '$schema = $p->string()->uriTemplate();',
         ];
 
         yield 'string: format url' => [
@@ -576,5 +611,77 @@ final class JsonSchemaToCodeTest extends TestCase
             '{"type":"object","properties":{"name":{"type":"string"}},"additionalProperties":false,"required":["name"]}',
             '$schema = $p->object([\'name\' => $p->string()])->strict();',
         ];
+    }
+
+    public function testJsonSchemaToParsingCodeWithMaxDepth(): void
+    {
+        $jsonSchema = '{"type":"string","x-ignored":'.str_repeat('[', 510).'1'.str_repeat(']', 510).'}';
+
+        self::assertSame('$schema = $p->string();', (new JsonSchemaToCode())->convert($jsonSchema));
+    }
+
+    public function testJsonSchemaToParsingCodeWithTooDeepJsonSchema(): void
+    {
+        $jsonSchema = '{"type":"string","x-ignored":'.str_repeat('[', 511).'1'.str_repeat(']', 511).'}';
+
+        $this->expectException(\JsonException::class);
+
+        (new JsonSchemaToCode())->convert($jsonSchema);
+    }
+
+    public function testJsonSchemaToParsingCodeWithNonObjectJsonSchema(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Json schema must decode to an object');
+
+        (new JsonSchemaToCode())->convert('"string"');
+    }
+
+    public function testJsonSchemaToParsingCodeWithUnknownType(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported type "unknown"');
+
+        (new JsonSchemaToCode())->convert('{"type":"unknown"}');
+    }
+
+    public function testJsonSchemaToParsingCodeWithNonStringType(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported type "integer"');
+
+        (new JsonSchemaToCode())->convert('{"type":1}');
+    }
+
+    public function testJsonSchemaToParsingCodeWithArrayWithoutItemsAndPrefixItems(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Type "array" requires one of: items, prefixItems');
+
+        (new JsonSchemaToCode())->convert('{"type":"array"}');
+    }
+
+    public function testJsonSchemaToParsingCodeWithUnknownFormat(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported format "unknown"');
+
+        (new JsonSchemaToCode())->convert('{"type":"string","format":"unknown"}');
+    }
+
+    public function testJsonSchemaToParsingCodeWithNumericPropertyName(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported numeric property name "0"');
+
+        (new JsonSchemaToCode())->convert('{"type":"object","properties":{"0":{"type":"string"}}}');
+    }
+
+    public function testJsonSchemaToParsingCodeWithNonNumericMinimum(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keyword "minimum" must be a number');
+
+        (new JsonSchemaToCode())->convert('{"type":"number","minimum":"0"}');
     }
 }

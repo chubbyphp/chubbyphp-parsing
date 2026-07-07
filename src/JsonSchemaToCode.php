@@ -92,9 +92,15 @@ final class JsonSchemaToCode
         'idn-hostname' => 'idnHostname',
         'ipv4' => 'ipV4',
         'ipv6' => 'ipV6',
+        'iri' => 'iri',
+        'iri-reference' => 'iriReference',
+        'json-pointer' => 'jsonPointer',
         'mac' => 'mac',
+        'relative-json-pointer' => 'relativeJsonPointer',
         'time' => 'time',
         'uri' => 'uri',
+        'uri-reference' => 'uriReference',
+        'uri-template' => 'uriTemplate',
         'url' => 'url',
         'uuid' => 'uuid',
     ];
@@ -163,7 +169,10 @@ final class JsonSchemaToCode
         $fields = [];
         $optional = [];
         foreach ($this->subSchema($schema['properties'] ?? [], 'properties') as $fieldName => $fieldSchema) {
-            $fieldName = (string) $fieldName;
+            if (!\is_string($fieldName)) {
+                throw new \InvalidArgumentException(\sprintf('Unsupported numeric property name "%s"', $fieldName));
+            }
+
             $fields[] = new ArrayItem(
                 $this->convertSchema($this->subSchema($fieldSchema, 'properties')),
                 new String_($fieldName)
@@ -209,7 +218,7 @@ final class JsonSchemaToCode
             $arg = $factory['list']
                 ? new Array_(array_map(
                     fn (mixed $itemSchema) => new ArrayItem($this->convertSchema($this->subSchema($itemSchema, $keyword))),
-                    array_values($subSchema)
+                    $subSchema
                 ))
                 : $this->convertSchema($subSchema);
 
