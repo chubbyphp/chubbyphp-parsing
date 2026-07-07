@@ -16,12 +16,6 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
     public const string ERROR_UNKNOWN_FIELD_CODE = 'abstract_object.unknownField';
     public const string ERROR_UNKNOWN_FIELD_TEMPLATE = 'Unknown field {{fieldName}}';
 
-    public const string ERROR_MIN_PROPERTIES_CODE = 'abstract_object.minProperties';
-    public const string ERROR_MIN_PROPERTIES_TEMPLATE = 'Properties should be minimum {{minProperties}}, {{given}} given';
-
-    public const string ERROR_MAX_PROPERTIES_CODE = 'abstract_object.maxProperties';
-    public const string ERROR_MAX_PROPERTIES_TEMPLATE = 'Properties should be maximum {{maxProperties}}, {{given}} given';
-
     /**
      * @var array<string, SchemaInterface>
      */
@@ -36,10 +30,6 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
      * @var null|array<string>
      */
     private ?array $optional = null;
-
-    private ?int $minProperties = null;
-
-    private ?int $maxProperties = null;
 
     /**
      * @param array<mixed, mixed> $fieldToSchema
@@ -120,22 +110,6 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
         return $clone;
     }
 
-    final public function minProperties(int $minProperties): static
-    {
-        $clone = clone $this;
-        $clone->minProperties = $minProperties;
-
-        return $clone;
-    }
-
-    final public function maxProperties(int $maxProperties): static
-    {
-        $clone = clone $this;
-        $clone->maxProperties = $maxProperties;
-
-        return $clone;
-    }
-
     protected function innerParse(mixed $input): mixed
     {
         if (!\is_array($input)) {
@@ -149,8 +123,6 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
         }
 
         /** @var array<string, mixed> $input */
-        $this->propertiesCount($input);
-
         $childrenErrors = new Errors();
 
         $this->unknownFields($input, $childrenErrors);
@@ -177,34 +149,6 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
         return !\array_key_exists($fieldName, $input)
             && \is_array($this->optional)
             && \in_array($fieldName, $this->optional, true);
-    }
-
-    /**
-     * @param array<string, mixed> $input
-     */
-    private function propertiesCount(array $input): void
-    {
-        $propertiesCount = \count($input);
-
-        if (null !== $this->minProperties && $propertiesCount < $this->minProperties) {
-            throw new ErrorsException(
-                new Error(
-                    static::ERROR_MIN_PROPERTIES_CODE,
-                    static::ERROR_MIN_PROPERTIES_TEMPLATE,
-                    ['minProperties' => $this->minProperties, 'given' => $propertiesCount]
-                )
-            );
-        }
-
-        if (null !== $this->maxProperties && $propertiesCount > $this->maxProperties) {
-            throw new ErrorsException(
-                new Error(
-                    static::ERROR_MAX_PROPERTIES_CODE,
-                    static::ERROR_MAX_PROPERTIES_TEMPLATE,
-                    ['maxProperties' => $this->maxProperties, 'given' => $propertiesCount]
-                )
-            );
-        }
     }
 
     /**

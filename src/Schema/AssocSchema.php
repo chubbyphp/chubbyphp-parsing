@@ -11,8 +11,6 @@ final class AssocSchema extends AbstractObjectSchema implements ObjectSchemaInte
 {
     public const string ERROR_TYPE_CODE = 'assoc.type';
     public const string ERROR_UNKNOWN_FIELD_CODE = 'assoc.unknownField';
-    public const string ERROR_MIN_PROPERTIES_CODE = 'assoc.minProperties';
-    public const string ERROR_MAX_PROPERTIES_CODE = 'assoc.maxProperties';
 
     /**
      * @param array<string, mixed> $input

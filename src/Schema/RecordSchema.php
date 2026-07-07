@@ -19,10 +19,6 @@ final class RecordSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_MAX_PROPERTIES_CODE = 'record.maxProperties';
     public const string ERROR_MAX_PROPERTIES_TEMPLATE = 'Properties should be maximum {{maxProperties}}, {{given}} given';
 
-    private ?int $minProperties = null;
-
-    private ?int $maxProperties = null;
-
     public function __construct(private SchemaInterface $fieldSchema)
     {
         $this->preParses[] = static function (mixed $input) {
@@ -40,18 +36,40 @@ final class RecordSchema extends AbstractSchemaInnerParse implements SchemaInter
 
     public function minProperties(int $minProperties): static
     {
-        $clone = clone $this;
-        $clone->minProperties = $minProperties;
+        return $this->postParse(static function (array $record) use ($minProperties) {
+            $propertiesCount = \count($record);
 
-        return $clone;
+            if ($propertiesCount >= $minProperties) {
+                return $record;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MIN_PROPERTIES_CODE,
+                    self::ERROR_MIN_PROPERTIES_TEMPLATE,
+                    ['minProperties' => $minProperties, 'given' => $propertiesCount]
+                )
+            );
+        });
     }
 
     public function maxProperties(int $maxProperties): static
     {
-        $clone = clone $this;
-        $clone->maxProperties = $maxProperties;
+        return $this->postParse(static function (array $record) use ($maxProperties) {
+            $propertiesCount = \count($record);
 
-        return $clone;
+            if ($propertiesCount <= $maxProperties) {
+                return $record;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_MAX_PROPERTIES_CODE,
+                    self::ERROR_MAX_PROPERTIES_TEMPLATE,
+                    ['maxProperties' => $maxProperties, 'given' => $propertiesCount]
+                )
+            );
+        });
     }
 
     protected function innerParse(mixed $input): mixed
@@ -65,8 +83,6 @@ final class RecordSchema extends AbstractSchemaInnerParse implements SchemaInter
                 )
             );
         }
-
-        $this->propertiesCount($input);
 
         $output = [];
 
@@ -85,33 +101,5 @@ final class RecordSchema extends AbstractSchemaInnerParse implements SchemaInter
         }
 
         return $output;
-    }
-
-    /**
-     * @param array<mixed> $input
-     */
-    private function propertiesCount(array $input): void
-    {
-        $propertiesCount = \count($input);
-
-        if (null !== $this->minProperties && $propertiesCount < $this->minProperties) {
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_MIN_PROPERTIES_CODE,
-                    self::ERROR_MIN_PROPERTIES_TEMPLATE,
-                    ['minProperties' => $this->minProperties, 'given' => $propertiesCount]
-                )
-            );
-        }
-
-        if (null !== $this->maxProperties && $propertiesCount > $this->maxProperties) {
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_MAX_PROPERTIES_CODE,
-                    self::ERROR_MAX_PROPERTIES_TEMPLATE,
-                    ['maxProperties' => $this->maxProperties, 'given' => $propertiesCount]
-                )
-            );
-        }
     }
 }

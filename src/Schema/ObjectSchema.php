@@ -11,8 +11,6 @@ final class ObjectSchema extends AbstractObjectSchema implements ObjectSchemaInt
 {
     public const string ERROR_TYPE_CODE = 'object.type';
     public const string ERROR_UNKNOWN_FIELD_CODE = 'object.unknownField';
-    public const string ERROR_MIN_PROPERTIES_CODE = 'object.minProperties';
-    public const string ERROR_MAX_PROPERTIES_CODE = 'object.maxProperties';
 
     /**
      * @param array<mixed, mixed> $fieldToSchema
