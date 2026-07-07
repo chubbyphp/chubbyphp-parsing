@@ -50,6 +50,12 @@ $schema->ipV4();          // Valid IPv4 address
 $schema->ipV6();          // Valid IPv6 address
 $schema->mac();           // Valid mac address
 $schema->uri();           // Valid URI
+$schema->uriReference();          // Valid URI or relative reference, example: '/path?q=1#frag'
+$schema->iri();                   // Valid internationalized URI, example: 'https://bücher.example/päth'
+$schema->iriReference();          // Valid internationalized URI or relative reference, example: '/päth'
+$schema->uriTemplate();           // Valid URI template, example: '/users/{id}'
+$schema->jsonPointer();           // Valid JSON pointer, example: '/foo/0/bar'
+$schema->relativeJsonPointer();   // Valid relative JSON pointer, example: '1/foo/bar'
 $schema->uuid();          // Valid UUID v4
 $schema->uuid(Uuid::v5);  // Valid UUID v5
 ```
@@ -147,6 +153,12 @@ $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 | `string.mac` | Invalid mac format |
 | `string.pattern` | String doesn't match the pattern |
 | `string.uri` | Invalid URI format |
+| `string.uriReference` | Invalid URI reference format |
+| `string.iri` | Invalid internationalized URI format |
+| `string.iriReference` | Invalid internationalized URI reference format |
+| `string.uriTemplate` | Invalid URI template format |
+| `string.jsonPointer` | Invalid JSON pointer format |
+| `string.relativeJsonPointer` | Invalid relative JSON pointer format |
 | `string.uuidV4` | Invalid UUID v4 format |
 | `string.uuidV5` | Invalid UUID v5 format |
 | `string.bool` | Cannot convert string to bool (for `toBool()`) |
