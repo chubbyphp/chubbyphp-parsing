@@ -311,6 +311,10 @@ final class FloatSchema extends AbstractSchemaInnerParse implements SchemaInterf
             return $input;
         }
 
+        if (\is_int($input)) {
+            return (float) $input;
+        }
+
         throw new ErrorsException(
             new Error(
                 self::ERROR_TYPE_CODE,
