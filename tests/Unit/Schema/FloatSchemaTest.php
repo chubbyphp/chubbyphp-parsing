@@ -41,6 +41,15 @@ final class FloatSchemaTest extends TestCase
         self::assertSame($input, $schema->parse($input));
     }
 
+    public function testParseSuccessWithInt(): void
+    {
+        $input = 1;
+
+        $schema = new FloatSchema();
+
+        self::assertSame(1.0, $schema->parse($input));
+    }
+
     public function testParseSuccessWithDefault(): void
     {
         $input1 = 1.5;
@@ -185,6 +194,44 @@ final class FloatSchemaTest extends TestCase
                         'variables' => [
                             'minimum' => $minimum,
                             'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidMinimumWithInt(): void
+    {
+        $input = 4;
+        $minimum = 4.0;
+
+        $schema = (new FloatSchema())->minimum($minimum);
+
+        self::assertSame(4.0, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMinimumWithInt(): void
+    {
+        $input = 4;
+        $minimum = 4.1;
+
+        $schema = (new FloatSchema())->minimum($minimum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'float.minimum',
+                        'template' => 'Value should be minimum {{minimum}}, {{given}} given',
+                        'variables' => [
+                            'minimum' => $minimum,
+                            'given' => 4,
                         ],
                     ],
                 ],
@@ -404,6 +451,16 @@ final class FloatSchemaTest extends TestCase
                 ],
             ], $errorsException->errors->jsonSerialize());
         }
+    }
+
+    public function testParseWithValidMultipleOfWithInt(): void
+    {
+        $input = 3;
+        $multipleOf = 0.5;
+
+        $schema = (new FloatSchema())->multipleOf($multipleOf);
+
+        self::assertSame(3.0, $schema->parse($input));
     }
 
     public function testMultipleOfWithInvalidMultipleOf(): void
@@ -884,6 +941,15 @@ final class FloatSchemaTest extends TestCase
         $schema = (new FloatSchema())->toInt()->gte(4);
 
         self::assertSame((int) $input, $schema->parse($input));
+    }
+
+    public function testParseWithValidToIntWithInt(): void
+    {
+        $input = 4;
+
+        $schema = (new FloatSchema())->toInt();
+
+        self::assertSame($input, $schema->parse($input));
     }
 
     public function testParseWithToIntNullable(): void
