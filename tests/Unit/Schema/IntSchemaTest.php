@@ -41,6 +41,102 @@ final class IntSchemaTest extends TestCase
         self::assertSame($input, $schema->parse($input));
     }
 
+    public function testParseSuccessWithIntegralFloat(): void
+    {
+        $input = 1.0;
+
+        $schema = new IntSchema();
+
+        self::assertSame(1, $schema->parse($input));
+    }
+
+    public function testParseFailedWithFractionalFloat(): void
+    {
+        $input = 1.5;
+
+        $schema = new IntSchema();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", {{given}} given',
+                        'variables' => [
+                            'given' => 'double',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithOutOfRangeFloat(): void
+    {
+        $input = 1.0e20;
+
+        $schema = new IntSchema();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", {{given}} given',
+                        'variables' => [
+                            'given' => 'double',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseSuccessWithIntegralFloatAtIntMin(): void
+    {
+        $input = (float) PHP_INT_MIN;
+
+        $schema = new IntSchema();
+
+        self::assertSame(PHP_INT_MIN, $schema->parse($input));
+    }
+
+    public function testParseFailedWithIntegralFloatAtIntMax(): void
+    {
+        $input = (float) PHP_INT_MAX;
+
+        $schema = new IntSchema();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", {{given}} given',
+                        'variables' => [
+                            'given' => 'double',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseSuccessWithDefault(): void
     {
         $input1 = 1;
@@ -184,6 +280,44 @@ final class IntSchemaTest extends TestCase
                         'variables' => [
                             'minimum' => $minimum,
                             'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidMinimumWithIntegralFloat(): void
+    {
+        $input = 4.0;
+        $minimum = 4;
+
+        $schema = (new IntSchema())->minimum($minimum);
+
+        self::assertSame(4, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMinimumWithIntegralFloat(): void
+    {
+        $input = 4.0;
+        $minimum = 5;
+
+        $schema = (new IntSchema())->minimum($minimum);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.minimum',
+                        'template' => 'Value should be minimum {{minimum}}, {{given}} given',
+                        'variables' => [
+                            'minimum' => $minimum,
+                            'given' => 4,
                         ],
                     ],
                 ],
@@ -403,6 +537,16 @@ final class IntSchemaTest extends TestCase
                 ],
             ], $errorsException->errors->jsonSerialize());
         }
+    }
+
+    public function testParseWithValidMultipleOfWithIntegralFloat(): void
+    {
+        $input = 6.0;
+        $multipleOf = 3;
+
+        $schema = (new IntSchema())->multipleOf($multipleOf);
+
+        self::assertSame(6, $schema->parse($input));
     }
 
     public function testMultipleOfWithInvalidMultipleOf(): void
