@@ -299,11 +299,7 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
             return $input;
         }
 
-        if (\is_float($input)
-            && $input >= (float) PHP_INT_MIN
-            && $input < (float) PHP_INT_MAX
-            && (float) (int) $input === $input
-        ) {
+        if (\is_float($input) && $this->isConvertibleToInt($input)) {
             return (int) $input;
         }
 
@@ -314,5 +310,12 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
                 ['given' => $this->getDataType($input)]
             )
         );
+    }
+
+    private function isConvertibleToInt(float $input): bool
+    {
+        return $input >= PHP_INT_MIN
+            && $input < PHP_INT_MAX
+            && (float) (int) $input === $input;
     }
 }

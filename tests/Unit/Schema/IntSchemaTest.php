@@ -102,6 +102,32 @@ final class IntSchemaTest extends TestCase
         }
     }
 
+    public function testParseFailedWithOutOfRangeNegativeFloat(): void
+    {
+        $input = -1.0e20;
+
+        $schema = new IntSchema();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", {{given}} given',
+                        'variables' => [
+                            'given' => 'double',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testParseSuccessWithIntegralFloatAtIntMin(): void
     {
         $input = (float) PHP_INT_MIN;
