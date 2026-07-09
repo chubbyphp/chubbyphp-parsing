@@ -316,6 +316,6 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
     {
         return $input >= PHP_INT_MIN
             && $input < PHP_INT_MAX
-            && (float) (int) $input === $input;
+            && 0.0 === fmod($input, 1.0);
     }
 }
