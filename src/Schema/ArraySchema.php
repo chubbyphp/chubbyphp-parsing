@@ -189,33 +189,38 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
         });
     }
 
+    /**
+     * The given $contains can be a literal value or a schema. If it is a schema (json schema
+     * spec), at least one item has to be valid against it, otherwise at least one item has to
+     * be equal to the literal value ($strict defines whether the comparison is strict or not).
+     */
     public function contains(mixed $contains, bool $strict = true): static
     {
         return $this->postParse(static function (array $array) use ($contains, $strict) {
-            if (!\in_array($contains, $array, $strict)) {
-                throw new ErrorsException(
-                    new Error(
-                        self::ERROR_CONTAINS_CODE,
-                        self::ERROR_CONTAINS_TEMPLATE,
-                        ['contains' => $contains, 'given' => $array]
-                    )
-                );
+            if (self::containsCount($array, $contains, $strict) > 0) {
+                return $array;
             }
 
-            return $array;
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_CONTAINS_CODE,
+                    self::ERROR_CONTAINS_TEMPLATE,
+                    ['contains' => self::containsVariable($contains), 'given' => $array]
+                )
+            );
         });
     }
 
+    /**
+     * The given $contains can be a literal value or a schema. If it is a schema (json schema
+     * spec), at least $minContains items have to be valid against it, otherwise at least
+     * $minContains items have to be equal to the literal value ($strict defines whether the
+     * comparison is strict or not).
+     */
     public function minContains(mixed $contains, int $minContains, bool $strict = true): static
     {
         return $this->postParse(static function (array $array) use ($contains, $minContains, $strict) {
-            $containsCount = 0;
-
-            foreach ($array as $value) {
-                if (($strict && $value === $contains) || (!$strict && $value == $contains)) {
-                    ++$containsCount;
-                }
-            }
+            $containsCount = self::containsCount($array, $contains, $strict);
 
             if ($containsCount < $minContains) {
                 throw new ErrorsException(
@@ -223,7 +228,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
                         self::ERROR_MIN_CONTAINS_CODE,
                         self::ERROR_MIN_CONTAINS_TEMPLATE,
                         [
-                            'contains' => $contains,
+                            'contains' => self::containsVariable($contains),
                             'containsCount' => $containsCount,
                             'given' => $array,
                             'minContains' => $minContains,
@@ -236,16 +241,16 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
         });
     }
 
+    /**
+     * The given $contains can be a literal value or a schema. If it is a schema (json schema
+     * spec), at most $maxContains items have to be valid against it, otherwise at most
+     * $maxContains items have to be equal to the literal value ($strict defines whether the
+     * comparison is strict or not).
+     */
     public function maxContains(mixed $contains, int $maxContains, bool $strict = true): static
     {
         return $this->postParse(static function (array $array) use ($contains, $maxContains, $strict) {
-            $containsCount = 0;
-
-            foreach ($array as $value) {
-                if (($strict && $value === $contains) || (!$strict && $value == $contains)) {
-                    ++$containsCount;
-                }
-            }
+            $containsCount = self::containsCount($array, $contains, $strict);
 
             if ($containsCount > $maxContains) {
                 throw new ErrorsException(
@@ -253,7 +258,7 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
                         self::ERROR_MAX_CONTAINS_CODE,
                         self::ERROR_MAX_CONTAINS_TEMPLATE,
                         [
-                            'contains' => $contains,
+                            'contains' => self::containsVariable($contains),
                             'containsCount' => $containsCount,
                             'given' => $array,
                             'maxContains' => $maxContains,
@@ -288,21 +293,34 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
         });
     }
 
+    /**
+     * Uniqueness is based on json (schema spec) equality: numbers with the same mathematical
+     * value (1 and 1.0) are equal, while 1, "1" and true are not. Lists are equal if the items
+     * at each position are equal, objects (associative arrays) if they have the same property
+     * names with equal values, independent of the property order.
+     */
     public function uniqueItems(): static
     {
         return $this->postParse(static function (array $array) {
-            $uniqueArray = array_unique($array);
+            $duplicateKeys = [];
 
-            if (\count($uniqueArray) === \count($array)) {
-                return $array;
+            $seenHashes = [];
+
+            foreach ($array as $key => $item) {
+                $hash = self::jsonHash($item);
+
+                if (isset($seenHashes[$hash])) {
+                    $duplicateKeys[] = $key;
+
+                    continue;
+                }
+
+                $seenHashes[$hash] = $hash;
             }
 
-            $duplicateKeys = array_values(
-                array_diff(
-                    array_keys($array),
-                    array_keys($uniqueArray)
-                )
-            );
+            if ([] === $duplicateKeys) {
+                return $array;
+            }
 
             throw new ErrorsException(
                 new Error(
@@ -385,5 +403,72 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
         }
 
         return $output;
+    }
+
+    /**
+     * If $contains is a schema, the items valid against it are counted (json schema spec),
+     * otherwise the items equal to the literal value.
+     *
+     * @param array<mixed> $array
+     */
+    private static function containsCount(array $array, mixed $contains, bool $strict): int
+    {
+        $containsCount = 0;
+
+        foreach ($array as $item) {
+            if (self::itemMatches($item, $contains, $strict)) {
+                ++$containsCount;
+            }
+        }
+
+        return $containsCount;
+    }
+
+    private static function itemMatches(mixed $item, mixed $contains, bool $strict): bool
+    {
+        if ($contains instanceof SchemaInterface) {
+            return $contains->safeParse($item)->success;
+        }
+
+        return $strict ? $item === $contains : $item == $contains;
+    }
+
+    private static function containsVariable(mixed $contains): mixed
+    {
+        return $contains instanceof SchemaInterface ? $contains::class : $contains;
+    }
+
+    /**
+     * Creates a canonical hash based on json (schema spec) equality.
+     */
+    private static function jsonHash(mixed $value): string
+    {
+        return serialize(self::normalizeJson($value));
+    }
+
+    /**
+     * Normalizes a value so that json (schema spec) equal values share the same
+     * representation: integral floats within the json safe integer range (2 ** 53, same as
+     * Number.MAX_SAFE_INTEGER) are equal to their integer counterpart (1.0 equals 1),
+     * objects (associative arrays) are sorted by their property names, as the property
+     * order does not matter.
+     */
+    private static function normalizeJson(mixed $value): mixed
+    {
+        if (\is_float($value) && abs($value) <= 2 ** 53 && 0.0 === fmod($value, 1.0)) {
+            return (int) $value;
+        }
+
+        if (\is_object($value)) {
+            $value = (array) $value;
+        }
+
+        if (\is_array($value)) {
+            ksort($value);
+
+            return array_map(self::normalizeJson(...), $value);
+        }
+
+        return $value;
     }
 }

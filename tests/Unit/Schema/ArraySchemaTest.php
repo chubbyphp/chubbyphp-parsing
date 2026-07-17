@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ErrorsException;
+use Chubbyphp\Parsing\Schema\AbstractSchemaInnerParse;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
+use Chubbyphp\Parsing\Schema\ObjectSchema;
+use Chubbyphp\Parsing\Schema\RecordSchema;
+use Chubbyphp\Parsing\Schema\SchemaInterface;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use PHPUnit\Framework\TestCase;
 
@@ -991,6 +995,373 @@ final class ArraySchemaTest extends TestCase
         }
     }
 
+    public function testParseWithValidContainsSchema(): void
+    {
+        $input = [1, 2, 3];
+
+        $schema = (new ArraySchema(new IntSchema()))->contains((new IntSchema())->gt(2));
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidContainsSchema(): void
+    {
+        $input = [1, 2, 3];
+
+        $schema = (new ArraySchema(new IntSchema()))->contains((new IntSchema())->gt(3));
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.contains',
+                            'template' => '{{given}} does not contain {{contains}}',
+                            'variables' => [
+                                'contains' => IntSchema::class,
+                                'given' => $input,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithValidMinContainsSchema(): void
+    {
+        $input = [1, 2, 3, 4];
+
+        $schema = (new ArraySchema(new IntSchema()))->minContains((new IntSchema())->gte(2), 3);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMinContainsSchema(): void
+    {
+        $input = [1, 2, 3, 4];
+
+        $schema = (new ArraySchema(new IntSchema()))->minContains((new IntSchema())->gte(3), 3);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.minContains',
+                            'template' => '{{given}} contains {{contains}} {{containsCount}} times, min {{minContains}} required',
+                            'variables' => [
+                                'contains' => IntSchema::class,
+                                'containsCount' => 2,
+                                'given' => $input,
+                                'minContains' => 3,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithValidMaxContainsSchema(): void
+    {
+        $input = [1, 2, 3, 4];
+
+        $schema = (new ArraySchema(new IntSchema()))->maxContains((new IntSchema())->gte(3), 2);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMaxContainsSchema(): void
+    {
+        $input = [1, 2, 3, 4];
+
+        $schema = (new ArraySchema(new IntSchema()))->maxContains((new IntSchema())->gte(2), 2);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.maxContains',
+                            'template' => '{{given}} contains {{contains}} {{containsCount}} times, max {{maxContains}} allowed',
+                            'variables' => [
+                                'contains' => IntSchema::class,
+                                'containsCount' => 3,
+                                'given' => $input,
+                                'maxContains' => 2,
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithValidUniqueItemsWithScalarsOfDifferentTypes(): void
+    {
+        $input = [1, '1', 1.5, '1.5', true, false, null, [1], ['1'], ['a' => 1]];
+
+        $schema = (new ArraySchema($this->identitySchema()))->uniqueItems();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUniqueItemsWithIntAndFloatOfSameMathematicalValue(): void
+    {
+        $input = [1, '1', 1.0];
+
+        $schema = (new ArraySchema($this->identitySchema()))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            // assertEquals: 1.0 may be serialized as 1 depending on the serialize_precision ini setting
+            self::assertEquals([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [2],
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidUniqueItemsWithIntAndFloatBeyondSafeIntegerRange(): void
+    {
+        // 2 ** 53 + 2: the float is beyond the json safe integer range (2 ** 53),
+        // so it is not unified with its integer counterpart even though it is integral
+        $input = [9007199254740994, 9007199254740994.0];
+
+        $schema = (new ArraySchema($this->identitySchema()))->uniqueItems();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUniqueItemsWithMaxSafeIntAndFloat(): void
+    {
+        // 2 ** 53: same mathematical value, both within the json safe integer range
+        $input = [9007199254740992, 9007199254740992.0];
+
+        $schema = (new ArraySchema($this->identitySchema()))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            // assertEquals: 9007199254740992.0 may be serialized as 9007199254740992 depending on the serialize_precision ini setting
+            self::assertEquals([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [1],
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithValidUniqueItemsWithNestedLists(): void
+    {
+        $input = [[1, 2], [2, 1], [1, 2, 3]];
+
+        $schema = (new ArraySchema(new ArraySchema(new IntSchema())))->uniqueItems();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidUniqueItemsWithNestedLists(): void
+    {
+        $input = [[1, 2], [2, 1], [1, 2]];
+
+        $schema = (new ArraySchema(new ArraySchema(new IntSchema())))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [2],
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidUniqueItemsWithRecordsOfDifferentPropertyOrder(): void
+    {
+        $input = [['a' => 1, 'b' => 2], ['b' => 2, 'a' => 1]];
+
+        $schema = (new ArraySchema(new RecordSchema(new IntSchema())))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [1],
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidUniqueItemsWithObjects(): void
+    {
+        $input = [['a' => 1], ['a' => 1]];
+
+        $schema = (new ArraySchema(new ObjectSchema(['a' => new IntSchema()])))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [1],
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidUniqueItemsWithNestedRecordsOfDifferentPropertyOrder(): void
+    {
+        $input = [
+            ['a' => 1, 'b' => ['x' => 1, 'y' => 2]],
+            ['b' => ['y' => 2, 'x' => 1], 'a' => 1],
+        ];
+
+        $schema = (new ArraySchema($this->identitySchema()))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [1],
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidUniqueItemsWithEqualRecordAndObject(): void
+    {
+        $input = [['a' => 1], (object) ['a' => 1]];
+
+        $schema = (new ArraySchema($this->identitySchema()))->uniqueItems();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'array.uniqueItems',
+                        'template' => 'Duplicate keys {{duplicateKeys}}, {{given}} given',
+                        'variables' => [
+                            'duplicateKeys' => [1],
+                            'given' => [['a' => 1], ['a' => 1]],
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseWithInvalidUniqueItemsWithResources(): void
+    {
+        $resource1 = fopen('php://memory', 'r');
+        $resource2 = fopen('php://memory', 'r');
+
+        self::assertNotFalse($resource1);
+        self::assertNotFalse($resource2);
+
+        $schema = (new ArraySchema($this->identitySchema()))->uniqueItems();
+
+        try {
+            $schema->parse([$resource1, $resource2]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame('Duplicate keys [1], <cannot_be_encoded> given', (string) $errorsException->errors);
+        } finally {
+            fclose($resource1);
+            fclose($resource2);
+        }
+    }
+
     public function testParseWithFilter(): void
     {
         $input = [1, 2, 3, 4, 5];
@@ -1036,5 +1407,15 @@ final class ArraySchemaTest extends TestCase
         $schema = (new ArraySchema(new IntSchema()))->reduce(static fn (int $sum, int $current) => $sum + $current, 0);
 
         self::assertSame(array_sum($input), $schema->parse($input));
+    }
+
+    private function identitySchema(): SchemaInterface
+    {
+        return new class extends AbstractSchemaInnerParse {
+            protected function innerParse(mixed $input): mixed
+            {
+                return $input;
+            }
+        };
     }
 }

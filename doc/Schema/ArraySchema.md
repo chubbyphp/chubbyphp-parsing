@@ -26,10 +26,31 @@ $schema->maxItems(10);   // At most 10 items
 
 ### Content Check
 
+`contains`, `minContains` and `maxContains` accept either a literal value or a schema.
+
+With a literal value, items are compared strictly by default (`===`). Pass `false` as the last
+argument to compare loosely (`==`):
+
 ```php
 $schema->contains(5); // Array must contain value 5
 $schema->minContains(5, 2); // Value 5 must appear at least twice
 $schema->maxContains(5, 2); // Value 5 may appear at most twice
+```
+
+With a schema (json schema spec), the items valid against that schema are counted:
+
+```php
+$schema->contains($p->int()->gt(5)); // At least one item must be an int greater than 5
+$schema->minContains($p->int()->gt(5), 2); // At least two items must be ints greater than 5
+$schema->maxContains($p->int()->gt(5), 2); // At most two items may be ints greater than 5
+```
+
+Uniqueness follows json (schema spec) equality: numbers with the same mathematical value
+(`1` and `1.0`) are equal, while `1`, `"1"` and `true` are not. Lists are equal if the items
+at each position are equal, objects (associative arrays) if they have the same property names
+with equal values, independent of the property order.
+
+```php
 $schema->uniqueItems(); // Array must contain unique items
 ```
 
@@ -153,8 +174,9 @@ $matrixSchema->parse([
 | `array.exactItems` | Array items count doesn't match exact count |
 | `array.minItems` | Array has fewer items than minimum |
 | `array.maxItems` | Array has more items than maximum |
-| `array.contains` | Array doesn't contain required value |
-| `array.minContains` | Array contains a value less often than required |
-| `array.maxContains` | Array contains a value more often than allowed |
+| `array.contains` | Array doesn't contain required value or an item valid against the given schema |
+| `array.minContains` | Array contains a value or schema-matching items less often than required |
+| `array.maxContains` | Array contains a value or schema-matching items more often than allowed |
+| `array.uniqueItems` | Array contains duplicate items (json equality) |
 
 Item-level errors will include the array index in the error path (e.g., `items.0`, `items.1`).
