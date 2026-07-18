@@ -63,6 +63,20 @@ final class ConstSchemaTest extends TestCase
         self::assertSame($input, $schema->parse($input));
     }
 
+    public function testParseSuccessWithIntConstAndFloatInput(): void
+    {
+        $schema = new ConstSchema(1);
+
+        self::assertSame(1.0, $schema->parse(1.0));
+    }
+
+    public function testParseSuccessWithFloatConstAndIntInput(): void
+    {
+        $schema = new ConstSchema(1.0);
+
+        self::assertSame(1, $schema->parse(1));
+    }
+
     public function testParseSuccessWithDefault(): void
     {
         $input = 'test';
@@ -196,6 +210,81 @@ final class ConstSchemaTest extends TestCase
                         'variables' => [
                             'expected' => true,
                             'given' => false,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithStringConstAndIntInput(): void
+    {
+        $schema = new ConstSchema('1');
+
+        try {
+            $schema->parse(1);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'const.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => '1',
+                            'given' => 1,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithBoolConstAndIntInput(): void
+    {
+        $schema = new ConstSchema(true);
+
+        try {
+            $schema->parse(1);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'const.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => true,
+                            'given' => 1,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithIntConstAndStringInput(): void
+    {
+        $schema = new ConstSchema(1);
+
+        try {
+            $schema->parse('1');
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'const.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => 1,
+                            'given' => '1',
                         ],
                     ],
                 ],

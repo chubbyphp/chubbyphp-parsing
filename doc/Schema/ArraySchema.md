@@ -28,8 +28,11 @@ $schema->maxItems(10);   // At most 10 items
 
 `contains`, `minContains` and `maxContains` accept either a literal value or a schema.
 
-With a literal value, items are compared strictly by default (`===`). Pass `false` as the last
-argument to compare loosely (`==`):
+With a literal value, items are compared strictly by default, following json (schema spec)
+equality: numbers with the same mathematical value (`1` and `1.0`) are equal, while `1`,
+`"1"` and `true` are not, and objects (associative arrays) are equal independent of the
+property order. Object instances are compared by identity. Pass `false` as the last argument
+to compare loosely (`==`):
 
 ```php
 $schema->contains(5); // Array must contain value 5

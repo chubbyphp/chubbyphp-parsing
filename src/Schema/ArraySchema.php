@@ -192,7 +192,10 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     /**
      * The given $contains can be a literal value or a schema. If it is a schema (json schema
      * spec), at least one item has to be valid against it, otherwise at least one item has to
-     * be equal to the literal value ($strict defines whether the comparison is strict or not).
+     * be equal to the literal value. In strict mode (default) the equality is based on json
+     * (schema spec) equality (1 equals 1.0, while 1, "1" and true are not, property order of
+     * objects does not matter, object instances are compared by identity), in non-strict mode
+     * the comparison is loose (==).
      */
     public function contains(mixed $contains, bool $strict = true): static
     {
@@ -214,8 +217,10 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     /**
      * The given $contains can be a literal value or a schema. If it is a schema (json schema
      * spec), at least $minContains items have to be valid against it, otherwise at least
-     * $minContains items have to be equal to the literal value ($strict defines whether the
-     * comparison is strict or not).
+     * $minContains items have to be equal to the literal value. In strict mode (default) the
+     * equality is based on json (schema spec) equality (1 equals 1.0, while 1, "1" and true
+     * are not, property order of objects does not matter, object instances are compared by
+     * identity), in non-strict mode the comparison is loose (==).
      */
     public function minContains(mixed $contains, int $minContains, bool $strict = true): static
     {
@@ -244,8 +249,10 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     /**
      * The given $contains can be a literal value or a schema. If it is a schema (json schema
      * spec), at most $maxContains items have to be valid against it, otherwise at most
-     * $maxContains items have to be equal to the literal value ($strict defines whether the
-     * comparison is strict or not).
+     * $maxContains items have to be equal to the literal value. In strict mode (default) the
+     * equality is based on json (schema spec) equality (1 equals 1.0, while 1, "1" and true
+     * are not, property order of objects does not matter, object instances are compared by
+     * identity), in non-strict mode the comparison is loose (==).
      */
     public function maxContains(mixed $contains, int $maxContains, bool $strict = true): static
     {
@@ -407,7 +414,12 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
 
     /**
      * If $contains is a schema, the items valid against it are counted (json schema spec),
-     * otherwise the items equal to the literal value.
+     * otherwise the items equal to the literal value. In strict mode the equality is based
+     * on json (schema spec) equality: numbers with the same mathematical value (1 and 1.0)
+     * are equal, while 1, "1" and true are not, and objects (associative arrays) are equal
+     * if they have the same property names with equal values, independent of the property
+     * order. Object instances are compared by identity. In non-strict mode the comparison
+     * is loose (==).
      *
      * @param array<mixed> $array
      */
@@ -430,7 +442,15 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
             return $contains->safeParse($item)->success;
         }
 
-        return $strict ? $item === $contains : $item == $contains;
+        if (!$strict) {
+            return $item == $contains;
+        }
+
+        if (\is_object($item) || \is_object($contains)) {
+            return $item === $contains;
+        }
+
+        return self::normalizeJson($item) === self::normalizeJson($contains);
     }
 
     private static function containsVariable(mixed $contains): mixed
@@ -444,31 +464,5 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
     private static function jsonHash(mixed $value): string
     {
         return serialize(self::normalizeJson($value));
-    }
-
-    /**
-     * Normalizes a value so that json (schema spec) equal values share the same
-     * representation: integral floats within the json safe integer range (2 ** 53, same as
-     * Number.MAX_SAFE_INTEGER) are equal to their integer counterpart (1.0 equals 1),
-     * objects (associative arrays) are sorted by their property names, as the property
-     * order does not matter.
-     */
-    private static function normalizeJson(mixed $value): mixed
-    {
-        if (\is_float($value) && abs($value) <= 2 ** 53 && 0.0 === fmod($value, 1.0)) {
-            return (int) $value;
-        }
-
-        if (\is_object($value)) {
-            $value = (array) $value;
-        }
-
-        if (\is_array($value)) {
-            ksort($value);
-
-            return array_map(self::normalizeJson(...), $value);
-        }
-
-        return $value;
     }
 }

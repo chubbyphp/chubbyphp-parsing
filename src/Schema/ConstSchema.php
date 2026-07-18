@@ -29,7 +29,11 @@ final class ConstSchema extends AbstractSchemaInnerParse
             );
         }
 
-        if ($input === $this->const) {
+        /*
+         * Equality is based on json (schema spec) equality: numbers with the same
+         * mathematical value (1 and 1.0) are equal, while 1, "1" and true are not.
+         */
+        if (self::normalizeJson($input) === self::normalizeJson($this->const)) {
             return $input;
         }
 

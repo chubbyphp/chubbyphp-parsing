@@ -119,6 +119,32 @@ abstract class AbstractSchemaInnerParse implements SchemaInterface
         );
     }
 
+    /**
+     * Normalizes a value so that json (schema spec) equal values share the same
+     * representation: integral floats within the json safe integer range (2 ** 53, same as
+     * Number.MAX_SAFE_INTEGER) are equal to their integer counterpart (1.0 equals 1),
+     * objects (associative arrays) are sorted by their property names, as the property
+     * order does not matter.
+     */
+    final protected static function normalizeJson(mixed $value): mixed
+    {
+        if (\is_float($value) && abs($value) <= 2 ** 53 && 0.0 === fmod($value, 1.0)) {
+            return (int) $value;
+        }
+
+        if (\is_object($value)) {
+            $value = (array) $value;
+        }
+
+        if (\is_array($value)) {
+            ksort($value);
+
+            return array_map(self::normalizeJson(...), $value);
+        }
+
+        return $value;
+    }
+
     final protected function getDataType(mixed $input): string
     {
         return \is_object($input) ? $input::class : \gettype($input);

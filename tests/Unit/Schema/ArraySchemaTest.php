@@ -8,6 +8,7 @@ use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\AbstractSchemaInnerParse;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
+use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\RecordSchema;
@@ -485,6 +486,84 @@ final class ArraySchemaTest extends TestCase
         $schema = (new ArraySchema(new DateTimeSchema()))->contains($dateTime2Equal, false);
 
         self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidContainsWithIntAndFloat(): void
+    {
+        $input = [1.0, 2.5];
+
+        $schema = (new ArraySchema(new FloatSchema()))->contains(1);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidContainsWithUnorderedArray(): void
+    {
+        $input = [['b' => 2, 'a' => 1]];
+
+        $schema = (new ArraySchema(new RecordSchema(new IntSchema())))->contains(['a' => 1, 'b' => 2]);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidContainsWithStringAndInt(): void
+    {
+        $input = [1];
+
+        $schema = (new ArraySchema(new IntSchema()))->contains('1');
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.contains',
+                            'template' => '{{given}} does not contain {{contains}}',
+                            'variables' => [
+                                'contains' => '1',
+                                'given' => [1],
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
+    }
+
+    public function testParseWithInvalidContainsWithObjectItemAndArrayContains(): void
+    {
+        $input = [['a' => 1]];
+
+        $schema = (new ArraySchema(new ObjectSchema(['a' => new IntSchema()])))->contains(['a' => 1]);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame(
+                [
+                    [
+                        'path' => '',
+                        'error' => [
+                            'code' => 'array.contains',
+                            'template' => '{{given}} does not contain {{contains}}',
+                            'variables' => [
+                                'contains' => ['a' => 1],
+                                'given' => [['a' => 1]],
+                            ],
+                        ],
+                    ],
+                ],
+                $errorsException->errors->jsonSerialize()
+            );
+        }
     }
 
     public function testParseWithInvalidContainsWithEqualButNotSame(): void

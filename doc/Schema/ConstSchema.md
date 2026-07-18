@@ -32,6 +32,10 @@ $p->const(true);      // Boolean const
 $p->const(false);     // Boolean const
 ```
 
+Equality follows the JSON Schema specification: numbers with the same mathematical value are
+equal, so `1` matches `1.0` (and vice versa), while `1`, `'1'` and `true` are all distinct
+values.
+
 ## Common Patterns
 
 ### Type Discriminators
