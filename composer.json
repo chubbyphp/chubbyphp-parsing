@@ -18,6 +18,7 @@
     ],
     "require": {
         "php": "^8.3",
+        "ext-bcmath": "*",
         "ext-mbstring": "*"
     },
     "require-dev": {

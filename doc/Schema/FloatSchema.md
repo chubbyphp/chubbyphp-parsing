@@ -26,6 +26,11 @@ $schema->maximum(10.0); // Less than or equal to 10.0
 $schema->multipleOf(0.5); // Multiple of 0.5
 ```
 
+`multipleOf` uses exact decimal math (following the JSON Schema specification: division
+must result in an integer), not a binary floating point comparison. This means `0.3` is a
+multiple of `0.1`, while `0.30000000000000004` (e.g. the result of `0.1 + 0.2`) is not.
+Requires the `bcmath` extension.
+
 ### Sign Constraints
 
 ```php

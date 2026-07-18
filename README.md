@@ -29,6 +29,8 @@ Heavily inspired by the well-known TypeScript library [zod](https://github.com/c
 ## Requirements
 
  * php: ^8.3
+ * ext-bcmath: *
+ * ext-mbstring: *
 
 ## Installation
 

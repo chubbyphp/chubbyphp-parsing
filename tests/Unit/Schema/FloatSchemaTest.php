@@ -466,9 +466,17 @@ final class FloatSchemaTest extends TestCase
     public function testMultipleOfWithInvalidMultipleOf(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Argument #1 ($multipleOf) must be greater than 0, 0 given');
+        $this->expectExceptionMessage('Argument #1 ($multipleOf) must be finite and greater than 0, 0 given');
 
         (new FloatSchema())->multipleOf(0.0);
+    }
+
+    public function testMultipleOfWithNotFiniteMultipleOf(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument #1 ($multipleOf) must be finite and greater than 0, INF given');
+
+        (new FloatSchema())->multipleOf(INF);
     }
 
     public function testParseWithValidMultipleOfTrickyFloatingPointValues(): void
@@ -510,30 +518,51 @@ final class FloatSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidMultipleOfAtEpsilonBoundary(): void
+    public function testParseWithValidMultipleOfExactDecimalMath(): void
     {
-        $multipleOf = 1.0;
-        $input = 1.0 - 10 * PHP_FLOAT_EPSILON;
+        $cases = [
+            [1.0E20, 0.5],
+            [-1.0E20, 0.5],
+            [1.0E-8, 1.0E-9],
+            [0.0001, 1.0E-5],
+            [-0.0, 0.1],
+        ];
 
-        $schema = (new FloatSchema())->multipleOf($multipleOf);
+        foreach ($cases as [$input, $multipleOf]) {
+            $schema = (new FloatSchema())->multipleOf($multipleOf);
 
-        self::assertSame($input, $schema->parse($input));
+            self::assertSame($input, $schema->parse($input));
+        }
     }
 
-    public function testParseWithInvalidMultipleOfJustAboveEpsilonBoundary(): void
+    public function testParseWithInvalidMultipleOfExactDecimalMath(): void
     {
-        $multipleOf = 1.0;
-        $input = 1.0 - 21 * PHP_FLOAT_EPSILON / 2;
+        $cases = [
+            [0.1 + 0.2, 0.1], // 0.30000000000000004 is not a multiple of 0.1
+            [1000000000000000.5, 1.0],
+            [1.0 - 10 * PHP_FLOAT_EPSILON, 1.0],
+            [1.0E-9, 1.0E-8],
+            [1.0E-5, 0.0001],
+        ];
 
-        $schema = (new FloatSchema())->multipleOf($multipleOf);
+        foreach ($cases as [$input, $multipleOf]) {
+            $schema = (new FloatSchema())->multipleOf($multipleOf);
 
-        try {
-            $schema->parse($input);
+            try {
+                $schema->parse($input);
 
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame('float.multipleOf', $errorsException->errors->jsonSerialize()[0]['error']['code']);
+                throw new \Exception('code should not be reached');
+            } catch (ErrorsException $errorsException) {
+                self::assertSame('float.multipleOf', $errorsException->errors->jsonSerialize()[0]['error']['code']);
+            }
         }
+    }
+
+    public function testParseWithInvalidMultipleOfNotFiniteInput(): void
+    {
+        $this->expectException(ErrorsException::class);
+
+        (new FloatSchema())->multipleOf(0.1)->parse(INF);
     }
 
     public function testParseWithValidGte(): void
