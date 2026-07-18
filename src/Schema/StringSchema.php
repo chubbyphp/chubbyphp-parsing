@@ -204,7 +204,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public function length(int $length): static
     {
         return $this->postParse(static function (string $string) use ($length) {
-            $stringLength = \strlen($string);
+            $stringLength = mb_strlen($string);
 
             if ($stringLength === $length) {
                 return $string;
@@ -223,7 +223,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public function minLength(int $minLength): static
     {
         return $this->postParse(static function (string $string) use ($minLength) {
-            $stringLength = \strlen($string);
+            $stringLength = mb_strlen($string);
 
             if ($stringLength >= $minLength) {
                 return $string;
@@ -242,7 +242,7 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public function maxLength(int $maxLength): static
     {
         return $this->postParse(static function (string $string) use ($maxLength) {
-            $stringLength = \strlen($string);
+            $stringLength = mb_strlen($string);
 
             if ($stringLength <= $maxLength) {
                 return $string;

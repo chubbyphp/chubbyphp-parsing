@@ -24,6 +24,9 @@ $schema->minLength(3);   // Minimum 3 characters
 $schema->maxLength(100); // Maximum 100 characters
 ```
 
+Length is counted in characters (Unicode code points), not bytes, following the JSON Schema
+specification: `'tést'` has a length of 4. Requires the `mbstring` extension.
+
 ### Content Checks
 
 ```php

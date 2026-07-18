@@ -190,6 +190,15 @@ final class StringSchemaTest extends TestCase
         self::assertSame($input, $schema->parse($input));
     }
 
+    public function testParseWithValidMultibyteLength(): void
+    {
+        $input = 'tést';
+
+        $schema = (new StringSchema())->length(4);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
     public function testParseWithInvalidLength(): void
     {
         $input = 'test';
@@ -209,7 +218,7 @@ final class StringSchemaTest extends TestCase
                         'template' => 'Length {{length}}, {{given}} given',
                         'variables' => [
                             'length' => 5,
-                            'given' => \strlen($input),
+                            'given' => mb_strlen($input),
                         ],
                     ],
                 ],
@@ -224,6 +233,42 @@ final class StringSchemaTest extends TestCase
         $schema = (new StringSchema())->minLength(4);
 
         self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidMultibyteMinLength(): void
+    {
+        $input = 'tést';
+
+        $schema = (new StringSchema())->minLength(4);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidMultibyteMinLength(): void
+    {
+        $input = 'tést';
+
+        $schema = (new StringSchema())->minLength(5);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.minLength',
+                        'template' => 'Min length {{min}}, {{given}} given',
+                        'variables' => [
+                            'minLength' => 5,
+                            'given' => mb_strlen($input),
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
     }
 
     public function testParseWithInvalidMinLength(): void
@@ -245,7 +290,7 @@ final class StringSchemaTest extends TestCase
                         'template' => 'Min length {{min}}, {{given}} given',
                         'variables' => [
                             'minLength' => 5,
-                            'given' => \strlen($input),
+                            'given' => mb_strlen($input),
                         ],
                     ],
                 ],
@@ -256,6 +301,15 @@ final class StringSchemaTest extends TestCase
     public function testParseWithValidMaxLength(): void
     {
         $input = 'test';
+
+        $schema = (new StringSchema())->maxLength(4);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidMultibyteMaxLength(): void
+    {
+        $input = 'tést';
 
         $schema = (new StringSchema())->maxLength(4);
 
@@ -281,7 +335,7 @@ final class StringSchemaTest extends TestCase
                         'template' => 'Max length {{max}}, {{given}} given',
                         'variables' => [
                             'maxLength' => 3,
-                            'given' => \strlen($input),
+                            'given' => mb_strlen($input),
                         ],
                     ],
                 ],

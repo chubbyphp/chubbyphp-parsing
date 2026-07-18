@@ -17,7 +17,8 @@
         }
     ],
     "require": {
-        "php": "^8.3"
+        "php": "^8.3",
+        "ext-mbstring": "*"
     },
     "require-dev": {
         "chubbyphp/chubbyphp-dev-helper": "dev-master",
