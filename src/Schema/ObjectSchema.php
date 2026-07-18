@@ -11,6 +11,7 @@ final class ObjectSchema extends AbstractObjectSchema implements ObjectSchemaInt
 {
     public const string ERROR_TYPE_CODE = 'object.type';
     public const string ERROR_UNKNOWN_FIELD_CODE = 'object.unknownField';
+    public const string ERROR_MISSING_FIELD_CODE = 'object.missingField';
 
     /**
      * @param array<mixed, mixed> $fieldToSchema
@@ -36,7 +37,7 @@ final class ObjectSchema extends AbstractObjectSchema implements ObjectSchemaInt
                     continue;
                 }
 
-                $fields[$fieldName] = $fieldSchema->parse($input[$fieldName] ?? null);
+                $fields[$fieldName] = $this->parseField($input, $fieldName, $fieldSchema);
             } catch (ErrorsException $e) {
                 $childrenErrors->add($e->errors, $fieldName);
             }

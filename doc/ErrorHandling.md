@@ -272,8 +272,8 @@ Each schema type uses a consistent error code prefix:
 | bool | `bool.` | `bool.type` |
 | const | `const.` | `const.type` |
 | array | `array.` | `array.type`, `array.minLength` |
-| assoc | `assoc.` | `assoc.type`, `assoc.unknownField` |
-| object | `object.` | `object.type`, `object.unknownField` |
+| assoc | `assoc.` | `assoc.type`, `assoc.unknownField`, `assoc.missingField` |
+| object | `object.` | `object.type`, `object.unknownField`, `object.missingField` |
 | dateTime | `dateTime.` | `dateTime.type`, `dateTime.from` |
 | tuple | `tuple.` | `tuple.type`, `tuple.length` |
 | record | `record.` | `record.type` |

@@ -194,11 +194,11 @@ $jsonSchemaType = $p->lazy(static function () use ($p, &$jsonSchemaType) {
         $p->object([
             'type' => $p->const('string'),
             'minLength' => $p->int()->nonNegative(),
-        ])->optional(['minLength']),
+        ])->required(['type']),
         $p->object([
             'type' => $p->const('number'),
             'minimum' => $p->float(),
-        ])->optional(['minimum']),
+        ])->required(['type']),
         $p->object([
             'type' => $p->const('object'),
             'properties' => $p->record($jsonSchemaType),

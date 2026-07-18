@@ -47,6 +47,7 @@ final class AssocSchemaTest extends TestCase
 
         self::assertNotSame($schema, $schema->strict());
         self::assertNotSame($schema, $schema->optional([]));
+        self::assertNotSame($schema, $schema->required());
     }
 
     public function testConstructWithoutFieldName(): void
@@ -150,11 +151,21 @@ final class AssocSchemaTest extends TestCase
     {
         $input = ['field2' => 'test', 'field3' => null];
 
+        error_clear_last();
+
         $schema = (new AssocSchema([
             'field1' => new StringSchema(),
             'field2' => new StringSchema(),
             'field3' => (new StringSchema())->nullable(),
         ]))->optional(['field1', 'field3']);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Use required() instead, fields not listed there are optional', $lastError['message']);
 
         $output = $schema->parse($input);
 
@@ -329,6 +340,113 @@ final class AssocSchemaTest extends TestCase
                 'field3: Type should be "string", "NULL" given',
                 $errorsException->getMessage()
             );
+        }
+    }
+
+    public function testParseSuccessWithMissingNullableField(): void
+    {
+        $schema = new AssocSchema([
+            'field1' => new StringSchema(),
+            'field2' => (new StringSchema())->nullable(),
+        ]);
+
+        self::assertSame(['field1' => 'test', 'field2' => null], $schema->parse(['field1' => 'test']));
+    }
+
+    public function testParseSuccessWithMissingFieldWithDefault(): void
+    {
+        $schema = new AssocSchema([
+            'field1' => new StringSchema(),
+            'field2' => (new StringSchema())->default('default'),
+        ]);
+
+        self::assertSame(['field1' => 'test', 'field2' => 'default'], $schema->parse(['field1' => 'test']));
+    }
+
+    public function testParseFailedWithRequiredAndMissingField(): void
+    {
+        $schema = (new AssocSchema(['field1' => new StringSchema(), 'field2' => new StringSchema()]))
+            ->required(['field1', 'field2'])
+        ;
+
+        try {
+            $schema->parse(['field1' => 'test']);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => 'field2',
+                    'error' => [
+                        'code' => 'assoc.missingField',
+                        'template' => 'Missing field {{fieldName}}',
+                        'variables' => [
+                            'fieldName' => 'field2',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseSuccessWithRequiredAndMissingNotRequiredField(): void
+    {
+        $schema = (new AssocSchema([
+            'field1' => new StringSchema(),
+            'field2' => new StringSchema(),
+        ]))->required(['field1']);
+
+        self::assertSame(['field1' => 'test'], $schema->parse(['field1' => 'test']));
+    }
+
+    public function testParseFailedWithPartialRequiredAndMissingFields(): void
+    {
+        $schema = (new AssocSchema([
+            'field1' => new StringSchema(),
+            'field2' => new StringSchema(),
+        ]))->required(['field1']);
+
+        try {
+            $schema->parse([]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => 'field1',
+                    'error' => [
+                        'code' => 'assoc.missingField',
+                        'template' => 'Missing field {{fieldName}}',
+                        'variables' => [
+                            'fieldName' => 'field1',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithRequiredAndNullOnNotNullableField(): void
+    {
+        $schema = (new AssocSchema(['field1' => new StringSchema()]))->required(['field1']);
+
+        try {
+            $schema->parse(['field1' => null]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => 'field1',
+                    'error' => [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", {{given}} given',
+                        'variables' => [
+                            'given' => 'NULL',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
         }
     }
 

@@ -16,6 +16,9 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
     public const string ERROR_UNKNOWN_FIELD_CODE = 'abstract_object.unknownField';
     public const string ERROR_UNKNOWN_FIELD_TEMPLATE = 'Unknown field {{fieldName}}';
 
+    public const string ERROR_MISSING_FIELD_CODE = 'abstract_object.missingField';
+    public const string ERROR_MISSING_FIELD_TEMPLATE = 'Missing field {{fieldName}}';
+
     /**
      * @var array<string, SchemaInterface>
      */
@@ -30,6 +33,11 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
      * @var null|array<string>
      */
     private ?array $optional = null;
+
+    /**
+     * @var null|array<string>
+     */
+    private ?array $required = null;
 
     /**
      * @param array<mixed, mixed> $fieldToSchema
@@ -100,12 +108,30 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
     }
 
     /**
+     * @deprecated use required() instead, fields not listed there are optional
+     *
      * @param array<string> $optional
      */
     final public function optional(array $optional = []): static
     {
+        @trigger_error('Use required() instead, fields not listed there are optional', E_USER_DEPRECATED);
+
         $clone = clone $this;
         $clone->optional = $optional;
+
+        return $clone;
+    }
+
+    /**
+     * Fields listed here must be present, all other fields are optional (missing ones get
+     * skipped), like the json schema required keyword.
+     *
+     * @param array<string> $required
+     */
+    final public function required(array $required = []): static
+    {
+        $clone = clone $this;
+        $clone->required = $required;
 
         return $clone;
     }
@@ -142,13 +168,45 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
     abstract protected function parseFields(array $input, Errors $childrenErrors): mixed;
 
     /**
+     * Without required() a missing field is parsed as null, which allows nullable /
+     * default to apply. Once required() is used, a missing required field causes a
+     * dedicated missing field error (missing not required ones get skipped beforehand).
+     *
+     * @param array<string, mixed> $input
+     */
+    final protected function parseField(array $input, string $fieldName, SchemaInterface $fieldSchema): mixed
+    {
+        if (\array_key_exists($fieldName, $input)) {
+            return $fieldSchema->parse($input[$fieldName]);
+        }
+
+        if (\is_array($this->required)) {
+            throw new ErrorsException(
+                new Error(
+                    static::ERROR_MISSING_FIELD_CODE,
+                    static::ERROR_MISSING_FIELD_TEMPLATE,
+                    ['fieldName' => $fieldName]
+                )
+            );
+        }
+
+        return $fieldSchema->parse(null);
+    }
+
+    /**
      * @param array<string, mixed> $input
      */
     final protected function skip(array $input, string $fieldName): bool
     {
-        return !\array_key_exists($fieldName, $input)
-            && \is_array($this->optional)
-            && \in_array($fieldName, $this->optional, true);
+        if (\array_key_exists($fieldName, $input)) {
+            return false;
+        }
+
+        if (\is_array($this->optional) && \in_array($fieldName, $this->optional, true)) {
+            return true;
+        }
+
+        return \is_array($this->required) && !\in_array($fieldName, $this->required, true);
     }
 
     /**

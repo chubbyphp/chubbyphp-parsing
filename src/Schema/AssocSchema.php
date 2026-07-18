@@ -11,6 +11,7 @@ final class AssocSchema extends AbstractObjectSchema implements ObjectSchemaInte
 {
     public const string ERROR_TYPE_CODE = 'assoc.type';
     public const string ERROR_UNKNOWN_FIELD_CODE = 'assoc.unknownField';
+    public const string ERROR_MISSING_FIELD_CODE = 'assoc.missingField';
 
     /**
      * @param array<string, mixed> $input
@@ -27,7 +28,7 @@ final class AssocSchema extends AbstractObjectSchema implements ObjectSchemaInte
                     continue;
                 }
 
-                $fields[$fieldName] = $fieldSchema->parse($input[$fieldName] ?? null);
+                $fields[$fieldName] = $this->parseField($input, $fieldName, $fieldSchema);
             } catch (ErrorsException $e) {
                 $childrenErrors->add($e->errors, $fieldName);
             }

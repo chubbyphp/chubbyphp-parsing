@@ -72,19 +72,30 @@ $schema->parse(['name' => 'John', '_id' => '123']);     // OK, _id stripped
 $schema->parse(['name' => 'John', 'unknown' => 'val']); // Throws error
 ```
 
-### Optional Fields
+### Required Fields
 
-Make certain fields optional (they won't appear in output if not provided):
+Like the JSON Schema `required` keyword: fields listed in `required()` must be present -
+a missing one causes a dedicated `assoc.missingField` error. All other fields are
+optional and won't appear in the output if not provided:
 
 ```php
 $schema = $p->assoc([
     'name' => $p->string(),
     'nickname' => $p->string(),
-])->optional(['nickname']);
+])->required(['name']);
 
 $schema->parse(['name' => 'John']);
 // Returns: ['name' => 'John'] - no nickname key
+
+$schema->parse(['nickname' => 'Johnny']);
+// Throws: name: Missing field "name"
 ```
+
+Without `required()` a missing field is parsed as null, so `nullable()` / `default()`
+apply.
+
+The deprecated `optional()` is the inverse: listed fields won't appear in the output if
+not provided, while all other missing fields are parsed as null. Use `required()` instead.
 
 ## Schema Utilities
 
@@ -178,15 +189,15 @@ $person = $personSchema->parse([
 echo $person['address']['city']; // 'Springfield'
 ```
 
-### With Optional and Nullable
+### With Required and Nullable
 
 ```php
 $schema = $p->assoc([
     'id' => $p->int(),
     'name' => $p->string(),
     'bio' => $p->string()->nullable(),      // Can be null
-    'website' => $p->string()->url(),        // Required if present
-])->optional(['website']);                   // website field is optional
+    'website' => $p->string()->url(),        // Validated if present
+])->required(['id', 'name', 'bio']);         // website field is optional
 
 // Valid inputs:
 $schema->parse(['id' => 1, 'name' => 'John', 'bio' => null]);
@@ -238,5 +249,6 @@ $result = $schema->parse(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 3
 |------|-------------|
 | `assoc.type` | Value is not a valid input type |
 | `assoc.unknownField` | Unknown field found in strict mode |
+| `assoc.missingField` | Field listed in `required()` is missing |
 
 Field-level errors include the field name in the error path (e.g., `name`, `address.city`).
