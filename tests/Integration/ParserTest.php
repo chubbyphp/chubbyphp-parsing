@@ -82,12 +82,12 @@ final class ParserTest extends TestCase
         ]), JSON_PRETTY_PRINT));
     }
 
-    public function testFailureWithEmptyArray(): void
+    public function testFailureWithMissingFieldsAndNotSupportedConst(): void
     {
         $schema = $this->getSchema();
 
         try {
-            $schema->parse([]);
+            $schema->parse(['const' => new \DateTimeImmutable('2024-01-20T09:15:00+00:00')]);
 
             throw new \Exception('code should not be reached');
         } catch (ErrorsException $errorsException) {
@@ -166,9 +166,9 @@ final class ParserTest extends TestCase
                     'path' => 'const',
                     'error' => [
                         'code' => 'const.type',
-                        'template' => 'Type should be "bool|float|int|string", {{given}} given',
+                        'template' => 'Type should be "array|bool|float|int|\stdClass|string|null", {{given}} given',
                         'variables' => [
-                            'given' => 'NULL',
+                            'given' => 'DateTimeImmutable',
                         ],
                     ],
                 ],

@@ -1,6 +1,6 @@
 # ConstSchema
 
-The `ConstSchema` validates that a value matches an exact const value. It supports string, integer, float, and boolean consts.
+The `ConstSchema` validates that a value matches an exact const value. It supports any json value: null, boolean, number, string, array and object (associative array / `\stdClass`).
 
 ## Basic Usage
 
@@ -25,16 +25,20 @@ $data = $schema->parse(true); // Returns: true
 ## Supported Types
 
 ```php
-$p->const('string');  // String const
-$p->const(42);        // Integer const
-$p->const(3.14);      // Float const
-$p->const(true);      // Boolean const
-$p->const(false);     // Boolean const
+$p->const('string');        // String const
+$p->const(42);              // Integer const
+$p->const(3.14);            // Float const
+$p->const(true);            // Boolean const
+$p->const(false);           // Boolean const
+$p->const(null);            // Null const
+$p->const([1, 2, 3]);       // Array const
+$p->const(['a' => 1]);      // Object const (matches \stdClass input too)
 ```
 
 Equality follows the JSON Schema specification: numbers with the same mathematical value are
 equal, so `1` matches `1.0` (and vice versa), while `1`, `'1'` and `true` are all distinct
-values.
+values. Arrays must match in order, objects are compared by their properties regardless of
+order - an `\stdClass` input is equal to the corresponding associative array.
 
 ## Common Patterns
 
@@ -167,6 +171,7 @@ $direction = $p->backedEnum(Direction::class);
 
 | Code | Description |
 |------|-------------|
-| `const.type` | Value doesn't match the expected const |
+| `const.type` | Value is not a json representable type |
+| `const.equals` | Value doesn't match the expected const |
 
-The error will include the expected const value and the actual value received.
+The `const.equals` error will include the expected const value and the actual value received.

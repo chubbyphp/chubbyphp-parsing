@@ -93,6 +93,40 @@ final class ConstSchemaTest extends TestCase
         self::assertNull($schema->parse(null));
     }
 
+    public function testParseSuccessWithNullConst(): void
+    {
+        $schema = new ConstSchema(null);
+
+        self::assertNull($schema->parse(null));
+    }
+
+    public function testParseSuccessWithArray(): void
+    {
+        $input = [1, 'two', true];
+
+        $schema = new ConstSchema($input);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseSuccessWithIntArrayConstAndFloatArrayInput(): void
+    {
+        $schema = new ConstSchema([1, 2.0]);
+
+        self::assertSame([1.0, 2], $schema->parse([1.0, 2]));
+    }
+
+    public function testParseSuccessWithObjectConstAndDifferentPropertyOrderStdClassInput(): void
+    {
+        $schema = new ConstSchema(['b' => 2, 'a' => ['c' => 3.0]]);
+
+        $input = new \stdClass();
+        $input->a = ['c' => 3];
+        $input->b = 2.0;
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
     public function testParseFailedWithNull(): void
     {
         $schema = new ConstSchema('test');
@@ -106,10 +140,110 @@ final class ConstSchemaTest extends TestCase
                 [
                     'path' => '',
                     'error' => [
-                        'code' => 'const.type',
-                        'template' => 'Type should be "bool|float|int|string", {{given}} given',
+                        'code' => 'const.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
                         'variables' => [
-                            'given' => 'NULL',
+                            'expected' => 'test',
+                            'given' => null,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithNullConstAndStringInput(): void
+    {
+        $schema = new ConstSchema(null);
+
+        try {
+            $schema->parse('test');
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'const.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => null,
+                            'given' => 'test',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithNotSupportedInput(): void
+    {
+        $schema = new ConstSchema('test');
+
+        try {
+            $schema->parse(new \DateTimeImmutable('2024-01-20T09:15:00+00:00'));
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'const.type',
+                        'template' => 'Type should be "array|bool|float|int|\stdClass|string|null", {{given}} given',
+                        'variables' => [
+                            'given' => \DateTimeImmutable::class,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithDifferentArrayOrder(): void
+    {
+        $schema = new ConstSchema([1, 2]);
+
+        try {
+            $schema->parse([2, 1]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'const.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => [1, 2],
+                            'given' => [2, 1],
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithAdditionalObjectProperty(): void
+    {
+        $schema = new ConstSchema(['a' => 1]);
+
+        try {
+            $schema->parse(['a' => 1, 'b' => 2]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'const.equals',
+                        'template' => 'Input should be {{expected}}, {{given}} given',
+                        'variables' => [
+                            'expected' => ['a' => 1],
+                            'given' => ['a' => 1, 'b' => 2],
                         ],
                     ],
                 ],
@@ -319,10 +453,11 @@ final class ConstSchemaTest extends TestCase
                     [
                         'path' => '',
                         'error' => [
-                            'code' => 'const.type',
-                            'template' => 'Type should be "bool|float|int|string", {{given}} given',
+                            'code' => 'const.equals',
+                            'template' => 'Input should be {{expected}}, {{given}} given',
                             'variables' => [
-                                'given' => 'NULL',
+                                'expected' => 'test',
+                                'given' => null,
                             ],
                         ],
                     ],
@@ -352,10 +487,11 @@ final class ConstSchemaTest extends TestCase
             [
                 'path' => '',
                 'error' => [
-                    'code' => 'const.type',
-                    'template' => 'Type should be "bool|float|int|string", {{given}} given',
+                    'code' => 'const.equals',
+                    'template' => 'Input should be {{expected}}, {{given}} given',
                     'variables' => [
-                        'given' => 'NULL',
+                        'expected' => 'test',
+                        'given' => null,
                     ],
                 ],
             ],

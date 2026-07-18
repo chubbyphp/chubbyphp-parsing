@@ -43,7 +43,10 @@ interface ParserInterface
 
     public function bool(): BoolSchema;
 
-    // public function const(bool|float|int|string $const): ConstSchema;
+    // /**
+    //  * @param null|array<mixed>|bool|float|int|\stdClass|string $const any json value: null, boolean, number, string, array or object (associative array / \stdClass)
+    //  */
+    // public function const(array|bool|float|int|\stdClass|string|null $const): ConstSchema;
 
     public function dateTime(): DateTimeSchema;
 
