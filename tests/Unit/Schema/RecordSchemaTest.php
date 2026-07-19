@@ -43,6 +43,8 @@ final class RecordSchemaTest extends TestCase
 
         self::assertNotSame($schema, $schema->minProperties(1));
         self::assertNotSame($schema, $schema->maxProperties(1));
+
+        self::assertNotSame($schema, $schema->propertyNames(new StringSchema()));
     }
 
     public function testParseSuccess(): void
@@ -290,6 +292,54 @@ final class RecordSchemaTest extends TestCase
                         'variables' => [
                             'maxProperties' => 1,
                             'given' => 2,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseSuccessWithPropertyNames(): void
+    {
+        $input = ['field1' => 'value1', 2 => 'value2'];
+
+        $schema = (new RecordSchema(new StringSchema()))
+            ->propertyNames((new StringSchema())->pattern('/^[a-z0-9]+$/'))
+        ;
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseFailedWithPropertyNames(): void
+    {
+        $schema = (new RecordSchema(new StringSchema()))
+            ->propertyNames((new StringSchema())->pattern('/^[a-z]+$/'))
+        ;
+
+        try {
+            $schema->parse(['field' => 'value1', 'field2' => 1]);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => 'field2',
+                    'error' => [
+                        'code' => 'string.pattern',
+                        'template' => '{{given}} does not pattern {{pattern}}',
+                        'variables' => [
+                            'pattern' => '/^[a-z]+$/',
+                            'given' => 'field2',
+                        ],
+                    ],
+                ],
+                [
+                    'path' => 'field2',
+                    'error' => [
+                        'code' => 'string.type',
+                        'template' => 'Type should be "string", {{given}} given',
+                        'variables' => [
+                            'given' => 'integer',
                         ],
                     ],
                 ],

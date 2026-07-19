@@ -155,6 +155,22 @@ Constrain the number of input properties with `minProperties()` / `maxProperties
 $schema = $p->record($p->string())->minProperties(1)->maxProperties(10);
 ```
 
+## Property Names
+
+Validate each property name (key) against a schema with `propertyNames()`, like the JSON
+Schema `propertyNames` keyword. Combined with a pattern this also covers the common
+`patternProperties` use case (one pattern, all values with the same schema):
+
+```php
+$schema = $p->record($p->string())->propertyNames($p->string()->pattern('/^x-/'));
+
+$schema->parse(['x-header' => 'value']); // OK
+$schema->parse(['header' => 'value']);   // Throws: header: "header" does not pattern "/^x-/"
+```
+
+Keys are validated as strings, failures get reported at the key's error path, next to a
+possible value error.
+
 ## Record vs Object vs Assoc
 
 Use **RecordSchema** when:
@@ -202,3 +218,5 @@ $userData = $p->assoc([
 | `record.maxProperties` | More properties than allowed |
 
 Value-specific errors include the key in the error path (e.g., `key1`, `settings.debug`).
+Property name errors use the codes of the schema given to `propertyNames()` (e.g.
+`string.pattern`) and share the key's error path.

@@ -16,3 +16,9 @@ Guidance for AI agents working on this codebase.
   Schema `enum` keyword: `union([const(...), const(...)])` is exactly how it is meant
   to be expressed (and `backedEnum()` covers PHP backed enums). Don't propose adding
   an `enum([...])` convenience.
+- The JSON Schema `propertyNames` keyword is covered by `RecordSchema::propertyNames()`,
+  which combined with a pattern also covers the common single-pattern `patternProperties`
+  case. A multi-pattern `patternProperties` map (different value schemas per pattern) is
+  intentionally out of scope: its spec semantics require `allOf` (a key matching multiple
+  patterns must validate against all their schemas), and it can be composed from
+  `record(union([...]))` plus `propertyNames()` or a `postParse()` closure instead.
