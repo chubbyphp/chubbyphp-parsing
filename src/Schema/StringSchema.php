@@ -132,6 +132,8 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
 
     private const string UUID_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-(\d{1})[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
+    private const string UUID_ANY_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
+
     private const string DATE_TIME_PATTERN = '/^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})[Tt](?:[01]\d|2[0-3]):[0-5]\d:(?:[0-5]\d|60)(?:\.\d+)?(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/';
 
     private const string DATE_PATTERN = '/^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$/';
@@ -778,21 +780,32 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
+    /**
+     * Uuid::any matches every string in uuid format (any version, including nil/max),
+     * which is what the json schema "format": "uuid" requires. The versioned cases
+     * additionally check the version and variant fields.
+     */
     public function uuid(Uuid $version = Uuid::v4): static
     {
         return $this->postParse(static function (string $string) use ($version) {
-            $matches = [];
-            preg_match(self::UUID_PATTERN, $string, $matches);
+            if (Uuid::any === $version) {
+                if (1 === preg_match(self::UUID_ANY_PATTERN, $string)) {
+                    return $string;
+                }
+            } else {
+                $matches = [];
+                preg_match(self::UUID_PATTERN, $string, $matches);
 
-            if ((int) ($matches[1] ?? '-1') === $version->value) {
-                return $string;
+                if ((int) ($matches[1] ?? '-1') === $version->value) {
+                    return $string;
+                }
             }
 
             throw new ErrorsException(
                 new Error(
                     self::ERROR_UUID_CODE,
                     self::ERROR_UUID_TEMPLATE,
-                    ['version' => 'v'.$version->value, 'given' => $string]
+                    ['version' => $version->name, 'given' => $string]
                 )
             );
         });

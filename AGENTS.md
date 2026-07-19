@@ -16,6 +16,12 @@ Guidance for AI agents working on this codebase.
   Schema `enum` keyword: `union([const(...), const(...)])` is exactly how it is meant
   to be expressed (and `backedEnum()` covers PHP backed enums). Don't propose adding
   an `enum([...])` convenience.
+- The JSON Schema `format: "uuid"` keyword is covered by `uuid(Uuid::any)`: it validates
+  the plain RFC 9562 grammar (8-4-4-4-12 hex digits, case-insensitive) without version or
+  variant constraints, so any version plus the nil and max UUIDs pass — matching common
+  `format: "uuid"` validators. The versioned cases (`Uuid::v1`..`Uuid::v8`, default
+  `Uuid::v4`) additionally check the version and variant fields; don't loosen them, and
+  don't change the default.
 - The JSON Schema `propertyNames` keyword is covered by `RecordSchema::propertyNames()`,
   which combined with a pattern also covers the common single-pattern `patternProperties`
   case. A multi-pattern `patternProperties` map (different value schemas per pattern) is

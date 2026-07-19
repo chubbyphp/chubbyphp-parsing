@@ -6,6 +6,7 @@ namespace Chubbyphp\Parsing\Enum;
 
 enum Uuid: int
 {
+    case any = 0; // Any version, including nil/max (json schema "format": "uuid")
     case v1 = 1; // Gregorian Time
     case v2 = 2; // DCE Security
     case v3 = 3; // MD5 Hash

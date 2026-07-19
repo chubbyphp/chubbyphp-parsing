@@ -1715,6 +1715,26 @@ final class StringSchemaTest extends TestCase
                 Uuid::v8,
                 'c0ffee00-cafe-8bad-beef-deaddeadbeef',
             ],
+            'any with v4' => [
+                Uuid::any,
+                'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+            ],
+            'any with v7' => [
+                Uuid::any,
+                '019490a9-5e00-7d34-b5f6-4a1b2c3d4e5f',
+            ],
+            'any with nil' => [
+                Uuid::any,
+                '00000000-0000-0000-0000-000000000000',
+            ],
+            'any with max' => [
+                Uuid::any,
+                'ffffffff-ffff-ffff-ffff-ffffffffffff',
+            ],
+            'any with uppercase' => [
+                Uuid::any,
+                'F47AC10B-58CC-4372-A567-0E02B2C3D479',
+            ],
         ];
     }
 
@@ -1733,7 +1753,7 @@ final class StringSchemaTest extends TestCase
                         'code' => 'string.uuid',
                         'template' => 'Invalid uuid {{version}} {{given}}',
                         'variables' => [
-                            'version' => 'v'.$version->value,
+                            'version' => $version->name,
                             'given' => $uuid,
                         ],
                     ],
@@ -1779,6 +1799,18 @@ final class StringSchemaTest extends TestCase
             'v8 with wrong version 0' => [
                 Uuid::v8,
                 'c0ffee00-cafe-0bad-beef-deaddeadbeef',
+            ],
+            'any with invalid hex character g' => [
+                Uuid::any,
+                '5df41881-3aed-3515-88a7-2f4a814cg09e',
+            ],
+            'any with missing group' => [
+                Uuid::any,
+                'f47ac10b-58cc-4372-a567',
+            ],
+            'any without hyphens' => [
+                Uuid::any,
+                'f47ac10b58cc4372a5670e02b2c3d479',
             ],
         ];
     }

@@ -59,8 +59,9 @@ $schema->iriReference();          // Valid internationalized URI or relative ref
 $schema->uriTemplate();           // Valid URI template, example: '/users/{id}'
 $schema->jsonPointer();           // Valid JSON pointer, example: '/foo/0/bar'
 $schema->relativeJsonPointer();   // Valid relative JSON pointer, example: '1/foo/bar'
-$schema->uuid();          // Valid UUID v4
-$schema->uuid(Uuid::v5);  // Valid UUID v5
+$schema->uuid();           // Valid UUID v4
+$schema->uuid(Uuid::v5);   // Valid UUID v5
+$schema->uuid(Uuid::any);  // Valid UUID of any version, including nil/max (json schema "format": "uuid")
 ```
 
 `idnEmail()` and `idnHostname()` require the [intl](https://www.php.net/manual/en/book.intl.php) extension.
