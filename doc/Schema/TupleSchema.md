@@ -23,6 +23,23 @@ A tuple schema:
 - Validates that the input has exactly the expected number of elements
 - Validates each element against its corresponding schema by position
 - Fails if there are missing or extra elements
+- Optionally accepts extra elements via `rest()`, validating each against a shared schema
+
+## Rest Items
+
+By default extra elements are rejected. With `rest()` (JSON Schema: `prefixItems` combined
+with `items`), elements beyond the tuple prefix are validated against the given schema and
+kept in the output:
+
+```php
+$schema = $p->tuple([
+    $p->string(), // Command
+])->rest($p->int()); // Arguments
+
+$schema->parse(['sum', 1, 2, 3]); // Returns: ['sum', 1, 2, 3]
+$schema->parse(['sum']);          // Returns: ['sum']
+$schema->parse(['sum', 'one']);   // Fails: int.type at path 1
+```
 
 ## Common Patterns
 
@@ -122,6 +139,9 @@ Use **TupleSchema** when:
 - Each position has a specific meaning and type
 - Element order matters
 
+Use **TupleSchema with `rest()`** when:
+- A fixed prefix of positional types is followed by a variable number of same-typed elements
+
 Use **ArraySchema** when:
 - You have a variable number of elements
 - All elements share the same type
@@ -140,6 +160,7 @@ $tags = $p->array($p->string());
 | Code | Description |
 |------|-------------|
 | `tuple.type` | Value is not an array |
-| `tuple.length` | Array length doesn't match expected tuple length |
+| `tuple.missingIndex` | No input at an index the tuple defines |
+| `tuple.additionalIndex` | Input at an index beyond the tuple length (without `rest()`) |
 
 Position-specific errors include the index in the error path (e.g., `0`, `1`).

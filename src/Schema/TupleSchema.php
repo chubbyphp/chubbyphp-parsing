@@ -27,6 +27,8 @@ final class TupleSchema extends AbstractSchemaInnerParse implements SchemaInterf
      */
     private array $schemas = [];
 
+    private ?SchemaInterface $restSchema = null;
+
     /**
      * @param array<mixed> $schemas
      */
@@ -46,6 +48,18 @@ final class TupleSchema extends AbstractSchemaInnerParse implements SchemaInterf
 
             $this->schemas[] = $schema;
         }
+    }
+
+    /**
+     * Items beyond the tuple prefix are validated against the given schema and kept in the
+     * output, instead of being rejected (json schema spec: prefixItems combined with items).
+     */
+    public function rest(SchemaInterface $restSchema): static
+    {
+        $clone = clone $this;
+        $clone->restSchema = $restSchema;
+
+        return $clone;
     }
 
     protected function innerParse(mixed $input): mixed
@@ -86,11 +100,21 @@ final class TupleSchema extends AbstractSchemaInnerParse implements SchemaInterf
         $schemaCount = \count($this->schemas);
 
         for ($i = $schemaCount; $i < $inputCount; ++$i) {
-            $childrenErrors->add(new Error(
-                self::ERROR_ADDITIONAL_INDEX_CODE,
-                self::ERROR_ADDITIONAL_INDEX_TEMPLATE,
-                ['index' => $i]
-            ), (string) $i);
+            if (null === $this->restSchema) {
+                $childrenErrors->add(new Error(
+                    self::ERROR_ADDITIONAL_INDEX_CODE,
+                    self::ERROR_ADDITIONAL_INDEX_TEMPLATE,
+                    ['index' => $i]
+                ), (string) $i);
+
+                continue;
+            }
+
+            try {
+                $output[$i] = $this->restSchema->parse($input[$i]);
+            } catch (ErrorsException $e) {
+                $childrenErrors->add($e->errors, (string) $i);
+            }
         }
 
         if ($childrenErrors->has()) {

@@ -53,6 +53,12 @@ Guidance for AI agents working on this codebase.
   intentionally out of scope: its spec semantics require `allOf` (a key matching multiple
   patterns must validate against all their schemas), and it can be composed from
   `record(union([...]))` plus `propertyNames()` or a `postParse()` closure instead.
+- The JSON Schema `prefixItems` combined with `items` (tuple prefix plus typed remainder)
+  is covered by `TupleSchema::rest()`: extra indices are validated against the rest schema
+  and kept in the output instead of failing with `tuple.additionalIndex`. The related
+  `unevaluatedItems` keyword needs nothing for the same reason as `unevaluatedProperties`
+  (see below): without `allOf`/`$ref` composition it degenerates to the covered
+  plain-tuple rejection / `rest()` cases.
 - The JSON Schema `dependentRequired` / `dependentSchemas` keywords ("if key A is
   present, key B must be too / the object must match an extra schema") are intentionally
   not implemented as an API on `AssocSchema` / `ObjectSchema`: they compose cleanly with

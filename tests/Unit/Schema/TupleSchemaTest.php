@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
 use Chubbyphp\Parsing\ErrorsException;
+use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\TupleSchema;
 use PHPUnit\Framework\TestCase;
@@ -26,6 +27,7 @@ final class TupleSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->preParse(static fn (mixed $input) => $input));
         self::assertNotSame($schema, $schema->postParse(static fn (array $output) => $output));
         self::assertNotSame($schema, $schema->catch(static fn (array $output, ErrorsException $e) => $output));
+        self::assertNotSame($schema, $schema->rest(new StringSchema()));
     }
 
     public function testConstructWithoutSchema(): void
@@ -160,7 +162,7 @@ final class TupleSchemaTest extends TestCase
 
     public function testParseFailedCauseAdditionalIndex(): void
     {
-        $input = ['test', 'test', 'test'];
+        $input = ['test', 'test', 'test', 'test'];
 
         $schema = new TupleSchema([new StringSchema(), new StringSchema()]);
 
@@ -177,6 +179,60 @@ final class TupleSchemaTest extends TestCase
                         'template' => 'Additional input at index {{index}}',
                         'variables' => [
                             'index' => 2,
+                        ],
+                    ],
+                ],
+                [
+                    'path' => '3',
+                    'error' => [
+                        'code' => 'tuple.additionalIndex',
+                        'template' => 'Additional input at index {{index}}',
+                        'variables' => [
+                            'index' => 3,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseSuccessWithRest(): void
+    {
+        $input = ['test', 1, 2, 3];
+
+        $schema = (new TupleSchema([new StringSchema()]))->rest(new IntSchema());
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseSuccessWithRestWithoutRestItems(): void
+    {
+        $input = ['test'];
+
+        $schema = (new TupleSchema([new StringSchema()]))->rest(new IntSchema());
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseFailedWithRest(): void
+    {
+        $input = ['test', 1, 'test', 2];
+
+        $schema = (new TupleSchema([new StringSchema()]))->rest(new IntSchema());
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '2',
+                    'error' => [
+                        'code' => 'int.type',
+                        'template' => 'Type should be "int", {{given}} given',
+                        'variables' => [
+                            'given' => 'string',
                         ],
                     ],
                 ],
