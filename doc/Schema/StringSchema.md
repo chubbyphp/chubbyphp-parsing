@@ -30,11 +30,18 @@ specification: `'tést'` has a length of 4. Requires the `mbstring` extension.
 ### Content Checks
 
 ```php
+use Chubbyphp\Parsing\Enum\PatternDialect;
+
 $schema->contains('amp');    // Must contain 'amp'
 $schema->startsWith('exa');  // Must start with 'exa'
 $schema->endsWith('ple');    // Must end with 'ple'
-$schema->pattern('/^[a-z]+$/i'); // Must match regex pattern
+$schema->pattern('/^[a-z]+$/i'); // Must match delimited PCRE pattern
+$schema->pattern('^[a-z]+$', PatternDialect::ecma262); // Must match delimiter-less ECMA-262 pattern (json schema "pattern")
 ```
+
+`PatternDialect::ecma262` translates the pattern to a PCRE with ECMA-262 semantics:
+unanchored, `.` matches a code point, `\d` / `\w` / `\s` stay ASCII and `$` does not
+match before a trailing newline. Errors report the pattern as given.
 
 ### Format Validations
 
@@ -59,6 +66,7 @@ $schema->iriReference();          // Valid internationalized URI or relative ref
 $schema->uriTemplate();           // Valid URI template, example: '/users/{id}'
 $schema->jsonPointer();           // Valid JSON pointer, example: '/foo/0/bar'
 $schema->relativeJsonPointer();   // Valid relative JSON pointer, example: '1/foo/bar'
+$schema->regex();                 // Valid regex, example: '^[a-z]+$' (json schema "format": "regex")
 $schema->uuid();           // Valid UUID v4
 $schema->uuid(Uuid::v5);   // Valid UUID v5
 $schema->uuid(Uuid::any);  // Valid UUID of any version, including nil/max (json schema "format": "uuid")
@@ -156,6 +164,7 @@ $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 | `string.ipV6` | Invalid IPv6 format |
 | `string.mac` | Invalid mac format |
 | `string.pattern` | String doesn't match the pattern |
+| `string.regex` | String is not a valid regex |
 | `string.uri` | Invalid URI format |
 | `string.uriReference` | Invalid URI reference format |
 | `string.iri` | Invalid internationalized URI format |

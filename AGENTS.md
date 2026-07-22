@@ -73,3 +73,17 @@ Guidance for AI agents working on this codebase.
   validation semantics and are out of scope for a parsing library. With these, the JSON
   Schema object vocabulary is fully accounted for — a spec diff flagging any of them as
   "missing" is not a gap to fix.
+- The JSON Schema `pattern` keyword is covered by `pattern($pattern, PatternDialect::ecma262)`:
+  the delimiter-less ECMA-262 pattern is translated in `StringSchema::ecma262ToPcre()` —
+  unescaped `~` delimiters are escaped respecting backslash runs, `(*UTF)` applies
+  code-point semantics while keeping `\d`/`\w`/`\s` ASCII like ECMA-262 (the `u` modifier
+  would not: it also sets `PCRE2_UCP`, widening those classes), and `D` keeps `$` from
+  matching before a trailing newline. Matching stays unanchored, as the spec requires.
+  Errors report the pattern as given, not the translated PCRE — don't move this
+  translation out into adapters, and don't "simplify" `(*UTF)` + `D` to `u`.
+- The JSON Schema `format: "regex"` keyword is covered by `regex()`: ECMA-262 validity is
+  approximated by a PCRE compile check of the same `ecma262ToPcre()` translation, matching
+  common validator practice (ajv uses `new RegExp`, PHP validators use preg). A full
+  ECMA-262 grammar parser is intentionally out of scope, so some PCRE-only constructs
+  pass. Not to be confused with the deprecated `regexp($regexp)`, which matches the value
+  *against* a given pattern instead of validating that the value *is* one.

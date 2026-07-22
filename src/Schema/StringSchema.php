@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing\Schema;
 
+use Chubbyphp\Parsing\Enum\PatternDialect;
 use Chubbyphp\Parsing\Enum\Uuid;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
@@ -87,6 +88,9 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
 
     /** @deprecated: see ERROR_PATTERN_TEMPLATE */
     public const string ERROR_REGEXP_TEMPLATE = '{{given}} does not regexp {{regexp}}';
+
+    public const string ERROR_REGEX_CODE = 'string.regex';
+    public const string ERROR_REGEX_TEMPLATE = 'Invalid regex {{given}}';
 
     public const string ERROR_URI_CODE = 'string.uri';
     public const string ERROR_URI_TEMPLATE = 'Invalid uri {{given}}';
@@ -584,14 +588,23 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
-    public function pattern(string $pattern): static
+    /**
+     * PatternDialect::pcre expects a delimited PCRE, example: '/^[a-z]+$/i'.
+     * PatternDialect::ecma262 expects a delimiter-less ECMA-262 pattern as used by the
+     * json schema "pattern" keyword, example: '^[a-z]+$' — see ecma262ToPcre() for the
+     * translation semantics. Errors always report the pattern as given, not the
+     * translated PCRE.
+     */
+    public function pattern(string $pattern, PatternDialect $dialect = PatternDialect::pcre): static
     {
-        if (false === @preg_match($pattern, '')) {
+        $pcrePattern = PatternDialect::ecma262 === $dialect ? self::ecma262ToPcre($pattern) : $pattern;
+
+        if (false === @preg_match($pcrePattern, '')) {
             throw new \InvalidArgumentException(\sprintf('Invalid pattern "%s" given', $pattern));
         }
 
-        return $this->postParse(static function (string $string) use ($pattern) {
-            $doesMatch = 1 === preg_match($pattern, $string);
+        return $this->postParse(static function (string $string) use ($pattern, $pcrePattern) {
+            $doesMatch = 1 === preg_match($pcrePattern, $string);
 
             if ($doesMatch) {
                 return $string;
@@ -630,6 +643,29 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
                     self::ERROR_REGEXP_CODE,
                     self::ERROR_REGEXP_TEMPLATE,
                     ['regexp' => $regexp, 'given' => $string]
+                )
+            );
+        });
+    }
+
+    /**
+     * Validates that the string is itself a valid regex (json schema "format": "regex").
+     * ECMA-262 validity is approximated by a PCRE compile check of the ecma262ToPcre()
+     * translation, matching common validator practice; a full ECMA-262 grammar check
+     * is out of scope, so some PCRE-only constructs pass.
+     */
+    public function regex(): static
+    {
+        return $this->postParse(static function (string $string) {
+            if (false !== @preg_match(self::ecma262ToPcre($string), '')) {
+                return $string;
+            }
+
+            throw new ErrorsException(
+                new Error(
+                    self::ERROR_REGEX_CODE,
+                    self::ERROR_REGEX_TEMPLATE,
+                    ['given' => $string]
                 )
             );
         });
@@ -988,5 +1024,33 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
             static fn (array $matches) => rawurlencode($matches[0]),
             $string
         );
+    }
+
+    /**
+     * Translates a delimiter-less ECMA-262 pattern into a delimited PCRE: unescaped
+     * delimiter characters get escaped (respecting backslash runs), "(*UTF)" applies
+     * code-point semantics while "\d", "\w", "\s" stay ASCII as in ECMA-262 (unlike
+     * the "u" modifier, which also sets PCRE2_UCP and would widen them) and "D" keeps
+     * "$" from matching before a trailing newline (ECMA-262 has no such match, PCRE
+     * without "D" does).
+     */
+    private static function ecma262ToPcre(string $pattern): string
+    {
+        $escapedPattern = '';
+        $withinEscape = false;
+
+        foreach (str_split($pattern) as $char) {
+            if ($withinEscape) {
+                $escapedPattern .= $char;
+                $withinEscape = false;
+            } elseif ('\\' === $char) {
+                $escapedPattern .= $char;
+                $withinEscape = true;
+            } else {
+                $escapedPattern .= '~' === $char ? '\~' : $char;
+            }
+        }
+
+        return '~(*UTF)'.$escapedPattern.'~D';
     }
 }

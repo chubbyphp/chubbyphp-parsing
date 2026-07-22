@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Parsing\Unit\Schema;
 
+use Chubbyphp\Parsing\Enum\PatternDialect;
 use Chubbyphp\Parsing\Enum\Uuid;
 use Chubbyphp\Parsing\ErrorsException;
 use Chubbyphp\Parsing\Schema\StringSchema;
@@ -45,6 +46,8 @@ final class StringSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->ipV6());
         self::assertNotSame($schema, $schema->mac());
         self::assertNotSame($schema, $schema->pattern('/.*/'));
+        self::assertNotSame($schema, $schema->pattern('.*', PatternDialect::ecma262));
+        self::assertNotSame($schema, $schema->regex());
         self::assertNotSame($schema, $schema->uri());
         self::assertNotSame($schema, $schema->uriReference());
         self::assertNotSame($schema, $schema->iri());
@@ -1229,6 +1232,152 @@ final class StringSchemaTest extends TestCase
                 ],
             ], $errorsException->errors->jsonSerialize());
         }
+    }
+
+    public function testParseWithEcma262PatternWithInvalidPattern(): void
+    {
+        try {
+            (new StringSchema())->pattern('[', PatternDialect::ecma262);
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid pattern "[" given', $e->getMessage());
+        }
+    }
+
+    public function testParseWithEcma262PatternWithTrailingBackslashPattern(): void
+    {
+        try {
+            (new StringSchema())->pattern('test\\', PatternDialect::ecma262);
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Invalid pattern "test\" given', $e->getMessage());
+        }
+    }
+
+    #[DataProvider('provideParseWithValidEcma262PatternsCases')]
+    public function testParseWithValidEcma262Patterns(string $pattern, string $input): void
+    {
+        $schema = (new StringSchema())->pattern($pattern, PatternDialect::ecma262);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function provideParseWithValidEcma262PatternsCases(): iterable
+    {
+        return [
+            'anchored' => ['^[a-z]+$', 'abc'],
+            'unanchored partial match' => ['ell', 'hello'],
+            'unescaped delimiter' => ['^a~b$', 'a~b'],
+            'escaped delimiter' => ['^\~a~b$', '~a~b'],
+            'delimiter only' => ['~', '~'],
+            'escaped backslash' => ['^a\\\b$', 'a\b'],
+            'unicode code point' => ['^.$', 'ä'],
+            'ascii digit class' => ['^\d+$', '123'],
+        ];
+    }
+
+    #[DataProvider('provideParseWithInvalidEcma262PatternsCases')]
+    public function testParseWithInvalidEcma262Patterns(string $pattern, string $input): void
+    {
+        $schema = (new StringSchema())->pattern($pattern, PatternDialect::ecma262);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.pattern',
+                        'template' => '{{given}} does not pattern {{pattern}}',
+                        'variables' => [
+                            'pattern' => $pattern,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function provideParseWithInvalidEcma262PatternsCases(): iterable
+    {
+        return [
+            'no match' => ['^[a-z]+$', 'a1B2C3d4'],
+            'dollar does not match before trailing newline' => ['^[a-z]+$', "abc\n"],
+            'ascii digit class rejects non-ascii digit' => ['^\d+$', '٣'],
+            'prefix before escape is kept' => ['^a\d$', 'b5'],
+        ];
+    }
+
+    #[DataProvider('provideParseWithValidRegexesCases')]
+    public function testParseWithValidRegexes(string $input): void
+    {
+        $schema = (new StringSchema())->regex();
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function provideParseWithValidRegexesCases(): iterable
+    {
+        return [
+            'anchored' => ['^[a-z]+$'],
+            'empty' => [''],
+            'with slash' => ['^/api/[a-z]+$'],
+            'with delimiter char' => ['^a~b$'],
+            'with escaped delimiter char' => ['^a\~b$'],
+        ];
+    }
+
+    #[DataProvider('provideParseWithInvalidRegexesCases')]
+    public function testParseWithInvalidRegexes(string $input): void
+    {
+        $schema = (new StringSchema())->regex();
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'string.regex',
+                        'template' => 'Invalid regex {{given}}',
+                        'variables' => [
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function provideParseWithInvalidRegexesCases(): iterable
+    {
+        return [
+            'unclosed character class' => ['['],
+            'unclosed group' => ['(abc'],
+            'trailing backslash' => ['test\\'],
+            'invalid quantifier target' => ['*abc'],
+        ];
     }
 
     public function testParseWithValidUri(): void
