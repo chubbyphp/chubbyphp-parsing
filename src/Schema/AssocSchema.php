@@ -14,6 +14,11 @@ final class AssocSchema extends AbstractObjectSchema implements ObjectSchemaInte
     public const string ERROR_MISSING_FIELD_CODE = 'assoc.missingField';
 
     /**
+     * An assoc array accepts any additional field.
+     */
+    protected function assertAdditionalPropertiesSupport(): void {}
+
+    /**
      * @param array<string, mixed> $input
      *
      * @return null|array<string, mixed>
@@ -33,6 +38,8 @@ final class AssocSchema extends AbstractObjectSchema implements ObjectSchemaInte
                 $childrenErrors->add($e->errors, $fieldName);
             }
         }
+
+        $fields = $this->parseAdditionalFields($input, $fields, $childrenErrors);
 
         if ($childrenErrors->has()) {
             return null;

@@ -43,6 +43,8 @@ final class ObjectSchema extends AbstractObjectSchema implements ObjectSchemaInt
             }
         }
 
+        $fields = $this->parseAdditionalFields($input, $fields, $childrenErrors);
+
         if ($childrenErrors->has()) {
             return null;
         }
@@ -58,5 +60,36 @@ final class ObjectSchema extends AbstractObjectSchema implements ObjectSchemaInt
         }
 
         return new ($this->classname)(...$fields);
+    }
+
+    /**
+     * The extra fields kept by additionalProperties() become dynamic properties, so the
+     * classname must accept them (\stdClass or __set()) and construct must be false.
+     */
+    protected function assertAdditionalPropertiesSupport(): void
+    {
+        if ($this->construct) {
+            throw new \InvalidArgumentException(
+                'additionalProperties() is not supported with construct: true, an unknown named argument would be fatal'
+            );
+        }
+
+        if (!self::allowsDynamicProperties($this->classname)) {
+            throw new \InvalidArgumentException(
+                \sprintf(
+                    'additionalProperties() needs a classname which accepts dynamic properties (\stdClass or __set()), %s given',
+                    $this->classname
+                )
+            );
+        }
+    }
+
+    /**
+     * @param class-string $classname
+     */
+    private static function allowsDynamicProperties(string $classname): bool
+    {
+        return is_a($classname, \stdClass::class, true)
+            || (new \ReflectionClass($classname))->hasMethod('__set');
     }
 }

@@ -88,6 +88,41 @@ $schema->parse(['name' => 'John', '_id' => '123']);     // OK, _id stripped
 $schema->parse(['name' => 'John', 'unknown' => 'val']); // Throws error
 ```
 
+### Additional Properties
+
+Like the JSON Schema `additionalProperties` keyword with a schema: fields without a field
+schema are validated against the given schema and kept in the output as dynamic
+properties. Without `additionalProperties()` unknown fields are silently dropped, with
+`strict()` they are rejected (the JSON Schema `additionalProperties: false` case) -
+combining the two throws an `\InvalidArgumentException`:
+
+```php
+$schema = $p->object(['name' => $p->string()])->additionalProperties($p->float());
+
+$schema->parse(['name' => 'John', 'score' => 1.5]);
+// Returns: stdClass { name: 'John', score: 1.5 }
+
+$schema->parse(['name' => 'John', 'score' => 'high']);
+// Throws: score: Type should be "float", "string" given
+```
+
+The classname must accept dynamic properties: `\stdClass` (the default, including
+subclasses) or a class implementing `__set()`. It also cannot be combined with
+`construct: true`, since an extra field would be passed as an unknown named constructor
+argument. Violating either constraint throws an `\InvalidArgumentException` when
+`additionalProperties()` is called.
+
+A class marked with `#[\AllowDynamicProperties]` is intentionally not accepted: the
+attribute only suppresses the dynamic property deprecation, it is no opt-in for
+input-driven property names - a colliding declared property (private or typed) would
+cause a fatal error instead of a parse error. For such classes compose instead:
+
+```php
+$schema = $p->assoc(['name' => $p->string()])
+    ->additionalProperties($p->float())
+    ->postParse(static fn (array $data) => new TheClass($data));
+```
+
 ### Required Fields
 
 Like the JSON Schema `required` keyword: fields listed in `required()` must be present -

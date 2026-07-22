@@ -48,6 +48,7 @@ final class AssocSchemaTest extends TestCase
         self::assertNotSame($schema, $schema->strict());
         self::assertNotSame($schema, $schema->optional([]));
         self::assertNotSame($schema, $schema->required());
+        self::assertNotSame($schema, $schema->additionalProperties(new StringSchema()));
     }
 
     public function testConstructWithoutFieldName(): void
@@ -185,6 +186,125 @@ final class AssocSchemaTest extends TestCase
         self::assertIsArray($output);
 
         self::assertSame(['field1' => 'test'], $output);
+    }
+
+    public function testParseSuccessWithAdditionalProperties(): void
+    {
+        $input = ['field1' => 'test', 'field2' => 1.5, 'field3' => 2.5];
+
+        $schema = (new AssocSchema(['field1' => new StringSchema()]))
+            ->additionalProperties(new FloatSchema())
+        ;
+
+        $output = $schema->parse($input);
+
+        self::assertIsArray($output);
+
+        self::assertSame($input, $output);
+    }
+
+    public function testParseSuccessWithAdditionalPropertiesAndRequired(): void
+    {
+        $input = ['field1' => 'test', 'field2' => 1.5];
+
+        $schema = (new AssocSchema(['field1' => new StringSchema(), 'field3' => new IntSchema()]))
+            ->required(['field1'])
+            ->additionalProperties(new FloatSchema())
+        ;
+
+        $output = $schema->parse($input);
+
+        self::assertIsArray($output);
+
+        self::assertSame($input, $output);
+    }
+
+    public function testParseFailedWithInvalidAdditionalProperties(): void
+    {
+        $input = ['field1' => 'test', 'field2' => 1.5, 'field3' => 'test'];
+
+        $schema = (new AssocSchema(['field1' => new StringSchema()]))
+            ->additionalProperties(new FloatSchema())
+        ;
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => 'field3',
+                    'error' => [
+                        'code' => 'float.type',
+                        'template' => 'Type should be "float", {{given}} given',
+                        'variables' => [
+                            'given' => 'string',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testParseFailedWithInvalidAdditionalPropertyWithIntegerFieldName(): void
+    {
+        $input = ['field1' => 'test', 5 => 'test'];
+
+        $schema = (new AssocSchema(['field1' => new StringSchema()]))
+            ->additionalProperties(new FloatSchema())
+        ;
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '5',
+                    'error' => [
+                        'code' => 'float.type',
+                        'template' => 'Type should be "float", {{given}} given',
+                        'variables' => [
+                            'given' => 'string',
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
+    public function testAdditionalPropertiesFailedWithStrict(): void
+    {
+        $schema = (new AssocSchema(['field1' => new StringSchema()]))->strict();
+
+        try {
+            $schema->additionalProperties(new FloatSchema());
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $invalidArgumentException) {
+            self::assertSame(
+                'additionalProperties() cannot be combined with strict()',
+                $invalidArgumentException->getMessage()
+            );
+        }
+    }
+
+    public function testStrictFailedWithAdditionalProperties(): void
+    {
+        $schema = (new AssocSchema(['field1' => new StringSchema()]))->additionalProperties(new FloatSchema());
+
+        try {
+            $schema->strict();
+
+            throw new \Exception('code should not be reached');
+        } catch (\InvalidArgumentException $invalidArgumentException) {
+            self::assertSame(
+                'strict() cannot be combined with additionalProperties()',
+                $invalidArgumentException->getMessage()
+            );
+        }
     }
 
     public function testParseSuccessWithDefault(): void

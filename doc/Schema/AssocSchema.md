@@ -72,6 +72,24 @@ $schema->parse(['name' => 'John', '_id' => '123']);     // OK, _id stripped
 $schema->parse(['name' => 'John', 'unknown' => 'val']); // Throws error
 ```
 
+### Additional Properties
+
+Like the JSON Schema `additionalProperties` keyword with a schema: fields without a field
+schema are validated against the given schema and kept in the output. Without
+`additionalProperties()` unknown fields are silently dropped, with `strict()` they are
+rejected (the JSON Schema `additionalProperties: false` case) - combining the two throws
+an `\InvalidArgumentException`:
+
+```php
+$schema = $p->assoc(['name' => $p->string()])->additionalProperties($p->float());
+
+$schema->parse(['name' => 'John', 'score' => 1.5]);
+// Returns: ['name' => 'John', 'score' => 1.5]
+
+$schema->parse(['name' => 'John', 'score' => 'high']);
+// Throws: score: Type should be "float", "string" given
+```
+
 ### Required Fields
 
 Like the JSON Schema `required` keyword: fields listed in `required()` must be present -

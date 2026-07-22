@@ -39,6 +39,8 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
      */
     private ?array $required = null;
 
+    private ?SchemaInterface $additionalFieldSchema = null;
+
     /**
      * @param array<mixed, mixed> $fieldToSchema
      */
@@ -101,8 +103,31 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
 
     final public function strict(array $strict = []): static
     {
+        if (null !== $this->additionalFieldSchema) {
+            throw new \InvalidArgumentException('strict() cannot be combined with additionalProperties()');
+        }
+
         $clone = clone $this;
         $clone->strict = $strict;
+
+        return $clone;
+    }
+
+    /**
+     * Fields without a field schema are validated against the given schema and kept in the
+     * output (json schema spec additionalProperties). Without it unknown fields get dropped.
+     * Mutually exclusive with strict(), which covers the additionalProperties: false case.
+     */
+    final public function additionalProperties(SchemaInterface $additionalFieldSchema): static
+    {
+        if (\is_array($this->strict)) {
+            throw new \InvalidArgumentException('additionalProperties() cannot be combined with strict()');
+        }
+
+        $this->assertAdditionalPropertiesSupport();
+
+        $clone = clone $this;
+        $clone->additionalFieldSchema = $additionalFieldSchema;
 
         return $clone;
     }
@@ -191,6 +216,42 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
         }
 
         return $fieldSchema->parse(null);
+    }
+
+    /**
+     * Hook for subclasses to reject additionalProperties() based on their configuration.
+     */
+    abstract protected function assertAdditionalPropertiesSupport(): void;
+
+    /**
+     * @param array<string, mixed> $input
+     * @param array<string, mixed> $fields
+     *
+     * @return array<string, mixed>
+     */
+    final protected function parseAdditionalFields(array $input, array $fields, Errors $childrenErrors): array
+    {
+        if (null === $this->additionalFieldSchema) {
+            return $fields;
+        }
+
+        $fieldToSchema = $this->getFieldToSchema();
+
+        foreach ($input as $fieldName => $fieldValue) {
+            $fieldName = (string) $fieldName;
+
+            if (isset($fieldToSchema[$fieldName])) {
+                continue;
+            }
+
+            try {
+                $fields[$fieldName] = $this->additionalFieldSchema->parse($fieldValue);
+            } catch (ErrorsException $e) {
+                $childrenErrors->add($e->errors, $fieldName);
+            }
+        }
+
+        return $fields;
     }
 
     /**
