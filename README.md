@@ -90,6 +90,7 @@ $user = $userSchema->parse([
 |--------|-------------|---------------|
 | `union()` | Value matches one of several schemas | [UnionSchema](doc/Schema/UnionSchema.md) |
 | `discriminatedUnion()` | Tagged unions with a discriminator field | [DiscriminatedUnionSchema](doc/Schema/DiscriminatedUnionSchema.md) |
+| `not()` | Value must not match the given schema | [NotSchema](doc/Schema/NotSchema.md) |
 
 ### Special Types
 

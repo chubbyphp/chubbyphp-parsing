@@ -14,6 +14,7 @@ use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
+use Chubbyphp\Parsing\Schema\NotSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
 use Chubbyphp\Parsing\Schema\RecordSchema;
@@ -25,6 +26,7 @@ use Chubbyphp\Parsing\Schema\UnionSchema;
 /**
  * @method AssocSchema  assoc(array<string, SchemaInterface> $fieldNameToSchema)
  * @method ConstSchema  const(bool|float|int|string $const)
+ * @method NotSchema    not(SchemaInterface $schema)
  * @method ObjectSchema object(array<string, SchemaInterface> $fieldNameToSchema, class-string $classname = 'stdClass', bool $construct = false)
  */
 interface ParserInterface
@@ -68,6 +70,8 @@ interface ParserInterface
      * @deprecated use const() instead
      */
     public function literal(bool|float|int|string $literal): LiteralSchema;
+
+    // public function not(SchemaInterface $schema): NotSchema;
 
     /**
      * @param array<string, SchemaInterface> $fieldNameToSchema

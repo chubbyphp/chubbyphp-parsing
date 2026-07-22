@@ -15,6 +15,7 @@ use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
+use Chubbyphp\Parsing\Schema\NotSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
 use Chubbyphp\Parsing\Schema\RecordSchema;
@@ -98,6 +99,11 @@ final class Parser implements ParserInterface
     public function literal(bool|float|int|string $literal): LiteralSchema
     {
         return new LiteralSchema($literal);
+    }
+
+    public function not(SchemaInterface $schema): NotSchema
+    {
+        return new NotSchema($schema);
     }
 
     /**

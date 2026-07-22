@@ -73,6 +73,12 @@ Guidance for AI agents working on this codebase.
   validation semantics and are out of scope for a parsing library. With these, the JSON
   Schema object vocabulary is fully accounted for — a spec diff flagging any of them as
   "missing" is not a gap to fix.
+- The JSON Schema `not` keyword is covered by `not($schema)` (`NotSchema`): parsing
+  succeeds iff the wrapped schema fails, and returns the input **unchanged** — `not` is
+  pure validation, so the wrapped schema's coercions/transformations must never leak
+  into the output; don't "improve" it to return the wrapped schema's output. When it
+  fails there are no inner errors to report (the wrapped schema succeeded), so the
+  single `not.match` error is intentional, not a missing feature.
 - The JSON Schema `pattern` keyword is covered by `pattern($pattern, PatternDialect::ecma262)`:
   the delimiter-less ECMA-262 pattern is translated in `StringSchema::ecma262ToPcre()` —
   unescaped `~` delimiters are escaped respecting backslash runs, `(*UTF)` applies

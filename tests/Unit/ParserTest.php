@@ -16,6 +16,7 @@ use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
+use Chubbyphp\Parsing\Schema\NotSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\RecordSchema;
 use Chubbyphp\Parsing\Schema\RespectValidationSchema;
@@ -181,6 +182,15 @@ final class ParserTest extends TestCase
         self::assertSame('Use Chubbyphp\Parsing\Schema\ConstSchema instead', $lastError['message']);
 
         self::assertInstanceOf(LiteralSchema::class, $literalSchema);
+    }
+
+    public function testNot(): void
+    {
+        $p = new Parser();
+
+        $notSchema = $p->not($p->string());
+
+        self::assertInstanceOf(NotSchema::class, $notSchema);
     }
 
     public function testObjectStdClass(): void
