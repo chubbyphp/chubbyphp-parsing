@@ -4,11 +4,18 @@ Guidance for AI agents working on this codebase.
 
 ## Design decisions
 
-- `minProperties()` / `maxProperties()` exist only on `RecordSchema` and must not be
-  added to `AssocSchema` / `ObjectSchema`: those schemas provide the set of properties
-  themselves, and `required()` / `strict()` already determine which of them may or must
-  be present. Property-count constraints only make sense on `record()`, where the keys
-  are dynamic.
+- `propertyNames()` / `minProperties()` / `maxProperties()` exist only on `RecordSchema`
+  and must not be added to `AssocSchema` / `ObjectSchema`. The JSON Schema spec allows
+  these keywords on any object, so a spec comparison will flag them as "missing" there —
+  that is intentional, not a gap to fix: on a fixed shape the property count is already
+  determined by the field definitions plus `required()` (min = required fields,
+  max = defined fields), so a count constraint is redundant or contradictory, and
+  `propertyNames` is pointless on keys that are literals in the schema itself (Zod draws
+  the same line: `z.object()` has no such constraints either). The only inputs where they
+  would carry meaning are "at least N of these optional fields" (better expressed as a
+  union with different `required()` sets, or `postParse()`) and capping the total key
+  count when `additionalProperties()` admits dynamic keys — if that concrete need ever
+  materializes, revisit them together with `additionalProperties()`, not before.
 - There is intentionally no dedicated null schema for the JSON Schema `type: "null"`:
   `const(null)` already validates exactly the value `null`, and `nullable()` covers
   optional-null on any schema. Don't propose adding a `NullSchema`.
@@ -46,3 +53,17 @@ Guidance for AI agents working on this codebase.
   intentionally out of scope: its spec semantics require `allOf` (a key matching multiple
   patterns must validate against all their schemas), and it can be composed from
   `record(union([...]))` plus `propertyNames()` or a `postParse()` closure instead.
+- The JSON Schema `dependentRequired` / `dependentSchemas` keywords ("if key A is
+  present, key B must be too / the object must match an extra schema") are intentionally
+  not implemented as an API on `AssocSchema` / `ObjectSchema`: they compose cleanly with
+  a `postParse()` closure that throws an `ErrorsException`, which mirrors how Zod handles
+  them (`superRefine`, no native keyword) — too rare to earn a dedicated method. The
+  related composition keywords need nothing either: `unevaluatedProperties` is only
+  meaningful under `allOf`/`$ref` composition, which the library deliberately has no
+  equivalent of (shapes are merged in PHP via `getFieldToSchema()` before construction),
+  so it degenerates to the covered `additionalProperties`; `if`/`then`/`else` conditional
+  shapes are expressed with `discriminatedUnion()` / `union()`; and pure annotations
+  (`title`, `description`, `examples`, `deprecated`, `readOnly`/`writeOnly`) have no
+  validation semantics and are out of scope for a parsing library. With these, the JSON
+  Schema object vocabulary is fully accounted for — a spec diff flagging any of them as
+  "missing" is not a gap to fix.
