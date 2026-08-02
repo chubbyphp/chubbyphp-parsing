@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing;
 
+use Chubbyphp\Parsing\Schema\AnySchema;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\AssocSchema;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
@@ -24,6 +25,7 @@ use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
 
 /**
+ * @method AnySchema    any()
  * @method AssocSchema  assoc(array<string, SchemaInterface> $fieldNameToSchema)
  * @method ConstSchema  const(bool|float|int|string $const)
  * @method NotSchema    not(SchemaInterface $schema)
@@ -31,6 +33,8 @@ use Chubbyphp\Parsing\Schema\UnionSchema;
  */
 interface ParserInterface
 {
+    // public function any(): AnySchema;
+
     public function array(SchemaInterface $itemSchema): ArraySchema;
 
     // /**

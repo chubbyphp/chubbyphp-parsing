@@ -73,6 +73,12 @@ Guidance for AI agents working on this codebase.
   validation semantics and are out of scope for a parsing library. With these, the JSON
   Schema object vocabulary is fully accounted for — a spec diff flagging any of them as
   "missing" is not a gap to fix.
+- The JSON Schema boolean schema `true` and the empty schema `{}` are covered by `any()`
+  (`AnySchema`): it accepts every input — including `null`, without `nullable()` — and
+  returns it unchanged; parsing itself can never fail and there are no error codes. It is
+  the schema to pass where the spec allows `true` (`additionalProperties: true`,
+  `items: true`, `rest()` on tuples), and the boolean schema `false` is `not(any())`.
+  Don't add type restrictions, coercions, or a dedicated `NeverSchema`/`false()`.
 - The JSON Schema `not` keyword is covered by `not($schema)` (`NotSchema`): parsing
   succeeds iff the wrapped schema fails, and returns the input **unchanged** — `not` is
   pure validation, so the wrapped schema's coercions/transformations must never leak

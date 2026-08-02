@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing;
 
+use Chubbyphp\Parsing\Schema\AnySchema;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\AssocSchema;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
@@ -28,6 +29,11 @@ use Respect\Validation\Validatable;
 
 final class Parser implements ParserInterface
 {
+    public function any(): AnySchema
+    {
+        return new AnySchema();
+    }
+
     public function array(SchemaInterface $itemSchema): ArraySchema
     {
         return new ArraySchema($itemSchema);

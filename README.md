@@ -96,6 +96,7 @@ $user = $userSchema->parse([
 
 | Schema | Description | Documentation |
 |--------|-------------|---------------|
+| `any()` | Accepts any value unchanged | [AnySchema](doc/Schema/AnySchema.md) |
 | `const()` | Exact value matching | [ConstSchema](doc/Schema/ConstSchema.md) |
 | `backedEnum()` | PHP BackedEnum validation | [BackedEnumSchema](doc/Schema/BackedEnumSchema.md) |
 | `lazy()` | Recursive/self-referencing schemas | [LazySchema](doc/Schema/LazySchema.md) |

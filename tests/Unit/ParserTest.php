@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Tests\Parsing\Unit;
 
 use Chubbyphp\Parsing\Parser;
+use Chubbyphp\Parsing\Schema\AnySchema;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\AssocSchema;
 use Chubbyphp\Parsing\Schema\BackedEnumSchema;
@@ -65,6 +66,15 @@ final readonly class ObjectConstructDemo implements \JsonSerializable
  */
 final class ParserTest extends TestCase
 {
+    public function testAny(): void
+    {
+        $p = new Parser();
+
+        $anySchema = $p->any();
+
+        self::assertInstanceOf(AnySchema::class, $anySchema);
+    }
+
     public function testArray(): void
     {
         $p = new Parser();
