@@ -31,15 +31,6 @@ must result in an integer), not a binary floating point comparison. This means `
 multiple of `0.1`, while `0.30000000000000004` (e.g. the result of `0.1 + 0.2`) is not.
 Requires the `bcmath` extension.
 
-### Sign Constraints
-
-```php
-$schema->positive();    // Must be > 0
-$schema->nonNegative(); // Must be >= 0
-$schema->negative();    // Must be < 0
-$schema->nonPositive(); // Must be <= 0
-```
-
 ## Conversions
 
 ```php
@@ -52,11 +43,11 @@ $schema->toString(); // Convert to string
 ### Price Validation
 
 ```php
-$priceSchema = $p->float()->nonNegative();
+$priceSchema = $p->float()->minimum(0.0);
 
 $priceSchema->parse(19.99); // Returns: 19.99
 $priceSchema->parse(0.0);   // Returns: 0.0
-$priceSchema->parse(-5.0);  // Throws: nonNegative validation error
+$priceSchema->parse(-5.0);  // Throws: minimum validation error
 ```
 
 ### Percentage

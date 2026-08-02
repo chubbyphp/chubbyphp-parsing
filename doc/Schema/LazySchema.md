@@ -94,7 +94,7 @@ $nodeSchema->parse([
 ```php
 $commentSchema = $p->lazy(static function () use ($p, &$commentSchema) {
     return $p->object([
-        'id' => $p->string()->uuidV4(),
+        'id' => $p->string()->uuid(),
         'author' => $p->string(),
         'text' => $p->string(),
         'createdAt' => $p->string()->toDateTime(),
@@ -125,7 +125,7 @@ $commentSchema->parse([
 $fileSchema = $p->object([
     'type' => $p->const('file'),
     'name' => $p->string(),
-    'size' => $p->int()->nonNegative(),
+    'size' => $p->int()->minimum(0),
 ]);
 
 $folderSchema = $p->lazy(static function () use ($p, &$folderSchema, $fileSchema) {
@@ -193,7 +193,7 @@ $jsonSchemaType = $p->lazy(static function () use ($p, &$jsonSchemaType) {
     return $p->discriminatedUnion([
         $p->object([
             'type' => $p->const('string'),
-            'minLength' => $p->int()->nonNegative(),
+            'minLength' => $p->int()->minimum(0),
         ])->required(['type']),
         $p->object([
             'type' => $p->const('number'),

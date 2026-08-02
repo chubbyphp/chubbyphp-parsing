@@ -26,12 +26,6 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_CONTAINS_CODE = 'string.contains';
     public const string ERROR_CONTAINS_TEMPLATE = '{{given}} does not contain {{contains}}';
 
-    /** @deprecated: see ERROR_CONTAINS_CODE */
-    public const string ERROR_INCLUDES_CODE = 'string.includes';
-
-    /** @deprecated: see ERROR_CONTAINS_TEMPLATE */
-    public const string ERROR_INCLUDES_TEMPLATE = '{{given}} does not include {{includes}}';
-
     public const string ERROR_STARTSWITH_CODE = 'string.startsWith';
     public const string ERROR_STARTSWITH_TEMPLATE = '{{given}} does not starts with {{startsWith}}';
 
@@ -59,12 +53,6 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_HOSTNAME_CODE = 'string.hostname';
     public const string ERROR_HOSTNAME_TEMPLATE = 'Invalid hostname {{given}}';
 
-    /** @deprecated: see ERROR_HOSTNAME_CODE */
-    public const string ERROR_DOMAIN_CODE = 'string.domain';
-
-    /** @deprecated: see ERROR_HOSTNAME_TEMPLATE */
-    public const string ERROR_DOMAIN_TEMPLATE = 'Invalid domain {{given}}';
-
     public const string ERROR_EMAIL_CODE = 'string.email';
     public const string ERROR_EMAIL_TEMPLATE = 'Invalid email {{given}}';
 
@@ -74,32 +62,14 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     public const string ERROR_MAC_CODE = 'string.mac';
     public const string ERROR_MAC_TEMPLATE = 'Invalid mac {{given}}';
 
-    /** @deprecated: see ERROR_PATTERN_CODE */
-    public const string ERROR_MATCH_CODE = 'string.match';
-
-    /** @deprecated: see ERROR_PATTERN_TEMPLATE */
-    public const string ERROR_MATCH_TEMPLATE = '{{given}} does not match {{match}}';
-
     public const string ERROR_PATTERN_CODE = 'string.pattern';
     public const string ERROR_PATTERN_TEMPLATE = '{{given}} does not pattern {{pattern}}';
-
-    /** @deprecated: see ERROR_PATTERN_CODE */
-    public const string ERROR_REGEXP_CODE = 'string.regexp';
-
-    /** @deprecated: see ERROR_PATTERN_TEMPLATE */
-    public const string ERROR_REGEXP_TEMPLATE = '{{given}} does not regexp {{regexp}}';
 
     public const string ERROR_REGEX_CODE = 'string.regex';
     public const string ERROR_REGEX_TEMPLATE = 'Invalid regex {{given}}';
 
     public const string ERROR_URI_CODE = 'string.uri';
     public const string ERROR_URI_TEMPLATE = 'Invalid uri {{given}}';
-
-    /** @deprecated: see ERROR_URI_CODE */
-    public const string ERROR_URL_CODE = 'string.url';
-
-    /** @deprecated: see ERROR_URI_TEMPLATE */
-    public const string ERROR_URL_TEMPLATE = 'Invalid url {{given}}';
 
     public const string ERROR_URI_REFERENCE_CODE = 'string.uriReference';
     public const string ERROR_URI_REFERENCE_TEMPLATE = 'Invalid uri-reference {{given}}';
@@ -281,28 +251,6 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
-    /**
-     * @deprecated Use contains($contains) instead
-     */
-    public function includes(string $includes): static
-    {
-        @trigger_error('Use contains($contains) instead', E_USER_DEPRECATED);
-
-        return $this->postParse(static function (string $string) use ($includes) {
-            if (str_contains($string, $includes)) {
-                return $string;
-            }
-
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_INCLUDES_CODE,
-                    self::ERROR_INCLUDES_TEMPLATE,
-                    ['includes' => $includes, 'given' => $string]
-                )
-            );
-        });
-    }
-
     public function startsWith(string $startsWith): static
     {
         return $this->postParse(static function (string $string) use ($startsWith) {
@@ -426,28 +374,6 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
         });
     }
 
-    /**
-     * @deprecated Use hostname() instead
-     */
-    public function domain(): static
-    {
-        @trigger_error('Use hostname() instead', E_USER_DEPRECATED);
-
-        return $this->postParse(static function (string $string) {
-            if (filter_var($string, FILTER_VALIDATE_DOMAIN)) {
-                return $string;
-            }
-
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_DOMAIN_CODE,
-                    self::ERROR_DOMAIN_TEMPLATE,
-                    ['given' => $string]
-                )
-            );
-        });
-    }
-
     public function idnHostname(): static
     {
         return $this->postParse(static function (string $string) {
@@ -561,34 +487,6 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
     }
 
     /**
-     * @deprecated: Use pattern($pattern) instead
-     */
-    public function match(string $match): static
-    {
-        @trigger_error('Use pattern($pattern) instead', E_USER_DEPRECATED);
-
-        if (false === @preg_match($match, '')) {
-            throw new \InvalidArgumentException(\sprintf('Invalid match "%s" given', $match));
-        }
-
-        return $this->postParse(static function (string $string) use ($match) {
-            $doesMatch = 1 === preg_match($match, $string);
-
-            if ($doesMatch) {
-                return $string;
-            }
-
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_MATCH_CODE,
-                    self::ERROR_MATCH_TEMPLATE,
-                    ['match' => $match, 'given' => $string]
-                )
-            );
-        });
-    }
-
-    /**
      * PatternDialect::pcre expects a delimited PCRE, example: '/^[a-z]+$/i'.
      * PatternDialect::ecma262 expects a delimiter-less ECMA-262 pattern as used by the
      * json schema "pattern" keyword, example: '^[a-z]+$' — see ecma262ToPcre() for the
@@ -615,34 +513,6 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
                     self::ERROR_PATTERN_CODE,
                     self::ERROR_PATTERN_TEMPLATE,
                     ['pattern' => $pattern, 'given' => $string]
-                )
-            );
-        });
-    }
-
-    /**
-     * @deprecated: Use pattern($pattern) instead
-     */
-    public function regexp(string $regexp): static
-    {
-        @trigger_error('Use pattern($pattern) instead', E_USER_DEPRECATED);
-
-        if (false === @preg_match($regexp, '')) {
-            throw new \InvalidArgumentException(\sprintf('Invalid regexp "%s" given', $regexp));
-        }
-
-        return $this->postParse(static function (string $string) use ($regexp) {
-            $doesMatch = 1 === preg_match($regexp, $string);
-
-            if ($doesMatch) {
-                return $string;
-            }
-
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_REGEXP_CODE,
-                    self::ERROR_REGEXP_TEMPLATE,
-                    ['regexp' => $regexp, 'given' => $string]
                 )
             );
         });
@@ -682,28 +552,6 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
                 new Error(
                     self::ERROR_URI_CODE,
                     self::ERROR_URI_TEMPLATE,
-                    ['given' => $string]
-                )
-            );
-        });
-    }
-
-    /**
-     * @deprecated Use uri() instead
-     */
-    public function url(): static
-    {
-        @trigger_error('Use uri() instead', E_USER_DEPRECATED);
-
-        return $this->postParse(static function (string $string) {
-            if (filter_var($string, FILTER_VALIDATE_URL)) {
-                return $string;
-            }
-
-            throw new ErrorsException(
-                new Error(
-                    self::ERROR_URL_CODE,
-                    self::ERROR_URL_TEMPLATE,
                     ['given' => $string]
                 )
             );
@@ -845,22 +693,6 @@ final class StringSchema extends AbstractSchemaInnerParse implements SchemaInter
                 )
             );
         });
-    }
-
-    /**
-     * @deprecated use uuid()
-     */
-    public function uuidV4(): static
-    {
-        return $this->uuid(Uuid::v4);
-    }
-
-    /**
-     * @deprecated use uuid(Chubbyphp\Parsing\Enum\Uuid::v5)
-     */
-    public function uuidV5(): static
-    {
-        return $this->uuid(Uuid::v5);
     }
 
     public function trim(): static

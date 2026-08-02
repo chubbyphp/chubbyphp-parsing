@@ -58,8 +58,8 @@ $schema->parse('');      // Throws error (empty string fails minLength)
 
 ```php
 $idSchema = $p->union([
-    $p->int()->positive(),
-    $p->string()->uuidV4(),
+    $p->int()->exclusiveMinimum(0),
+    $p->string()->uuid(),
 ]);
 
 $idSchema->parse(123);                                    // Returns: 123

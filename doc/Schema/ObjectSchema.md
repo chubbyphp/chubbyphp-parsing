@@ -145,9 +145,6 @@ $schema->parse(['nickname' => 'Johnny']);
 Without `required()` a missing field is parsed as null, so `nullable()` / `default()`
 apply.
 
-The deprecated `optional()` is the inverse: listed fields won't appear in the output if
-not provided, while all other missing fields are parsed as null. Use `required()` instead.
-
 ## Schema Utilities
 
 ### Get Field Schema
@@ -220,7 +217,7 @@ $schema = $p->object([
     'id' => $p->int(),
     'name' => $p->string(),
     'bio' => $p->string()->nullable(),      // Can be null
-    'website' => $p->string()->url(),        // Validated if present
+    'website' => $p->string()->uri(),        // Validated if present
 ])->required(['id', 'name', 'bio']);         // website field is optional
 
 // Valid inputs:
@@ -232,7 +229,7 @@ $schema->parse(['id' => 1, 'name' => 'John', 'bio' => 'Hello', 'website' => 'htt
 
 ```php
 $petSchema = $p->object([
-    'id' => $p->string()->uuidV4(),
+    'id' => $p->string()->uuid(),
     'name' => $p->string()->minLength(1),
     'vaccinations' => $p->array(
         $p->object([
@@ -243,8 +240,8 @@ $petSchema = $p->object([
 ]);
 
 $listRequestSchema = $p->object([
-    'offset' => $p->int()->nonNegative(),
-    'limit' => $p->int()->positive()->maximum(100),
+    'offset' => $p->int()->minimum(0),
+    'limit' => $p->int()->exclusiveMinimum(0)->maximum(100),
     'sort' => $p->record($p->const('asc')),
     'items' => $p->array($petSchema),
 ]);

@@ -16,7 +16,6 @@ use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IfThenElseSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
-use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\NotSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
@@ -27,31 +26,21 @@ use Chubbyphp\Parsing\Schema\StringSchema;
 use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
 
-/**
- * @method AllOfSchema      allOf(array<SchemaInterface> $schemas)
- * @method AnySchema        any()
- * @method AssocSchema      assoc(array<string, SchemaInterface> $fieldNameToSchema)
- * @method ConstSchema      const(bool|float|int|string $const)
- * @method IfThenElseSchema if(SchemaInterface $ifSchema)
- * @method NotSchema        not(SchemaInterface $schema)
- * @method ObjectSchema     object(array<string, SchemaInterface> $fieldNameToSchema, class-string $classname = 'stdClass', bool $construct = false)
- * @method OneOfSchema      oneOf(array<SchemaInterface> $schemas)
- */
 interface ParserInterface
 {
-    // /**
-    //  * @param array<SchemaInterface> $schemas
-    //  */
-    // public function allOf(array $schemas): AllOfSchema;
+    /**
+     * @param array<SchemaInterface> $schemas
+     */
+    public function allOf(array $schemas): AllOfSchema;
 
-    // public function any(): AnySchema;
+    public function any(): AnySchema;
 
     public function array(SchemaInterface $itemSchema): ArraySchema;
 
-    // /**
-    //  * @param array<string, SchemaInterface> $fieldNameToSchema
-    //  */
-    // public function assoc(array $fieldNameToSchema): AssocSchema;
+    /**
+     * @param array<string, SchemaInterface> $fieldNameToSchema
+     */
+    public function assoc(array $fieldNameToSchema): AssocSchema;
 
     /**
      * @param class-string<\BackedEnum> $backedEnumClass
@@ -60,10 +49,10 @@ interface ParserInterface
 
     public function bool(): BoolSchema;
 
-    // /**
-    //  * @param null|array<mixed>|bool|float|int|\stdClass|string $const any json value: null, boolean, number, string, array or object (associative array / \stdClass)
-    //  */
-    // public function const(array|bool|float|int|\stdClass|string|null $const): ConstSchema;
+    /**
+     * @param null|array<mixed>|bool|float|int|\stdClass|string $const any json value: null, boolean, number, string, array or object (associative array / \stdClass)
+     */
+    public function const(array|bool|float|int|\stdClass|string|null $const): ConstSchema;
 
     public function dateTime(): DateTimeSchema;
 
@@ -74,7 +63,7 @@ interface ParserInterface
 
     public function float(): FloatSchema;
 
-    // public function if(SchemaInterface $ifSchema): IfThenElseSchema;
+    public function if(SchemaInterface $ifSchema): IfThenElseSchema;
 
     public function int(): IntSchema;
 
@@ -83,23 +72,18 @@ interface ParserInterface
      */
     public function lazy(\Closure $lazy): SchemaInterface;
 
-    /**
-     * @deprecated use const() instead
-     */
-    public function literal(bool|float|int|string $literal): LiteralSchema;
-
-    // public function not(SchemaInterface $schema): NotSchema;
+    public function not(SchemaInterface $schema): NotSchema;
 
     /**
      * @param array<string, SchemaInterface> $fieldNameToSchema
      * @param class-string                   $classname
      */
-    public function object(array $fieldNameToSchema, string $classname = \stdClass::class): ObjectSchema;
+    public function object(array $fieldNameToSchema, string $classname = \stdClass::class, bool $construct = false): ObjectSchema;
 
-    // /**
-    //  * @param array<SchemaInterface> $schemas
-    //  */
-    // public function oneOf(array $schemas): OneOfSchema;
+    /**
+     * @param array<SchemaInterface> $schemas
+     */
+    public function oneOf(array $schemas): OneOfSchema;
 
     public function record(SchemaInterface $fieldSchema): RecordSchema;
 

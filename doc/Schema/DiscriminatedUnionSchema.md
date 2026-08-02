@@ -81,17 +81,17 @@ $contactSchema = $p->discriminatedUnion([
 $shapeSchema = $p->discriminatedUnion([
     $p->object([
         'type' => $p->const('circle'),
-        'radius' => $p->float()->positive(),
+        'radius' => $p->float()->exclusiveMinimum(0.0),
     ]),
     $p->object([
         'type' => $p->const('rectangle'),
-        'width' => $p->float()->positive(),
-        'height' => $p->float()->positive(),
+        'width' => $p->float()->exclusiveMinimum(0.0),
+        'height' => $p->float()->exclusiveMinimum(0.0),
     ]),
     $p->object([
         'type' => $p->const('triangle'),
-        'base' => $p->float()->positive(),
-        'height' => $p->float()->positive(),
+        'base' => $p->float()->exclusiveMinimum(0.0),
+        'height' => $p->float()->exclusiveMinimum(0.0),
     ]),
 ], 'type');
 ```
@@ -102,17 +102,17 @@ $shapeSchema = $p->discriminatedUnion([
 $eventSchema = $p->discriminatedUnion([
     $p->object([
         'event' => $p->const('user.created'),
-        'userId' => $p->string()->uuidV4(),
+        'userId' => $p->string()->uuid(),
         'email' => $p->string()->email(),
     ]),
     $p->object([
         'event' => $p->const('user.updated'),
-        'userId' => $p->string()->uuidV4(),
+        'userId' => $p->string()->uuid(),
         'changes' => $p->record($p->string()),
     ]),
     $p->object([
         'event' => $p->const('user.deleted'),
-        'userId' => $p->string()->uuidV4(),
+        'userId' => $p->string()->uuid(),
         'deletedAt' => $p->string()->toDateTime(),
     ]),
 ], 'event');

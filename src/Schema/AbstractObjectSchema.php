@@ -32,11 +32,6 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
     /**
      * @var null|array<string>
      */
-    private ?array $optional = null;
-
-    /**
-     * @var null|array<string>
-     */
     private ?array $required = null;
 
     private ?SchemaInterface $additionalFieldSchema = null;
@@ -128,21 +123,6 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
 
         $clone = clone $this;
         $clone->additionalFieldSchema = $additionalFieldSchema;
-
-        return $clone;
-    }
-
-    /**
-     * @deprecated use required() instead, fields not listed there are optional
-     *
-     * @param array<string> $optional
-     */
-    final public function optional(array $optional = []): static
-    {
-        @trigger_error('Use required() instead, fields not listed there are optional', E_USER_DEPRECATED);
-
-        $clone = clone $this;
-        $clone->optional = $optional;
 
         return $clone;
     }
@@ -261,10 +241,6 @@ abstract class AbstractObjectSchema extends AbstractSchemaInnerParse implements 
     {
         if (\array_key_exists($fieldName, $input)) {
             return false;
-        }
-
-        if (\is_array($this->optional) && \in_array($fieldName, $this->optional, true)) {
-            return true;
         }
 
         return \is_array($this->required) && !\in_array($fieldName, $this->required, true);

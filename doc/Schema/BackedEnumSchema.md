@@ -94,7 +94,7 @@ enum HttpMethod: string
 
 $requestSchema = $p->object([
     'method' => $p->backedEnum(HttpMethod::class),
-    'url' => $p->string()->url(),
+    'url' => $p->string()->uri(),
     'body' => $p->string()->nullable(),
 ]);
 ```
@@ -130,7 +130,7 @@ enum OrderStatus: string
 }
 
 $orderSchema = $p->object([
-    'id' => $p->string()->uuidV4(),
+    'id' => $p->string()->uuid(),
     'status' => $p->backedEnum(OrderStatus::class),
     'items' => $p->array($p->object([...])),
 ]);

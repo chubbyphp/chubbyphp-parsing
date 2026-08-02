@@ -18,7 +18,6 @@ use Chubbyphp\Parsing\Schema\FloatSchema;
 use Chubbyphp\Parsing\Schema\IfThenElseSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LazySchema;
-use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\NotSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\OneOfSchema;
@@ -194,25 +193,6 @@ final class ParserTest extends TestCase
         });
 
         self::assertInstanceOf(LazySchema::class, $lazySchema);
-    }
-
-    public function testLiteral(): void
-    {
-        $p = new Parser();
-
-        error_clear_last();
-
-        $literalSchema = $p->literal('person');
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use Chubbyphp\Parsing\Schema\ConstSchema instead', $lastError['message']);
-
-        self::assertInstanceOf(LiteralSchema::class, $literalSchema);
     }
 
     public function testNot(): void

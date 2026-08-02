@@ -85,7 +85,7 @@ $sortSchema->parse([
 ### Scores or Counts
 
 ```php
-$scoresSchema = $p->record($p->int()->nonNegative());
+$scoresSchema = $p->record($p->int()->minimum(0));
 
 $scoresSchema->parse([
     'player1' => 100,
@@ -100,7 +100,7 @@ $scoresSchema->parse([
 $metadataSchema = $p->record($p->string());
 
 $documentSchema = $p->object([
-    'id' => $p->string()->uuidV4(),
+    'id' => $p->string()->uuid(),
     'content' => $p->string(),
     'metadata' => $metadataSchema,
 ]);

@@ -157,7 +157,7 @@ Parse operations collect all validation errors, not just the first one:
 $schema = $p->object([
     'name' => $p->string()->minLength(3),
     'email' => $p->string()->email(),
-    'age' => $p->int()->positive(),
+    'age' => $p->int()->exclusiveMinimum(0),
 ]);
 
 try {

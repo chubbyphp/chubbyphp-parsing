@@ -172,8 +172,7 @@ $usernameSchema->parse('  John_Doe123  '); // Returns: 'john_doe123'
 | `string.uriTemplate` | Invalid URI template format |
 | `string.jsonPointer` | Invalid JSON pointer format |
 | `string.relativeJsonPointer` | Invalid relative JSON pointer format |
-| `string.uuidV4` | Invalid UUID v4 format |
-| `string.uuidV5` | Invalid UUID v5 format |
+| `string.uuid` | Invalid UUID format |
 | `string.bool` | Cannot convert string to bool (for `toBool()`) |
 | `string.float` | Cannot convert string to float (for `toFloat()`) |
 | `string.int` | Cannot convert string to int (for `toInt()`) |

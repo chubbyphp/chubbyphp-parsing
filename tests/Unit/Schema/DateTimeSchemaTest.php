@@ -233,7 +233,7 @@ final class DateTimeSchemaTest extends TestCase
     {
         $input = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
 
-        $schema = (new DateTimeSchema())->toInt()->positive();
+        $schema = (new DateTimeSchema())->toInt()->exclusiveMinimum(0);
 
         self::assertSame($input->getTimestamp(), $schema->parse($input));
     }

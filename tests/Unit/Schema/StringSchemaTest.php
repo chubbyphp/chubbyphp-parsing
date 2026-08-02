@@ -382,52 +382,6 @@ final class StringSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidIncludes(): void
-    {
-        $input = 'example';
-
-        error_clear_last();
-
-        $schema = (new StringSchema())->includes('amp');
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use contains($contains) instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidIncludes(): void
-    {
-        $input = 'example';
-
-        $schema = (new StringSchema())->includes('lee');
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'string.includes',
-                        'template' => '{{given}} does not include {{includes}}',
-                        'variables' => [
-                            'includes' => 'lee',
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
     public function testParseWithValidStartsWith(): void
     {
         $input = 'example';
@@ -552,51 +506,6 @@ final class StringSchemaTest extends TestCase
                     'error' => [
                         'code' => 'string.hostname',
                         'template' => 'Invalid hostname {{given}}',
-                        'variables' => [
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
-    public function testParseWithValidDomain(): void
-    {
-        $input = 'example.com';
-
-        error_clear_last();
-
-        $schema = (new StringSchema())->domain();
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use hostname() instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidDomain(): void
-    {
-        $input = 'example..com';
-
-        $schema = (new StringSchema())->domain();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'string.domain',
-                        'template' => 'Invalid domain {{given}}',
                         'variables' => [
                             'given' => $input,
                         ],
@@ -1064,63 +973,6 @@ final class StringSchemaTest extends TestCase
         }
     }
 
-    public function testParseWithMatchWithInvalidPattern(): void
-    {
-        try {
-            (new StringSchema())->match('test');
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid match "test" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidMatch(): void
-    {
-        $input = 'aBcDeFg';
-
-        error_clear_last();
-
-        $schema = (new StringSchema())->match('/^[a-z]+$/i');
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use pattern($pattern) instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidMatch(): void
-    {
-        $input = 'a1B2C3d4';
-
-        $schema = (new StringSchema())->match('/^[a-z]+$/i');
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'string.match',
-                        'template' => '{{given}} does not match {{match}}',
-                        'variables' => [
-                            'match' => '/^[a-z]+$/i',
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
     public function testParseWithPatternWithInvalidPattern(): void
     {
         try {
@@ -1169,63 +1021,6 @@ final class StringSchemaTest extends TestCase
                         'template' => '{{given}} does not pattern {{pattern}}',
                         'variables' => [
                             'pattern' => '/^[a-z]+$/i',
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
-    public function testParseWithRegexpWithInvalidPattern(): void
-    {
-        try {
-            (new StringSchema())->regexp('test');
-
-            throw new \Exception('code should not be reached');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('Invalid regexp "test" given', $e->getMessage());
-        }
-    }
-
-    public function testParseWithValidRegexp(): void
-    {
-        $input = 'aBcDeFg';
-
-        error_clear_last();
-
-        $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use pattern($pattern) instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidRegexp(): void
-    {
-        $input = 'a1B2C3d4';
-
-        $schema = (new StringSchema())->regexp('/^[a-z]+$/i');
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'string.regexp',
-                        'template' => '{{given}} does not regexp {{regexp}}',
-                        'variables' => [
-                            'regexp' => '/^[a-z]+$/i',
                             'given' => $input,
                         ],
                     ],
@@ -1406,51 +1201,6 @@ final class StringSchemaTest extends TestCase
                     'error' => [
                         'code' => 'string.uri',
                         'template' => 'Invalid uri {{given}}',
-                        'variables' => [
-                            'given' => $input,
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
-    public function testParseWithValidUrl(): void
-    {
-        $input = 'https://localhost';
-
-        error_clear_last();
-
-        $schema = (new StringSchema())->url();
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use uri() instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidUrl(): void
-    {
-        $input = 'test';
-
-        $schema = (new StringSchema())->url();
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'string.url',
-                        'template' => 'Invalid url {{given}}',
                         'variables' => [
                             'given' => $input,
                         ],
@@ -1962,24 +1712,6 @@ final class StringSchemaTest extends TestCase
                 'f47ac10b58cc4372a5670e02b2c3d479',
             ],
         ];
-    }
-
-    public function testParseWithValidUuidV4(): void
-    {
-        $input = '960b0533-da17-42d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuidV4();
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithValidUuidV5(): void
-    {
-        $input = '960b0533-da17-52d8-a0a4-dd2ab7213caf';
-
-        $schema = (new StringSchema())->uuidV5();
-
-        self::assertSame($input, $schema->parse($input));
     }
 
     public function testParseWithTrim(): void

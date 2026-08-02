@@ -30,15 +30,6 @@ $schema->multipleOf(0.5); // Multiple of 0.5 (JSON Schema allows a non-integer m
 `multipleOf` uses exact decimal math (following the JSON Schema specification: division
 by this keyword's value results in an integer), shared with [FloatSchema](FloatSchema.md).
 
-### Sign Constraints
-
-```php
-$schema->positive();    // Must be > 0
-$schema->nonNegative(); // Must be >= 0
-$schema->negative();    // Must be < 0
-$schema->nonPositive(); // Must be <= 0
-```
-
 ## Conversions
 
 ```php
@@ -52,11 +43,11 @@ $schema->toString();   // Convert to string
 ### Positive Integer
 
 ```php
-$positiveSchema = $p->int()->positive();
+$positiveSchema = $p->int()->exclusiveMinimum(0);
 
 $positiveSchema->parse(42);  // Returns: 42
-$positiveSchema->parse(0);   // Throws: positive validation error
-$positiveSchema->parse(-1);  // Throws: positive validation error
+$positiveSchema->parse(0);   // Throws: exclusiveMinimum validation error
+$positiveSchema->parse(-1);  // Throws: exclusiveMinimum validation error
 ```
 
 ### Range Validation
@@ -72,8 +63,8 @@ $ageSchema->parse(200); // Throws: maximum validation error
 ### Pagination
 
 ```php
-$offsetSchema = $p->int()->nonNegative();
-$limitSchema = $p->int()->positive()->maximum(100);
+$offsetSchema = $p->int()->minimum(0);
+$limitSchema = $p->int()->exclusiveMinimum(0)->maximum(100);
 
 $paginationSchema = $p->object([
     'offset' => $offsetSchema,
@@ -84,7 +75,7 @@ $paginationSchema = $p->object([
 ### Unix Timestamp to DateTime
 
 ```php
-$timestampSchema = $p->int()->positive()->toDateTime();
+$timestampSchema = $p->int()->exclusiveMinimum(0)->toDateTime();
 
 $date = $timestampSchema->parse(1705744500);
 // Returns: DateTimeImmutable instance for 2024-01-20T09:15:00+00:00

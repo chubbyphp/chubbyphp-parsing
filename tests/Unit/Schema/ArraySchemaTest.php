@@ -226,52 +226,6 @@ final class ArraySchemaTest extends TestCase
         );
     }
 
-    public function testParseWithValidLength(): void
-    {
-        $input = ['test', 'test', 'test', 'test'];
-
-        error_clear_last();
-
-        $schema = (new ArraySchema(new StringSchema()))->length(4);
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use exactItems($exactItems) instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidLength(): void
-    {
-        $input = ['test', 'test', 'test', 'test'];
-
-        $schema = (new ArraySchema(new StringSchema()))->length(5);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'array.length',
-                        'template' => 'Length {{length}}, {{given}} given',
-                        'variables' => [
-                            'length' => 5,
-                            'given' => \count($input),
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
     public function testParseWithValidExactItems(): void
     {
         $input = ['test', 'test', 'test', 'test'];
@@ -308,52 +262,6 @@ final class ArraySchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidMinLength(): void
-    {
-        $input = ['test', 'test', 'test', 'test'];
-
-        error_clear_last();
-
-        $schema = (new ArraySchema(new StringSchema()))->minLength(4);
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use minItems($minItems) instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidMinLength(): void
-    {
-        $input = ['test', 'test', 'test', 'test'];
-
-        $schema = (new ArraySchema(new StringSchema()))->minLength(5);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'array.minLength',
-                        'template' => 'Min length {{min}}, {{given}} given',
-                        'variables' => [
-                            'minLength' => 5,
-                            'given' => \count($input),
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
     public function testParseWithValidMinItems(): void
     {
         $input = ['test', 'test', 'test', 'test'];
@@ -382,52 +290,6 @@ final class ArraySchemaTest extends TestCase
                         'template' => 'Min items {{minItems}}, {{given}} given',
                         'variables' => [
                             'minItems' => 5,
-                            'given' => \count($input),
-                        ],
-                    ],
-                ],
-            ], $errorsException->errors->jsonSerialize());
-        }
-    }
-
-    public function testParseWithValidMaxLength(): void
-    {
-        $input = ['test', 'test', 'test', 'test'];
-
-        error_clear_last();
-
-        $schema = (new ArraySchema(new StringSchema()))->maxLength(4);
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use maxItems($maxItems) instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidMaxLength(): void
-    {
-        $input = ['test', 'test', 'test', 'test'];
-
-        $schema = (new ArraySchema(new StringSchema()))->maxLength(3);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame([
-                [
-                    'path' => '',
-                    'error' => [
-                        'code' => 'array.maxLength',
-                        'template' => 'Max length {{max}}, {{given}} given',
-                        'variables' => [
-                            'maxLength' => 3,
                             'given' => \count($input),
                         ],
                     ],
@@ -885,111 +747,6 @@ final class ArraySchemaTest extends TestCase
         }
     }
 
-    public function testParseWithValidIncludes(): void
-    {
-        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
-        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
-
-        $input = [$dateTime1, $dateTime2];
-
-        error_clear_last();
-
-        $schema = (new ArraySchema(new DateTimeSchema()))->includes($dateTime2);
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_DEPRECATED, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Use contains($contains, $strict) instead', $lastError['message']);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithValidIncludesWithEqualButNotSame(): void
-    {
-        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
-        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
-
-        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
-
-        $input = [$dateTime1, $dateTime2];
-
-        $schema = (new ArraySchema(new DateTimeSchema()))->includes($dateTime2Equal, false);
-
-        self::assertSame($input, $schema->parse($input));
-    }
-
-    public function testParseWithInvalidIncludesWithEqualButNotSame(): void
-    {
-        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
-        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
-
-        $dateTime2Equal = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
-
-        $input = [$dateTime1, $dateTime2];
-
-        $schema = (new ArraySchema(new DateTimeSchema()))->includes($dateTime2Equal);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame(
-                [
-                    [
-                        'path' => '',
-                        'error' => [
-                            'code' => 'array.includes',
-                            'template' => '{{given}} does not include {{includes}}',
-                            'variables' => [
-                                'includes' => json_decode(json_encode($dateTime2Equal), true),
-                                'given' => json_decode(json_encode($input), true),
-                            ],
-                        ],
-                    ],
-                ],
-                $errorsException->errors->jsonSerialize()
-            );
-        }
-    }
-
-    public function testParseWithInvalidIncludes(): void
-    {
-        $dateTime1 = new \DateTimeImmutable('2024-01-20T09:15:00+00:00');
-        $dateTime2 = new \DateTimeImmutable('2024-01-21T09:15:00+00:00');
-        $dateTime3 = new \DateTimeImmutable('2024-01-22T09:15:00+00:00');
-
-        $input = [$dateTime1, $dateTime2];
-
-        $schema = (new ArraySchema(new DateTimeSchema()))->includes($dateTime3);
-
-        try {
-            $schema->parse($input);
-
-            throw new \Exception('code should not be reached');
-        } catch (ErrorsException $errorsException) {
-            self::assertSame(
-                [
-                    [
-                        'path' => '',
-                        'error' => [
-                            'code' => 'array.includes',
-                            'template' => '{{given}} does not include {{includes}}',
-                            'variables' => [
-                                'includes' => json_decode(json_encode($dateTime3), true),
-                                'given' => json_decode(json_encode($input), true),
-                            ],
-                        ],
-                    ],
-                ],
-                $errorsException->errors->jsonSerialize()
-            );
-        }
-    }
-
     public function testParseWithValidUniqueItems(): void
     {
         $input = [1, 2, 3];
@@ -1088,7 +845,7 @@ final class ArraySchemaTest extends TestCase
     {
         $input = [1, 2, 3];
 
-        $schema = (new ArraySchema(new IntSchema()))->contains((new IntSchema())->gt(2));
+        $schema = (new ArraySchema(new IntSchema()))->contains((new IntSchema())->exclusiveMinimum(2));
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -1097,7 +854,7 @@ final class ArraySchemaTest extends TestCase
     {
         $input = [1, 2, 3];
 
-        $schema = (new ArraySchema(new IntSchema()))->contains((new IntSchema())->gt(3));
+        $schema = (new ArraySchema(new IntSchema()))->contains((new IntSchema())->exclusiveMinimum(3));
 
         try {
             $schema->parse($input);
@@ -1127,7 +884,7 @@ final class ArraySchemaTest extends TestCase
     {
         $input = [1, 2, 3, 4];
 
-        $schema = (new ArraySchema(new IntSchema()))->minContains((new IntSchema())->gte(2), 3);
+        $schema = (new ArraySchema(new IntSchema()))->minContains((new IntSchema())->minimum(2), 3);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -1136,7 +893,7 @@ final class ArraySchemaTest extends TestCase
     {
         $input = [1, 2, 3, 4];
 
-        $schema = (new ArraySchema(new IntSchema()))->minContains((new IntSchema())->gte(3), 3);
+        $schema = (new ArraySchema(new IntSchema()))->minContains((new IntSchema())->minimum(3), 3);
 
         try {
             $schema->parse($input);
@@ -1168,7 +925,7 @@ final class ArraySchemaTest extends TestCase
     {
         $input = [1, 2, 3, 4];
 
-        $schema = (new ArraySchema(new IntSchema()))->maxContains((new IntSchema())->gte(3), 2);
+        $schema = (new ArraySchema(new IntSchema()))->maxContains((new IntSchema())->minimum(3), 2);
 
         self::assertSame($input, $schema->parse($input));
     }
@@ -1177,7 +934,7 @@ final class ArraySchemaTest extends TestCase
     {
         $input = [1, 2, 3, 4];
 
-        $schema = (new ArraySchema(new IntSchema()))->maxContains((new IntSchema())->gte(2), 2);
+        $schema = (new ArraySchema(new IntSchema()))->maxContains((new IntSchema())->minimum(2), 2);
 
         try {
             $schema->parse($input);

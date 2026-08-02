@@ -94,9 +94,9 @@ $rangeSchema->parse([10, 100]);
 
 ```php
 $recordSchema = $p->tuple([
-    $p->string()->uuidV4(),  // ID
+    $p->string()->uuid(),  // ID
     $p->string(),            // Name
-    $p->int()->nonNegative(), // Count
+    $p->int()->minimum(0), // Count
     $p->bool(),              // Active
 ]);
 

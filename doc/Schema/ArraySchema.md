@@ -43,9 +43,9 @@ $schema->maxContains(5, 2); // Value 5 may appear at most twice
 With a schema (json schema spec), the items valid against that schema are counted:
 
 ```php
-$schema->contains($p->int()->gt(5)); // At least one item must be an int greater than 5
-$schema->minContains($p->int()->gt(5), 2); // At least two items must be ints greater than 5
-$schema->maxContains($p->int()->gt(5), 2); // At most two items may be ints greater than 5
+$schema->contains($p->int()->exclusiveMinimum(5)); // At least one item must be an int greater than 5
+$schema->minContains($p->int()->exclusiveMinimum(5), 2); // At least two items must be ints greater than 5
+$schema->maxContains($p->int()->exclusiveMinimum(5), 2); // At most two items may be ints greater than 5
 ```
 
 Uniqueness follows json (schema spec) equality: numbers with the same mathematical value
@@ -132,7 +132,7 @@ $tagsSchema = $p->array($p->string()->trim()->minLength(1))
 ```php
 $usersSchema = $p->array(
     $p->object([
-        'id' => $p->int()->positive(),
+        'id' => $p->int()->exclusiveMinimum(0),
         'name' => $p->string()->minLength(1),
         'email' => $p->string()->email(),
     ])
