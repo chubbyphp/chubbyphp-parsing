@@ -123,7 +123,7 @@ abstract class AbstractSchemaInnerParse implements SchemaInterface
      * Normalizes a value so that json (schema spec) equal values share the same
      * representation: integral floats within the json safe integer range (2 ** 53, same as
      * Number.MAX_SAFE_INTEGER) are equal to their integer counterpart (1.0 equals 1),
-     * objects (associative arrays) are sorted by their property names, as the property
+     * objects (associative arrays / \stdClass) are sorted by their property names, as the property
      * order does not matter.
      */
     final protected static function normalizeJson(mixed $value): mixed
@@ -132,7 +132,7 @@ abstract class AbstractSchemaInnerParse implements SchemaInterface
             return (int) $value;
         }
 
-        if (\is_object($value)) {
+        if ($value instanceof \stdClass) {
             $value = (array) $value;
         }
 

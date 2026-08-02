@@ -16,6 +16,16 @@ use Chubbyphp\Parsing\Schema\SchemaInterface;
 use Chubbyphp\Parsing\Schema\StringSchema;
 use PHPUnit\Framework\TestCase;
 
+final class SampleA
+{
+    public int $a = 1;
+}
+
+final class SampleB
+{
+    public int $a = 1;
+}
+
 /**
  * @covers \Chubbyphp\Parsing\Schema\ArraySchema
  *
@@ -1417,6 +1427,17 @@ final class ArraySchemaTest extends TestCase
                 ],
             ], $errorsException->errors->jsonSerialize());
         }
+    }
+
+    public function testParseWithValidUniqueItemsWithEqualPropertiesOnObjectsOfDifferentClasses(): void
+    {
+        // objects other than \stdClass keep their class identity: equal property
+        // values on different classes are not duplicates
+        $input = [new SampleA(), new SampleB()];
+
+        $schema = (new ArraySchema($this->identitySchema()))->uniqueItems();
+
+        self::assertSame($input, $schema->parse($input));
     }
 
     public function testParseWithInvalidUniqueItemsWithResources(): void
