@@ -438,19 +438,12 @@ final class ArraySchema extends AbstractSchemaInnerParse implements SchemaInterf
 
     private static function itemMatches(mixed $item, mixed $contains, bool $strict): bool
     {
-        if ($contains instanceof SchemaInterface) {
-            return $contains->safeParse($item)->success;
-        }
-
-        if (!$strict) {
-            return $item == $contains;
-        }
-
-        if (\is_object($item) || \is_object($contains)) {
-            return $item === $contains;
-        }
-
-        return self::normalizeJson($item) === self::normalizeJson($contains);
+        return match (true) {
+            $contains instanceof SchemaInterface => $contains->safeParse($item)->success,
+            !$strict => $item == $contains,
+            \is_object($item) || \is_object($contains) => $item === $contains,
+            default => self::normalizeJson($item) === self::normalizeJson($contains),
+        };
     }
 
     private static function containsVariable(mixed $contains): mixed
