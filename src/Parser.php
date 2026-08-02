@@ -21,6 +21,7 @@ use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\NotSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
+use Chubbyphp\Parsing\Schema\OneOfSchema;
 use Chubbyphp\Parsing\Schema\RecordSchema;
 use Chubbyphp\Parsing\Schema\RespectValidationSchema;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
@@ -134,6 +135,14 @@ final class Parser implements ParserInterface
     public function object(array $fieldNameToSchema, string $classname = \stdClass::class, bool $construct = false): ObjectSchema
     {
         return new ObjectSchema($fieldNameToSchema, $classname, $construct);
+    }
+
+    /**
+     * @param array<SchemaInterface> $schemas
+     */
+    public function oneOf(array $schemas): OneOfSchema
+    {
+        return new OneOfSchema($schemas);
     }
 
     public function record(SchemaInterface $fieldSchema): RecordSchema

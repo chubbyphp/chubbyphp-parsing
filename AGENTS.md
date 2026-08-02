@@ -87,6 +87,16 @@ Guidance for AI agents working on this codebase.
   empty schema list is vacuously valid (the spec's non-empty requirement is a
   document-level constraint for a compiler, not a parse-time concern). To validate
   and also populate, follow up with the populating schema in `postParse()`.
+- The JSON Schema `oneOf` keyword is covered by `oneOf($schemas)` (`OneOfSchema`),
+  while `union()` stays `anyOf` (first success wins) — don't add exactly-one semantics
+  to `union()`. `oneOf()` always evaluates every schema against the original input:
+  with exactly one match that schema's **output** is returned (unlike `allOf()`,
+  exactly-one means the applied coercion is unambiguous, so keeping the output is
+  safe); with no match every schema's errors are reported in schema order; with two
+  or more matches the single `oneOf.multipleMatch` error reports the matching indexes
+  and there are intentionally no inner errors (the schemas succeeded, same reasoning
+  as `not.match`). `discriminatedUnion()` remains the preferred encoding when a
+  discriminator exists (faster, better errors).
 - The JSON Schema `if`/`then`/`else` keywords are covered by `if($ifSchema)`
   (`IfThenElseSchema`) with the immutable `then()` / `else()` withers — optional
   configuration uses withers here like `rest()` / `propertyNames()` do, the constructor

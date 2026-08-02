@@ -21,6 +21,7 @@ use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\NotSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
+use Chubbyphp\Parsing\Schema\OneOfSchema;
 use Chubbyphp\Parsing\Schema\RecordSchema;
 use Chubbyphp\Parsing\Schema\RespectValidationSchema;
 use Chubbyphp\Parsing\Schema\StringSchema;
@@ -270,6 +271,15 @@ final class ParserTest extends TestCase
         self::assertTrue($constructReflection->getValue($objectSchema));
 
         self::assertInstanceOf(ObjectSchema::class, $objectSchema);
+    }
+
+    public function testOneOf(): void
+    {
+        $p = new Parser();
+
+        $oneOfSchema = $p->oneOf([$p->string(), $p->int()]);
+
+        self::assertInstanceOf(OneOfSchema::class, $oneOfSchema);
     }
 
     public function testRecord(): void

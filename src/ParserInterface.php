@@ -20,6 +20,7 @@ use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\NotSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchema;
 use Chubbyphp\Parsing\Schema\ObjectSchemaInterface;
+use Chubbyphp\Parsing\Schema\OneOfSchema;
 use Chubbyphp\Parsing\Schema\RecordSchema;
 use Chubbyphp\Parsing\Schema\SchemaInterface;
 use Chubbyphp\Parsing\Schema\StringSchema;
@@ -34,6 +35,7 @@ use Chubbyphp\Parsing\Schema\UnionSchema;
  * @method IfThenElseSchema if(SchemaInterface $ifSchema)
  * @method NotSchema        not(SchemaInterface $schema)
  * @method ObjectSchema     object(array<string, SchemaInterface> $fieldNameToSchema, class-string $classname = 'stdClass', bool $construct = false)
+ * @method OneOfSchema      oneOf(array<SchemaInterface> $schemas)
  */
 interface ParserInterface
 {
@@ -93,6 +95,11 @@ interface ParserInterface
      * @param class-string                   $classname
      */
     public function object(array $fieldNameToSchema, string $classname = \stdClass::class): ObjectSchema;
+
+    // /**
+    //  * @param array<SchemaInterface> $schemas
+    //  */
+    // public function oneOf(array $schemas): OneOfSchema;
 
     public function record(SchemaInterface $fieldSchema): RecordSchema;
 
