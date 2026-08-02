@@ -13,6 +13,7 @@ use Chubbyphp\Parsing\Schema\ConstSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
+use Chubbyphp\Parsing\Schema\IfThenElseSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
 use Chubbyphp\Parsing\Schema\NotSchema;
@@ -25,11 +26,12 @@ use Chubbyphp\Parsing\Schema\TupleSchema;
 use Chubbyphp\Parsing\Schema\UnionSchema;
 
 /**
- * @method AnySchema    any()
- * @method AssocSchema  assoc(array<string, SchemaInterface> $fieldNameToSchema)
- * @method ConstSchema  const(bool|float|int|string $const)
- * @method NotSchema    not(SchemaInterface $schema)
- * @method ObjectSchema object(array<string, SchemaInterface> $fieldNameToSchema, class-string $classname = 'stdClass', bool $construct = false)
+ * @method AnySchema        any()
+ * @method AssocSchema      assoc(array<string, SchemaInterface> $fieldNameToSchema)
+ * @method ConstSchema      const(bool|float|int|string $const)
+ * @method IfThenElseSchema if(SchemaInterface $ifSchema)
+ * @method NotSchema        not(SchemaInterface $schema)
+ * @method ObjectSchema     object(array<string, SchemaInterface> $fieldNameToSchema, class-string $classname = 'stdClass', bool $construct = false)
  */
 interface ParserInterface
 {
@@ -62,6 +64,8 @@ interface ParserInterface
     public function discriminatedUnion(array $objectSchemas, string $discriminatorFieldName): DiscriminatedUnionSchema;
 
     public function float(): FloatSchema;
+
+    // public function if(SchemaInterface $ifSchema): IfThenElseSchema;
 
     public function int(): IntSchema;
 

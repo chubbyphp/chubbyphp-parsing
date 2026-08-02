@@ -13,6 +13,7 @@ use Chubbyphp\Parsing\Schema\ConstSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
+use Chubbyphp\Parsing\Schema\IfThenElseSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
@@ -84,6 +85,11 @@ final class Parser implements ParserInterface
     public function float(): FloatSchema
     {
         return new FloatSchema();
+    }
+
+    public function if(SchemaInterface $ifSchema): IfThenElseSchema
+    {
+        return new IfThenElseSchema($ifSchema);
     }
 
     public function int(): IntSchema

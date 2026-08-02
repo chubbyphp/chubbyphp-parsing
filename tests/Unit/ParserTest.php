@@ -14,6 +14,7 @@ use Chubbyphp\Parsing\Schema\ConstSchema;
 use Chubbyphp\Parsing\Schema\DateTimeSchema;
 use Chubbyphp\Parsing\Schema\DiscriminatedUnionSchema;
 use Chubbyphp\Parsing\Schema\FloatSchema;
+use Chubbyphp\Parsing\Schema\IfThenElseSchema;
 use Chubbyphp\Parsing\Schema\IntSchema;
 use Chubbyphp\Parsing\Schema\LazySchema;
 use Chubbyphp\Parsing\Schema\LiteralSchema;
@@ -151,6 +152,15 @@ final class ParserTest extends TestCase
         $floatSchema = $p->float();
 
         self::assertInstanceOf(FloatSchema::class, $floatSchema);
+    }
+
+    public function testIf(): void
+    {
+        $p = new Parser();
+
+        $ifThenElseSchema = $p->if($p->string())->then($p->string())->else($p->int());
+
+        self::assertInstanceOf(IfThenElseSchema::class, $ifThenElseSchema);
     }
 
     public function testInt(): void

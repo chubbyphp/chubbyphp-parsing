@@ -68,11 +68,26 @@ Guidance for AI agents working on this codebase.
   meaningful under `allOf`/`$ref` composition, which the library deliberately has no
   equivalent of (shapes are merged in PHP via `getFieldToSchema()` before construction),
   so it degenerates to the covered `additionalProperties`; `if`/`then`/`else` conditional
-  shapes are expressed with `discriminatedUnion()` / `union()`; and pure annotations
+  shapes are covered by `if()` (see below), with `discriminatedUnion()` / `union()` as
+  the preferred encodings when a discriminator exists; and pure annotations
   (`title`, `description`, `examples`, `deprecated`, `readOnly`/`writeOnly`) have no
   validation semantics and are out of scope for a parsing library. With these, the JSON
   Schema object vocabulary is fully accounted for — a spec diff flagging any of them as
   "missing" is not a gap to fix.
+- The JSON Schema `if`/`then`/`else` keywords are covered by `if($ifSchema)`
+  (`IfThenElseSchema`) with the immutable `then()` / `else()` withers — optional
+  configuration uses withers here like `rest()` / `propertyNames()` do, the constructor
+  takes only the required condition (a constructor-arguments variant was tried and
+  reverted on purpose; the withers clone, so they are just as immutable). The `if`
+  schema is evaluated as a pure condition via `safeParse` — its
+  coercions/transformations never leak, the
+  chosen branch receives the **original input** (don't "optimize" by reusing the `if`
+  result). The applied branch schema's output is the result; an absent branch means no
+  constraint and the input is returned unchanged (json schema: absent `then`/`else` acts
+  as `true`). It produces no errors of its own — a failing branch propagates its errors
+  unchanged, so the instance paths stay correct; don't prefix them with a
+  `then`/`else` segment. For conditional shapes with a discriminator field,
+  `discriminatedUnion()` remains the preferred encoding (better errors).
 - The JSON Schema boolean schema `true` and the empty schema `{}` are covered by `any()`
   (`AnySchema`): it accepts every input — including `null`, without `nullable()` — and
   returns it unchanged; parsing itself can never fail and there are no error codes. It is
