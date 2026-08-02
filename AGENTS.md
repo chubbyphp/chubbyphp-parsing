@@ -100,6 +100,16 @@ Guidance for AI agents working on this codebase.
   into the output; don't "improve" it to return the wrapped schema's output. When it
   fails there are no inner errors to report (the wrapped schema succeeded), so the
   single `not.match` error is intentional, not a missing feature.
+- The JSON Schema `multipleOf` keyword allows non-integer values on integers
+  (`{"type": "integer", "multipleOf": 0.5}`): `IntSchema::multipleOf(int|float)` accepts
+  both and always routes through the exact decimal math shared with
+  `FloatSchema::multipleOf()` (`isMultipleOf()` / `toDigitsAndExponent()` on
+  `AbstractNumericSchema`, the common base of `IntSchema` and `FloatSchema` — numeric
+  helpers live there, not on `AbstractSchemaInnerParse`). There is deliberately no `%`
+  fast path for int
+  multiples and no `is_int` shortcut in `toDigitsAndExponent()` — `var_export()`
+  prints ints exactly, so both would be behaviorally equivalent branches that only
+  survive as mutants; don't add them back for "performance".
 - The JSON Schema `pattern` keyword is covered by `pattern($pattern, PatternDialect::ecma262)`:
   the delimiter-less ECMA-262 pattern is translated in `StringSchema::ecma262ToPcre()` —
   unescaped `~` delimiters are escaped respecting backslash runs, `(*UTF)` applies

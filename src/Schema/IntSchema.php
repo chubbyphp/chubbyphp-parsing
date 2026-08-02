@@ -7,7 +7,7 @@ namespace Chubbyphp\Parsing\Schema;
 use Chubbyphp\Parsing\Error;
 use Chubbyphp\Parsing\ErrorsException;
 
-final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterface
+final class IntSchema extends AbstractNumericSchema implements SchemaInterface
 {
     public const string ERROR_TYPE_CODE = 'int.type';
     public const string ERROR_TYPE_TEMPLATE = 'Type should be "int", {{given}} given';
@@ -119,16 +119,21 @@ final class IntSchema extends AbstractSchemaInnerParse implements SchemaInterfac
         });
     }
 
-    public function multipleOf(int $multipleOf): static
+    /**
+     * A float $multipleOf covers the json schema spec, which allows a non-integer
+     * multipleOf on integers ({"type": "integer", "multipleOf": 0.5}): the check uses
+     * the same exact decimal math as FloatSchema::multipleOf().
+     */
+    public function multipleOf(float|int $multipleOf): static
     {
-        if ($multipleOf <= 0) {
+        if (!is_finite($multipleOf) || $multipleOf <= 0) {
             throw new \InvalidArgumentException(
-                \sprintf('Argument #1 ($multipleOf) must be greater than 0, %s given', $multipleOf)
+                \sprintf('Argument #1 ($multipleOf) must be finite and greater than 0, %s given', $multipleOf)
             );
         }
 
         return $this->postParse(static function (int $int) use ($multipleOf) {
-            if (0 === $int % $multipleOf) {
+            if (self::isMultipleOf($int, $multipleOf)) {
                 return $int;
             }
 

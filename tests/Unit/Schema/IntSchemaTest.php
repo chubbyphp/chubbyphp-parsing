@@ -575,12 +575,76 @@ final class IntSchemaTest extends TestCase
         self::assertSame(6, $schema->parse($input));
     }
 
+    public function testParseWithValidFloatMultipleOf(): void
+    {
+        $input = 2;
+        $multipleOf = 0.4;
+
+        $schema = (new IntSchema())->multipleOf($multipleOf);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithValidFloatMultipleOfWithNegativeInput(): void
+    {
+        $input = -2;
+        $multipleOf = 0.4;
+
+        $schema = (new IntSchema())->multipleOf($multipleOf);
+
+        self::assertSame($input, $schema->parse($input));
+    }
+
+    public function testParseWithInvalidFloatMultipleOf(): void
+    {
+        $input = 3;
+        $multipleOf = 0.4;
+
+        $schema = (new IntSchema())->multipleOf($multipleOf);
+
+        try {
+            $schema->parse($input);
+
+            throw new \Exception('code should not be reached');
+        } catch (ErrorsException $errorsException) {
+            self::assertSame([
+                [
+                    'path' => '',
+                    'error' => [
+                        'code' => 'int.multipleOf',
+                        'template' => 'Value should be multiple of {{multipleOf}}, {{given}} given',
+                        'variables' => [
+                            'multipleOf' => $multipleOf,
+                            'given' => $input,
+                        ],
+                    ],
+                ],
+            ], $errorsException->errors->jsonSerialize());
+        }
+    }
+
     public function testMultipleOfWithInvalidMultipleOf(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Argument #1 ($multipleOf) must be greater than 0, 0 given');
+        $this->expectExceptionMessage('Argument #1 ($multipleOf) must be finite and greater than 0, 0 given');
 
         (new IntSchema())->multipleOf(0);
+    }
+
+    public function testMultipleOfWithInvalidFloatMultipleOf(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument #1 ($multipleOf) must be finite and greater than 0, 0 given');
+
+        (new IntSchema())->multipleOf(0.0);
+    }
+
+    public function testMultipleOfWithNotFiniteMultipleOf(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument #1 ($multipleOf) must be finite and greater than 0, INF given');
+
+        (new IntSchema())->multipleOf(INF);
     }
 
     public function testParseWithValidGte(): void

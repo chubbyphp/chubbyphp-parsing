@@ -24,7 +24,11 @@ $schema->exclusiveMinimum(5);   // Greater than 5
 $schema->exclusiveMaximum(10);  // Less than 10
 $schema->maximum(10); // Less than or equal to 10
 $schema->multipleOf(5); // Multiple of 5
+$schema->multipleOf(0.5); // Multiple of 0.5 (JSON Schema allows a non-integer multipleOf on integers)
 ```
+
+`multipleOf` uses exact decimal math (following the JSON Schema specification: division
+by this keyword's value results in an integer), shared with [FloatSchema](FloatSchema.md).
 
 ### Sign Constraints
 
