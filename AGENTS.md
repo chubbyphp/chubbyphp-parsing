@@ -50,30 +50,43 @@ Guidance for AI agents working on this codebase.
 - The JSON Schema `propertyNames` keyword is covered by `RecordSchema::propertyNames()`,
   which combined with a pattern also covers the common single-pattern `patternProperties`
   case. A multi-pattern `patternProperties` map (different value schemas per pattern) is
-  intentionally out of scope: its spec semantics require `allOf` (a key matching multiple
-  patterns must validate against all their schemas), and it can be composed from
-  `record(union([...]))` plus `propertyNames()` or a `postParse()` closure instead.
+  intentionally out of scope even now that `allOf()` exists (a key matching multiple
+  patterns must validate against all their schemas, but per-key pattern routing still
+  has no first-class expression), and it can be composed from `record(union([...]))`
+  plus `propertyNames()` or a `postParse()` closure instead.
 - The JSON Schema `prefixItems` combined with `items` (tuple prefix plus typed remainder)
   is covered by `TupleSchema::rest()`: extra indices are validated against the rest schema
   and kept in the output instead of failing with `tuple.additionalIndex`. The related
   `unevaluatedItems` keyword needs nothing for the same reason as `unevaluatedProperties`
-  (see below): without `allOf`/`$ref` composition it degenerates to the covered
+  (see below): without annotation-tracking composition it degenerates to the covered
   plain-tuple rejection / `rest()` cases.
 - The JSON Schema `dependentRequired` / `dependentSchemas` keywords ("if key A is
   present, key B must be too / the object must match an extra schema") are intentionally
-  not implemented as an API on `AssocSchema` / `ObjectSchema`: they compose cleanly with
-  a `postParse()` closure that throws an `ErrorsException`, which mirrors how Zod handles
+  not implemented as an API on `AssocSchema` / `ObjectSchema`: they compose with
+  `allOf([if(...)->then(...), ...])` (one presence-conditional per key) or a
+  `postParse()` closure that throws an `ErrorsException`, which mirrors how Zod handles
   them (`superRefine`, no native keyword) — too rare to earn a dedicated method. The
   related composition keywords need nothing either: `unevaluatedProperties` is only
-  meaningful under `allOf`/`$ref` composition, which the library deliberately has no
-  equivalent of (shapes are merged in PHP via `getFieldToSchema()` before construction),
-  so it degenerates to the covered `additionalProperties`; `if`/`then`/`else` conditional
+  meaningful with annotation tracking across subschemas, which `allOf()` deliberately
+  does not do (it is pure validation; shapes are merged in PHP via `getFieldToSchema()`
+  before construction), so it degenerates to the covered `additionalProperties`;
+  `if`/`then`/`else` conditional
   shapes are covered by `if()` (see below), with `discriminatedUnion()` / `union()` as
   the preferred encodings when a discriminator exists; and pure annotations
   (`title`, `description`, `examples`, `deprecated`, `readOnly`/`writeOnly`) have no
   validation semantics and are out of scope for a parsing library. With these, the JSON
   Schema object vocabulary is fully accounted for — a spec diff flagging any of them as
   "missing" is not a gap to fix.
+- The JSON Schema `allOf` keyword is covered by `allOf($schemas)` (`AllOfSchema`):
+  every schema validates the **original input** — like `not()` it is pure validation,
+  the subschemas' coercions/transformations never leak and the input is returned
+  unchanged (don't chain outputs: the spec requires each subschema to see the
+  instance itself, and object schemas would drop each other's fields). Unlike
+  `union()`, which stops at the first success, every failing subschema contributes
+  its errors at unchanged instance paths, so all violations are reported at once. An
+  empty schema list is vacuously valid (the spec's non-empty requirement is a
+  document-level constraint for a compiler, not a parse-time concern). To validate
+  and also populate, follow up with the populating schema in `postParse()`.
 - The JSON Schema `if`/`then`/`else` keywords are covered by `if($ifSchema)`
   (`IfThenElseSchema`) with the immutable `then()` / `else()` withers — optional
   configuration uses withers here like `rest()` / `propertyNames()` do, the constructor

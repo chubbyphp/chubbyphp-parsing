@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Parsing;
 
+use Chubbyphp\Parsing\Schema\AllOfSchema;
 use Chubbyphp\Parsing\Schema\AnySchema;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\AssocSchema;
@@ -30,6 +31,14 @@ use Respect\Validation\Validatable;
 
 final class Parser implements ParserInterface
 {
+    /**
+     * @param array<SchemaInterface> $schemas
+     */
+    public function allOf(array $schemas): AllOfSchema
+    {
+        return new AllOfSchema($schemas);
+    }
+
     public function any(): AnySchema
     {
         return new AnySchema();

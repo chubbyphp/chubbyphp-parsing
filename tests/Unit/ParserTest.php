@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Tests\Parsing\Unit;
 
 use Chubbyphp\Parsing\Parser;
+use Chubbyphp\Parsing\Schema\AllOfSchema;
 use Chubbyphp\Parsing\Schema\AnySchema;
 use Chubbyphp\Parsing\Schema\ArraySchema;
 use Chubbyphp\Parsing\Schema\AssocSchema;
@@ -67,6 +68,15 @@ final readonly class ObjectConstructDemo implements \JsonSerializable
  */
 final class ParserTest extends TestCase
 {
+    public function testAllOf(): void
+    {
+        $p = new Parser();
+
+        $allOfSchema = $p->allOf([$p->string()->minLength(2), $p->string()->maxLength(4)]);
+
+        self::assertInstanceOf(AllOfSchema::class, $allOfSchema);
+    }
+
     public function testAny(): void
     {
         $p = new Parser();
