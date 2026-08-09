@@ -139,7 +139,7 @@ See [Error Handling](doc/ErrorHandling.md) for detailed documentation.
 
 - **Schema Types**: [doc/Schema/](doc/Schema/)
 - **Error Handling**: [doc/ErrorHandling.md](doc/ErrorHandling.md)
-- **Migration**: [1.x to 2.x](doc/Migration/1.x-2.x.md)
+- **Migration**: [1.x to 2.x](doc/Migration/1.x-2.x.md), [2.x to 3.x](doc/Migration/2.x-3.x.md)
 
 ## Copyright
 
