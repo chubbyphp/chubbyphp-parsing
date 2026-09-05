@@ -5,7 +5,7 @@ The `RespectValidationSchema` integrates the [Respect/Validation](https://github
 ## Installation
 
 ```sh
-composer require respect/validation "^2.4.10"
+composer require respect/validation "^2.5.0"
 ```
 
 ## Basic Usage

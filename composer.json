@@ -23,16 +23,16 @@
     },
     "require-dev": {
         "chubbyphp/chubbyphp-dev-helper": "dev-master",
-        "infection/infection": "^0.34.0",
+        "infection/infection": "^0.35.4",
         "php-coveralls/php-coveralls": "^2.9.1",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^2.2.5",
-        "phpunit/phpunit": "^12.5.30",
-        "respect/validation": "^2.4.12"
+        "phpstan/phpstan": "^2.2.13",
+        "phpunit/phpunit": "^12.5.34",
+        "respect/validation": "^2.5.0"
     },
     "suggest": {
         "ext-intl": "If your interested in using idnEmail() or idnHostname() of the StringSchema, please install the intl extension",
-        "respect/validation": "If your interested in using the respect/validation, please install it with ^2.4.12"
+        "respect/validation": "If your interested in using the respect/validation, please install it with ^2.5.0"
     },
     "autoload": {
         "psr-4": {
