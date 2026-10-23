@@ -23,11 +23,11 @@
     },
     "require-dev": {
         "chubbyphp/chubbyphp-dev-helper": "dev-master",
-        "infection/infection": "^0.35.4",
+        "infection/infection": "^0.35.8",
         "php-coveralls/php-coveralls": "^2.9.1",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^2.2.13",
-        "phpunit/phpunit": "^12.5.34",
+        "phpstan/phpstan": "^2.3.1",
+        "phpunit/phpunit": "^12.5.40",
         "respect/validation": "^2.5.0"
     },
     "suggest": {
